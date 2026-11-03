@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Noto+Sans+SC:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Noto+Sans+SC:wght@300;400;500&family=Space+Grotesk:wght@400;600&display=swap');
 
 :root {
     --bg-color: #0d0f12;
@@ -7,7 +7,7 @@
     --accent-color: #00e5ff;
     --accent-warn: #ffb700;
     --accent-danger: #ff3366;
-    --text-main: #e2e8f0;
+    --text-main: #d0d7de;
     --text-dim: #8a99ad;
     --font-ui: "Noto Sans SC", "Space Grotesk", -apple-system, sans-serif;
     --font-mono: "Fira Code", "Consolas", monospace;
@@ -23,13 +23,14 @@ body {
     background-color: var(--bg-color);
     color: var(--text-main);
     font-family: var(--font-ui);
+    font-weight: 300; /* 调细中文字体，解决太粗太稠问题 */
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
     transition: filter 0.8s ease;
-    line-height: 1.6;
-    letter-spacing: 0.3px;
+    line-height: 1.65;
+    letter-spacing: 0.5px;
 }
 
 body.stage-1 { filter: hue-rotate(10deg); }
@@ -118,7 +119,7 @@ body.stage-3 {
     border: none;
     border-radius: 6px;
     padding: 0.9rem;
-    font-weight: 700;
+    font-weight: 500;
     font-family: var(--font-ui);
     font-size: 1rem;
     cursor: pointer;
@@ -154,7 +155,7 @@ header {
     justify-content: center; font-weight: bold; color: #000;
     font-family: var(--font-mono);
 }
-.title-text { font-size: 1.15rem; font-weight: 700; letter-spacing: 0.5px; }
+.title-text { font-size: 1.15rem; font-weight: 500; letter-spacing: 0.5px; }
 .subtitle { font-size: 0.75rem; color: var(--text-dim); font-family: var(--font-mono); }
 .status-bar { display: flex; gap: 12px; font-size: 0.85rem; align-items: center; }
 .user-tag { background: rgba(0, 229, 255, 0.1); color: var(--accent-color); padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(0,229,255,0.3); font-family: var(--font-mono); }
@@ -199,7 +200,7 @@ button.search-btn {
     border: none;
     border-radius: 8px;
     padding: 0 1.8rem;
-    font-weight: 700;
+    font-weight: 500;
     font-family: var(--font-ui);
     cursor: pointer;
 }
@@ -223,9 +224,9 @@ button.search-btn {
 
 .result-meta { font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-color); margin-bottom: 8px; display: flex; justify-content: space-between; }
 .google-style .result-meta { color: #8ab4f8; }
-.result-title { font-size: 1.1rem; font-weight: 600; color: #58a6ff; margin-bottom: 8px; text-decoration: none; display: inline-block; cursor: pointer; }
+.result-title { font-size: 1.08rem; font-weight: 500; color: #58a6ff; margin-bottom: 8px; text-decoration: none; display: inline-block; cursor: pointer; }
 .result-title:hover { text-decoration: underline; }
-.result-snippet { font-size: 0.92rem; color: var(--text-main); line-height: 1.6; }
+.result-snippet { font-size: 0.9rem; font-weight: 300; color: #c9d1d9; line-height: 1.7; }
 .result-footer { margin-top: 12px; font-size: 0.78rem; color: var(--text-dim); font-family: var(--font-mono); }
 
 .tab-btn {
@@ -240,9 +241,9 @@ button.search-btn {
     backdrop-filter: blur(4px);
 }
 .modal-card { background: #161822; border: 1px solid var(--border-color); border-radius: 12px; max-width: 580px; width: 90%; padding: 1.8rem; }
-.modal-header { color: var(--accent-warn); font-weight: bold; margin-bottom: 1rem; font-family: var(--font-mono); }
+.modal-header { color: var(--accent-warn); font-weight: 500; margin-bottom: 1rem; font-family: var(--font-mono); }
 .modal-body { font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem; color: var(--text-main); }
-.modal-btn { background: rgba(255,255,255,0.08); border: 1px solid var(--border-color); color: #fff; width: 100%; padding: 0.8rem; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: var(--font-ui); margin-top: 8px; }
+.modal-btn { background: rgba(255,255,255,0.08); border: 1px solid var(--border-color); color: #fff; width: 100%; padding: 0.8rem; border-radius: 6px; font-weight: 500; cursor: pointer; font-family: var(--font-ui); margin-top: 8px; }
 .modal-btn.danger { border-color: var(--accent-danger); color: var(--accent-danger); }
 .modal-btn.danger:hover { background: rgba(255, 51, 102, 0.15); }
 
