@@ -28,52 +28,62 @@ function startRealTimeClock() {
     setInterval(updateClock, 1000);
 }
 
-// 登录框按下 Enter 回车键处理
+// 支持登录弹窗按下 Enter 回车键连接
 function handleAuthKeyPress(e) {
     if (e.keyCode === 13 || e.key === 'Enter') {
         login();
     }
 }
 
+// 严谨登录鉴权逻辑（禁用 guest 留空进入，去掉中二报错前缀）
 function login() {
     const userIn = document.getElementById('usernameInput').value.trim();
     const passIn = document.getElementById('passwordInput').value.trim();
     const errorMsg = document.getElementById('authErrorMsg');
 
-    let currentUser = "guest";
+    // 1. 禁用留空登录：如果不填用户名，直接阻止并提示
+    if (!userIn) {
+        errorMsg.style.color = "#ff3366";
+        errorMsg.innerText = `无法识别的终端身份代号！`;
+        return;
+    }
 
-    if (userIn) {
-        const lowerUser = userIn.toLowerCase();
-        if (window.accountDb[lowerUser]) {
-            if (window.accountDb[lowerUser].password && window.accountDb[lowerUser].password !== passIn) {
+    const lowerUser = userIn.toLowerCase();
+    let currentUser = "";
+
+    // 2. 检查预设数据库 accountDb
+    if (window.accountDb && window.accountDb[lowerUser]) {
+        if (window.accountDb[lowerUser].password && window.accountDb[lowerUser].password !== passIn) {
+            errorMsg.style.color = "#ff3366";
+            errorMsg.innerText = `口令不正确！`;
+            return; // 密码错误，阻止进入
+        }
+        currentUser = lowerUser;
+    } else {
+        // 3. 检查本地存储用户
+        let localUsers = JSON.parse(localStorage.getItem('gateway_users') || '{}');
+        if (localUsers[lowerUser]) {
+            if (localUsers[lowerUser].password !== passIn) {
                 errorMsg.style.color = "#ff3366";
-                errorMsg.innerText = `❌ 鉴权失败：口令不正确！`;
-                return;
+                errorMsg.innerText = `口令不正确！`;
+                return; // 密码错误，阻止进入
             }
             currentUser = lowerUser;
         } else {
-            let localUsers = JSON.parse(localStorage.getItem('gateway_users') || '{}');
-            if (localUsers[lowerUser]) {
-                if (localUsers[lowerUser].password !== passIn) {
-                    errorMsg.style.color = "#ff3366";
-                    errorMsg.innerText = `❌ 鉴权失败：口令不正确！`;
-                    return;
-                }
-            } else {
-                localUsers[lowerUser] = { password: passIn };
-                localStorage.setItem('gateway_users', JSON.stringify(localUsers));
-            }
-            currentUser = lowerUser;
+            // ❌ 不是已注册/预设账号，禁止进入！
+            errorMsg.style.color = "#ff3366";
+            errorMsg.innerText = `无法识别的终端身份代号！`;
+            return; // 阻止进入
         }
     }
 
+    // 鉴权通过，保存登录状态
     setCurrentUserId(currentUser);
     document.getElementById('authOverlay').style.display = 'none';
     
-    let pKey = window.accountDb[currentUser] ? window.accountDb[currentUser].profileKey : "guest";
+    let pKey = window.accountDb && window.accountDb[currentUser] ? window.accountDb[currentUser].profileKey : currentUser;
     
-    // 强制读取最新配置，防止读取旧的 localStorage 缓存
-    let profile = window.userProfiles[pKey] || {
+    let profile = (window.userProfiles && window.userProfiles[pKey]) || {
         name: currentUser.toUpperCase(),
         welcome: `欢迎，${currentUser}。已经为您成功建立 Gateway VPN 加密会话。`,
         consoleLog: `[SYSTEM DIAGNOSTIC START]\nUser Identity: ${currentUser}\nGateway Node: ACTIVE PROTOCOL`,
@@ -146,7 +156,7 @@ function executeSearch() {
     container.appendChild(createResultCard(googleCardData, 'google-style'));
 
     // 2. 专属暗号词
-    if (window.customUserResults[activeUser] && window.customUserResults[activeUser][lowerInput]) {
+    if (window.customUserResults && window.customUserResults[activeUser] && window.customUserResults[activeUser][lowerInput]) {
         const customItem = window.customUserResults[activeUser][lowerInput];
         container.appendChild(createResultCard(customItem, 'anomaly'));
     }
@@ -161,7 +171,9 @@ function executeSearch() {
     if (lowerInput.includes("dabiq") || lowerInput.includes("屠杀") || lowerInput.includes("周五")) matchedKeys.push("dabiq");
 
     matchedKeys.forEach(key => {
-        container.appendChild(createResultCard(window.database[key], 'anomaly'));
+        if (window.database && window.database[key]) {
+            container.appendChild(createResultCard(window.database[key], 'anomaly'));
+        }
     });
 
     // 4. 调用外部 notifications.js 弹窗逻辑
@@ -176,7 +188,6 @@ function createResultCard(data, styleClass) {
     
     const isDirect = data.isDirectUrl;
 
-    // 兼容优化：Google 标签原生跳转；暗网线索点击调用右侧滑动抽屉！
     if (isDirect) {
         card.innerHTML = `
             <div class="result-meta">
