@@ -64,6 +64,8 @@ function login() {
     document.getElementById('authOverlay').style.display = 'none';
     
     let pKey = window.accountDb[currentUser] ? window.accountDb[currentUser].profileKey : "guest";
+    
+    // 强制每次登录直接读取 players.js 中最新的干净名称，绝不读取旧的 localStorage 缓存
     let profile = window.userProfiles[pKey] || {
         name: currentUser.toUpperCase(),
         welcome: `欢迎，${currentUser}。已经为您成功建立 Gateway VPN 加密会话。`,
@@ -142,7 +144,7 @@ function executeSearch() {
         container.appendChild(createResultCard(customItem, 'anomaly'));
     }
 
-    // 3. 模组彩蛋关键词
+    // 3. 模组彩蛋关键词（包含 tafu 掌局者支持）
     let matchedKeys = [];
     if (lowerInput.includes("tafu") || lowerInput.includes("塔夫") || lowerInput.includes("掌局者")) matchedKeys.push("tafu");
     if (lowerInput.includes("mckay") || lowerInput.includes("麦凯") || lowerInput.includes("康奈尔")) matchedKeys.push("mckay");
@@ -179,14 +181,13 @@ function createResultCard(data, styleClass) {
     return card;
 }
 
-// 2. 修正后的隧道打开逻辑：防浏览器静默拦截 + 0.8s 界面加载动画
+// 核心跳转函数：用户点击同步瞬时打开空白页，播放 800ms 动画后重定向，完美绕过浏览器拦截
 function openPageTunnel(title, url, isDirect) {
     const loader = document.getElementById('loaderOverlay');
     const statusText = document.getElementById('loaderStatusText');
     
     let newTab = null;
     if (isDirect) {
-        // 在点击事件发生的同步瞬间立即开新标签页，避免触发浏览器的拦截机制
         newTab = window.open('about:blank', '_blank');
     }
 
@@ -196,7 +197,7 @@ function openPageTunnel(title, url, isDirect) {
     setTimeout(() => {
         loader.style.display = 'none';
         if (isDirect && newTab) {
-            newTab.location.href = url; // 800ms 动画播放完成后，把空白新页重定向至真实 Google 搜索页
+            newTab.location.href = url;
         } else {
             alert(`[Gateway VPN 提示]\n目标文件: ${title}\n状态: 档案已被本地安全协议锁存，无法访问外部服务器。`);
         }
@@ -256,7 +257,7 @@ function closeHistoryModal() {
     document.getElementById('historyModal').style.display = 'none';
 }
 
-// 页面一加载自动启动实时时钟
+// 绑定 DOMContentLoaded 自动启动时钟
 window.addEventListener('DOMContentLoaded', () => {
     startRealTimeClock();
 });
