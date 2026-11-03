@@ -100,30 +100,29 @@ function executeSearch() {
 
     const activeUser = getCurrentUserId();
 
-    // 记录到本地历史记录
     if (window.activeProfile && window.activeProfile.history) {
         if (!window.activeProfile.history.includes(input)) {
             window.activeProfile.history.unshift(input);
         }
     }
 
-    // 1. 始终生成第一个 Google 直达选项卡（去掉假词条）
+    // 1. 恒定第一个展示 Google 搜索卡片（修饰文案已去掉多余错字）
     const googleCardData = {
         title: `🌐 在 Google 上搜索: "${input}"`,
         domain: `https://www.google.com/search?q=${encodeURIComponent(input)}`,
-        snippet: `点击此处通过 Gateway VPN 通道在 Google 搜索引擎中获取全网关于“${input}”的最新搜索结果。`,
-        footer: "来源: Google Search Engine / Direct Tunnel",
+        snippet: `点击此处通过 Gateway VPN 通道直接打开 Google 搜索，调取全网关于“${input}”的即时公开资讯与网页数据。`,
+        footer: "来源: Google Search Engine / Gateway VPN Direct Tunnel",
         isDirectUrl: true
     };
     container.appendChild(createResultCard(googleCardData, 'google-style'));
 
-    // 2. 检查是否有特定账号下的专属彩蛋线索
+    // 2. 如果存在当前用户特定互打暗号结果（例如 tafu 搜 schnell）
     if (window.customUserResults[activeUser] && window.customUserResults[activeUser][lowerInput]) {
         const customItem = window.customUserResults[activeUser][lowerInput];
         container.appendChild(createResultCard(customItem, 'anomaly'));
     }
 
-    // 3. 检查是否有全局模组案宗文件（如 COOL / MCKAY 等）
+    // 3. 匹配预设的模组彩蛋关键词
     let matchedKeys = [];
     if (lowerInput.includes("mckay") || lowerInput.includes("麦凯") || lowerInput.includes("康奈尔")) matchedKeys.push("mckay");
     if (lowerInput.includes("cool") || lowerInput.includes("库尔") || lowerInput.includes("mit")) matchedKeys.push("cool");
@@ -134,6 +133,8 @@ function executeSearch() {
     matchedKeys.forEach(key => {
         container.appendChild(createResultCard(window.database[key], 'anomaly'));
     });
+
+    // 随机输入的关键词在这里不会添加任何维基百科卡片，直接保持只有上方 Google 卡片的效果。
 
     if (searchCount === 3) {
         triggerNotifyModal("【设备通知】\n收到来自个人通讯录的加密短信：'亲爱的，家里一切都好，你永远是对的。'\n\n(提示：请注意检查您的物理联系。)");
