@@ -16,13 +16,13 @@ const userProfiles = {
         name: "Peanut",
         welcome: "欢迎回来，Peanut。高密通道已成功建立，算法正在为您自动整理关联线索。",
         consoleLog: "[SYSTEM LOG]\nUser: Peanut\nGateway Protocol: SECURE_TUNNEL\nNote: 关联节点 Schnell 处于连线就绪状态。",
-        history: ["Schnell", "Gateway VPN 核心架构", "麻省理工学院 库尔教授"]
+        history: ["Schnell", "Gateway VPN 核心架构", "空军怎么办"]
     },
     "schnell": {
         name: "Schnell",
         welcome: "通道已链接，Schnell。加密签名对齐完毕。",
         consoleLog: "[SYSTEM LOG]\nUser: Schnell\nGateway Protocol: HIGH_PRIORITY\nNote: 绑定账号 Peanut。",
-        history: ["Peanut", "工业焊接高频谐振", "极右翼拖车公园监控"]
+        history: ["Peanut", "打不到松鸡可以用炸鸡骗过去吗", "Jolibee near me"]
     },
     "player1": {
         name: "Player 1",
