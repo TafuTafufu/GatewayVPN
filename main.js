@@ -35,13 +35,12 @@ function handleAuthKeyPress(e) {
     }
 }
 
-// 严谨登录鉴权逻辑（禁用 guest 留空进入，去掉中二报错前缀）
+// 严谨登录鉴权逻辑
 function login() {
     const userIn = document.getElementById('usernameInput').value.trim();
     const passIn = document.getElementById('passwordInput').value.trim();
     const errorMsg = document.getElementById('authErrorMsg');
 
-    // 1. 禁用留空登录：如果不填用户名，直接阻止并提示
     if (!userIn) {
         errorMsg.style.color = "#ff3366";
         errorMsg.innerText = `无法识别的终端身份代号！`;
@@ -51,33 +50,29 @@ function login() {
     const lowerUser = userIn.toLowerCase();
     let currentUser = "";
 
-    // 2. 检查预设数据库 accountDb
     if (window.accountDb && window.accountDb[lowerUser]) {
         if (window.accountDb[lowerUser].password && window.accountDb[lowerUser].password !== passIn) {
             errorMsg.style.color = "#ff3366";
             errorMsg.innerText = `口令不正确！`;
-            return; // 密码错误，阻止进入
+            return;
         }
         currentUser = lowerUser;
     } else {
-        // 3. 检查本地存储用户
         let localUsers = JSON.parse(localStorage.getItem('gateway_users') || '{}');
         if (localUsers[lowerUser]) {
             if (localUsers[lowerUser].password !== passIn) {
                 errorMsg.style.color = "#ff3366";
                 errorMsg.innerText = `口令不正确！`;
-                return; // 密码错误，阻止进入
+                return;
             }
             currentUser = lowerUser;
         } else {
-            // ❌ 不是已注册/预设账号，禁止进入！
             errorMsg.style.color = "#ff3366";
             errorMsg.innerText = `无法识别的终端身份代号！`;
-            return; // 阻止进入
+            return;
         }
     }
 
-    // 鉴权通过，保存登录状态
     setCurrentUserId(currentUser);
     document.getElementById('authOverlay').style.display = 'none';
     
@@ -299,7 +294,7 @@ window.addEventListener('DOMContentLoaded', () => {
     startRealTimeClock();
 });
 
-// 全局挂载导出
+// 全局导出挂载
 window.getCurrentUserId = getCurrentUserId;
 window.setCurrentUserId = setCurrentUserId;
 window.handleAuthKeyPress = handleAuthKeyPress;
