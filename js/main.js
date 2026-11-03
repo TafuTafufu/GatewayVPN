@@ -35,7 +35,7 @@ function handleAuthKeyPress(e) {
     }
 }
 
-// 登录鉴权逻辑
+// 登录鉴权逻辑（严谨校验 + 隐匿登录弹窗）
 function login() {
     const userIn = document.getElementById('usernameInput').value.trim();
     const passIn = document.getElementById('passwordInput').value.trim();
@@ -73,8 +73,12 @@ function login() {
         }
     }
 
+    // 保存身份状态并关闭弹窗
     setCurrentUserId(currentUser);
-    document.getElementById('authOverlay').style.display = 'none';
+    const authOverlay = document.getElementById('authOverlay');
+    if (authOverlay) {
+        authOverlay.style.display = 'none';
+    }
     
     let pKey = window.accountDb && window.accountDb[currentUser] ? window.accountDb[currentUser].profileKey : currentUser;
     
@@ -87,24 +91,35 @@ function login() {
 
     window.activeProfile = profile;
 
-    document.getElementById('currentUserTag').innerText = `身份: ${profile.name}`;
-    document.getElementById('consoleLogText').innerText = profile.consoleLog;
+    const userTag = document.getElementById('currentUserTag');
+    if (userTag) userTag.innerText = `身份: ${profile.name}`;
+    
+    const consoleText = document.getElementById('consoleLogText');
+    if (consoleText) consoleText.innerText = profile.consoleLog;
     
     renderWelcomeCard(profile.welcome);
 }
 
 function logout() {
     setCurrentUserId("visitor");
-    document.getElementById('authOverlay').style.display = 'flex';
-    document.getElementById('searchInput').value = '';
-    document.getElementById('authErrorMsg').style.color = 'var(--text-dim)';
-    document.getElementById('authErrorMsg').innerText = '说明：终端将建立高密加密隧道。';
+    const authOverlay = document.getElementById('authOverlay');
+    if (authOverlay) authOverlay.style.display = 'flex';
+    
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = '';
+    
+    const errorMsg = document.getElementById('authErrorMsg');
+    if (errorMsg) {
+        errorMsg.style.color = 'var(--text-dim)';
+        errorMsg.innerText = '说明：终端将建立高密加密隧道。';
+    }
     document.body.className = '';
     searchCount = 0;
 }
 
 function renderWelcomeCard(welcomeText) {
     const container = document.getElementById('resultsContainer');
+    if (!container) return;
     container.innerHTML = `
         <div class="result-card">
             <div class="result-meta">
@@ -123,10 +138,12 @@ function handleKeyPress(e) {
 }
 
 function executeSearch() {
-    const input = document.getElementById('searchInput').value.trim();
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) return;
+    const input = searchInput.value.trim();
     const lowerInput = input.toLowerCase();
     const container = document.getElementById('resultsContainer');
-    if (!input) return;
+    if (!input || !container) return;
 
     searchCount++;
     updateStageEffects();
@@ -140,7 +157,7 @@ function executeSearch() {
         }
     }
 
-    // 1. Google 搜索卡片（原生 <a> 标签跳转，绕过弹窗拦截）
+    // 1. Google 搜索卡片
     const googleCardData = {
         title: `🌐 在 Google 上搜索: "${input}"`,
         domain: `https://www.google.com/search?q=${encodeURIComponent(input)}`,
@@ -163,102 +180,4 @@ function executeSearch() {
     if (lowerInput.includes("mckay") || lowerInput.includes("麦凯") || lowerInput.includes("康奈尔")) matchedKeys.push("mckay");
     if (lowerInput.includes("cool") || lowerInput.includes("库尔") || lowerInput.includes("mit")) matchedKeys.push("cool");
     if (lowerInput.includes("king") || lowerInput.includes("维姬") || lowerInput.includes("金")) matchedKeys.push("king");
-    if (lowerInput.includes("wallace") || lowerInput.includes("罗伯特") || lowerInput.includes("沃尔斯")) matchedKeys.push("wallace");
-    if (lowerInput.includes("dabiq") || lowerInput.includes("屠杀") || lowerInput.includes("周五")) matchedKeys.push("dabiq");
-
-    matchedKeys.forEach(key => {
-        if (window.database && window.database[key]) {
-            container.appendChild(createResultCard(window.database[key], 'anomaly'));
-        }
-    });
-
-    // 4. 调用外部 notifications.js 弹窗逻辑
-    if (typeof checkTriggerNotifications === 'function') {
-        checkTriggerNotifications(activeUser, searchCount);
-    }
-}
-
-function createResultCard(data, styleClass) {
-    const card = document.createElement('div');
-    card.className = `result-card ${styleClass}`;
-    
-    const isDirect = data.isDirectUrl;
-
-    if (isDirect) {
-        card.innerHTML = `
-            <div class="result-meta">
-                <span>${data.domain}</span>
-                <span>GOOGLE SEARCH</span>
-            </div>
-            <a class="result-title" href="${data.domain}" target="_blank" style="text-decoration: none; color: inherit;">${data.title}</a>
-            <div class="result-snippet">${data.snippet}</div>
-            <div class="result-footer">${data.footer}</div>
-        `;
-    } else {
-        const encodedData = encodeURIComponent(JSON.stringify(data));
-        card.innerHTML = `
-            <div class="result-meta">
-                <span>${data.domain}</span>
-                <span>ENCRYPTED NODE</span>
-            </div>
-            <div class="result-title" style="cursor:pointer;" onclick="triggerCardAction('${encodedData}')">${data.title}</div>
-            <div class="result-snippet">${data.snippet}</div>
-            <div class="result-footer">${data.footer}</div>
-        `;
-    }
-    return card;
-}
-
-// 解密动画结束后，直接在页面中央渲染内嵌游戏视窗或提示
-function triggerCardAction(encodedData) {
-    const data = JSON.parse(decodeURIComponent(encodedData));
-    const loader = document.getElementById('loaderOverlay');
-    const statusText = document.getElementById('loaderStatusText');
-
-    if (loader && statusText) {
-        loader.style.display = 'flex';
-        statusText.innerText = `正在建立加密代理隧道，传输数据: ${data.title}...`;
-
-        setTimeout(() => {
-            loader.style.display = 'none';
-            // 如果是矮人模拟器/小游戏，直接在主界面渲染内嵌视窗！
-            if (data.domain && (data.domain.includes('/games/') || data.domain.includes('dwarf_adventure'))) {
-                renderGameInMainView(data);
-            } else if (typeof window.openDrawerWithData === 'function') {
-                window.openDrawerWithData(data);
-            } else {
-                alert(`想喝伊斯班克？带上梯子和手来见我！`);
-            }
-        }, 800);
-    } else {
-        if (data.domain && (data.domain.includes('/games/') || data.domain.includes('dwarf_adventure'))) {
-            renderGameInMainView(data);
-        } else if (typeof window.openDrawerWithData === 'function') {
-            window.openDrawerWithData(data);
-        }
-    }
-}
-
-// 在终端中央直接替换为小游戏仿真控制面板
-function renderGameInMainView(data) {
-    const container = document.getElementById('resultsContainer');
-    if (!container) return;
-
-    container.innerHTML = `
-        <div class="result-card anomaly" style="border-color: #00e5ff; background: rgba(0, 229, 255, 0.05); padding: 15px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(0, 229, 255, 0.3); padding-bottom: 8px;">
-                <span style="color: #00e5ff; font-weight: bold; font-size: 16px;">🎮 [虚拟终端内嵌程序]: ${data.title}</span>
-                <button onclick="goHome()" style="background: #ff3366; color: #fff; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">✖ 退出程序 (CLOSE)</button>
-            </div>
-            <div style="width: 100%; height: 500px; border: 1px solid #00e5ff; border-radius: 6px; overflow: hidden; background: #000; margin-bottom: 10px;">
-                <iframe src="games/dwarf_adventure/index.html" style="width: 100%; height: 100%; border: none;"></iframe>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; color: var(--text-dim); font-size: 12px;">
-                <span>${data.footer || "SYSTEM // MINI-GAME MODULE"}</span>
-                <a href="games/dwarf_adventure/index.html" target="_blank" style="color: #00e5ff; text-decoration: underline;">[在新窗口单独全屏打开]</a>
-            </div>
-        </div>
-    `;
-}
-
-function updateStageEffects()
+    if (lowerInput.includes("wallace") || lowerInput.includes("罗伯特") || lowerInput.includes("沃尔
