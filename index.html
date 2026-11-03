@@ -37,17 +37,18 @@
     </div>
 
     <header>
-        <!-- 点击 Logo 回到主页 -->
+        <!-- 点击 Logo 区域回到主页 -->
         <div class="logo-area" onclick="goHome()" style="cursor: pointer;">
             <div class="logo-icon">▲</div>
             <div>
                 <div class="title-text">Gateway VPN</div>
-                <!-- 已添加实时时间挂载容器 realTimeClock -->
+                <!-- 实时时间挂载容器 realTimeClock -->
                 <div class="subtitle">v2.4.18-p2 [已加密] <span id="realTimeClock" style="margin-left: 10px; color: var(--accent-color);"></span></div>
             </div>
         </div>
         <div class="status-bar">
             <div class="user-tag" id="currentUserTag">身份: 尚未登录</div>
+            <!-- [主页] 按钮 -->
             <button class="tab-btn" onclick="goHome()">[主页]</button>
             <button class="tab-btn" onclick="openHistoryModal()">[搜索历史]</button>
             <button class="tab-btn" onclick="logout()">[切换身份]</button>
@@ -63,12 +64,13 @@
             </div>
         </div>
 
+        <!-- 结果区域：搜索结果与内置小游戏视窗均在此渲染 -->
         <div class="results-section" id="resultsContainer"></div>
     </div>
 
     <div class="watermark">SECURE TERMINAL // GATEWAY VPN HIGH-SPEED TUNNEL</div>
 
-    <!-- 右侧滑动抽屉 (Side Drawer) - 用于展示案宗细节与 Handout 大图/内嵌小游戏 -->
+    <!-- 右侧滑动抽屉 (Side Drawer) - 用于展示案宗细节与 Handout 大图 -->
     <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
     <div class="side-drawer" id="sideDrawer">
         <div class="drawer-header">
@@ -119,7 +121,7 @@
         </div>
     </div>
 
-    <!-- 准确的脚本引用路径（带 js/ 子目录前缀并按正确依赖顺序加载） -->
+    <!-- 准确的脚本引用路径（统一带有 js/ 前缀） -->
     <script src="js/database.js"></script>
     <script src="js/players.js"></script>
     <script src="js/notifications.js"></script>
