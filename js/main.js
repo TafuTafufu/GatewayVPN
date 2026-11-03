@@ -156,9 +156,10 @@ function executeSearch() {
         container.appendChild(createResultCard(customItem, 'anomaly'));
     }
 
-    // 3. 模组彩蛋关键词（包含 tafu 掌局者支持）
+    // 3. 模组彩蛋关键词（包含 tafu 掌局者与 dwarf 小游戏支持）
     let matchedKeys = [];
     if (lowerInput.includes("tafu") || lowerInput.includes("塔夫") || lowerInput.includes("掌局者")) matchedKeys.push("tafu");
+    if (lowerInput.includes("dwarf") || lowerInput.includes("矮人")) matchedKeys.push("dwarf");
     if (lowerInput.includes("mckay") || lowerInput.includes("麦凯") || lowerInput.includes("康奈尔")) matchedKeys.push("mckay");
     if (lowerInput.includes("cool") || lowerInput.includes("库尔") || lowerInput.includes("mit")) matchedKeys.push("cool");
     if (lowerInput.includes("king") || lowerInput.includes("维姬") || lowerInput.includes("金")) matchedKeys.push("king");
@@ -277,7 +278,7 @@ function closeHistoryModal() {
     document.getElementById('historyModal').style.display = 'none';
 }
 
-// 返回主页功能（清空搜索框并重新渲染当前登录角色的初始欢迎页）
+// 返回主页功能（清空搜索框并重置初始卡片）
 function goHome() {
     const searchInput = document.getElementById('searchInput');
     if (searchInput) searchInput.value = '';
