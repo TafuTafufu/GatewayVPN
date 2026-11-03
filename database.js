@@ -1,22 +1,19 @@
 const customUserResults = {
     "peanut": {
-        "schnell": {
-            title: "【今日速报】",
-            domain: "aegis.gateway.internal/user/peanut/schnell-telemetry",
-            snippet: "Peanut 今日战利品：极品伊斯班克，全新标签，纯净如水！",
-            // 1. 将图片路径更换为图1（Ithbank）的本地图片路径或网络链接
-            image: "ithbank.png", 
-            detailText: "【战利品检视日志】\nPeanut 今日战利品：极品伊斯班克，全新标签，纯净如水！",
-            // 2. 将底部标签替换为你指定的三条标签
-            footer: "#我用了动物交谈药水  #幸好我跑的飞快 #奇怪今天城镇守卫怎么没来抓我"
-        }
-    },
+    "schnell": {
+        title: "【今日速报】",
+        domain: "aegis.gateway.internal/user/peanut/schnell-telemetry",
+        snippet: "来自异世界的二尺旋风为您带来问候！",
+        image: "Gardengnome.png",
+        footer: "#真的还能长 #两尺不是我的极限 #哎这是我家不是松鼠洞！！"
+    }
+},
     "schnell": {
         "peanut": {
             title: "【今日速报】",
             domain: "aegis.gateway.internal/user/schnell/peanut-telemetry",
             snippet: "Peanut 今日战利品：极品伊斯班克，全新标签，纯净如水！",
-            image: "images/ithbank.png",
+            image: "ithbank.png",
             detailText: "【战利品检视日志】\nPeanut 今日战利品：极品伊斯班克，全新标签，纯净如水！",
             footer: "#我用了动物交谈药水  #幸好我跑的飞快 #奇怪今天城镇守卫怎么没来抓我"
         }
