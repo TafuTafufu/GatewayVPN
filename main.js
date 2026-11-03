@@ -28,6 +28,13 @@ function startRealTimeClock() {
     setInterval(updateClock, 1000);
 }
 
+// 登录框按下 Enter 回车键处理
+function handleAuthKeyPress(e) {
+    if (e.keyCode === 13 || e.key === 'Enter') {
+        login();
+    }
+}
+
 function login() {
     const userIn = document.getElementById('usernameInput').value.trim();
     const passIn = document.getElementById('passwordInput').value.trim();
@@ -107,7 +114,7 @@ function renderWelcomeCard(welcomeText) {
 }
 
 function handleKeyPress(e) {
-    if (e.keyCode === 13) executeSearch();
+    if (e.keyCode === 13 || e.key === 'Enter') executeSearch();
 }
 
 function executeSearch() {
@@ -271,6 +278,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 window.getCurrentUserId = getCurrentUserId;
 window.setCurrentUserId = setCurrentUserId;
+window.handleAuthKeyPress = handleAuthKeyPress;
 window.login = login;
 window.logout = logout;
 window.executeSearch = executeSearch;
