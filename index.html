@@ -123,4 +123,505 @@
             transition: opacity 0.2s;
         }
 
-        .auth-btn:hover { opacity
+        .auth-btn:hover {
+            opacity: 0.9;
+        }
+
+        .auth-hint {
+            margin-top: 1.2rem;
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            line-height: 1.4;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 0.8rem;
+        }
+
+        header {
+            background-color: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--accent-color), #0066ff);
+            border-radius: 6px; display: flex; align-items: center;
+            justify-content: center; font-weight: bold; color: #000;
+            font-family: var(--font-mono);
+        }
+        .title-text { font-size: 1.1rem; font-weight: 600; }
+        .subtitle { font-size: 0.75rem; color: var(--text-dim); font-family: var(--font-mono); }
+        .status-bar { display: flex; gap: 12px; font-family: var(--font-mono); font-size: 0.85rem; align-items: center; }
+        .user-tag { background: rgba(0, 229, 255, 0.1); color: var(--accent-color); padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(0,229,255,0.3); }
+
+        .container {
+            max-width: 960px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+            flex: 1;
+        }
+
+        .search-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            margin-bottom: 2rem;
+        }
+
+        .search-box-wrapper { display: flex; gap: 12px; }
+        input[type="text"] {
+            flex: 1;
+            background: #090a0d;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem 1.2rem;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        input[type="text"]:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.15);
+        }
+        button.search-btn {
+            background: var(--accent-color);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            padding: 0 1.8rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .results-section { display: flex; flex-direction: column; gap: 1rem; }
+
+        .result-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.2rem;
+            position: relative;
+        }
+        .result-card.anomaly {
+            border-left: 4px solid var(--accent-color);
+            background: linear-gradient(90deg, rgba(0, 229, 255, 0.03) 0%, var(--panel-bg) 100%);
+        }
+        .result-card.google-style {
+            border-left: 4px solid #4285f4;
+        }
+
+        .result-meta { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-color); margin-bottom: 6px; display: flex; justify-content: space-between; }
+        .google-style .result-meta { color: #9aa0a6; }
+        .result-title { font-size: 1.05rem; font-weight: 600; color: #58a6ff; margin-bottom: 8px; text-decoration: none; display: inline-block; }
+        .result-snippet { font-size: 0.9rem; color: var(--text-main); line-height: 1.55; }
+        .result-footer { margin-top: 10px; font-size: 0.75rem; color: var(--text-dim); font-family: var(--font-mono); }
+
+        .tab-btn {
+            background: transparent; color: var(--text-dim); border: 1px solid var(--border-color);
+            padding: 6px 14px; font-size: 0.8rem; font-family: var(--font-mono); border-radius: 4px; cursor: pointer;
+        }
+        .tab-btn:hover { color: var(--accent-color); border-color: var(--accent-color); }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 999;
+            backdrop-filter: blur(4px);
+        }
+        .modal-card { background: #161822; border: 1px solid var(--border-color); border-radius: 12px; max-width: 580px; width: 90%; padding: 1.8rem; }
+        .modal-header { color: var(--accent-warn); font-family: var(--font-mono); font-weight: bold; margin-bottom: 1rem; }
+        .modal-body { font-size: 0.92rem; line-height: 1.6; margin-bottom: 1.5rem; color: var(--text-main); }
+        .modal-btn { background: rgba(255,255,255,0.08); border: 1px solid var(--border-color); color: #fff; width: 100%; padding: 0.8rem; border-radius: 6px; font-weight: bold; cursor: pointer; }
+
+        .console-card { background: #050608; border: 1px solid #2d3748; border-radius: 8px; font-family: var(--font-mono); color: #00e5ff; padding: 1.2rem; max-width: 720px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .console-log { font-size: 0.82rem; line-height: 1.45; white-space: pre-wrap; color: #a0aec0; }
+        .watermark { position: fixed; bottom: 12px; right: 18px; font-family: var(--font-mono); font-size: 0.7rem; color: rgba(255,255,255,0.12); pointer-events: none; }
+        
+        .history-list { list-style: none; margin-top: 10px; }
+        .history-item { background: #090a0d; padding: 8px 12px; border: 1px solid var(--border-color); margin-bottom: 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent-color); }
+    </style>
+</head>
+<body>
+
+    <!-- 身份认证/登录界面 -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-card">
+            <div class="auth-title">GATEWAY VPN ACCESS</div>
+            <div class="subtitle">请输入硬件凭证或终端身份代号</div>
+            <div class="form-group">
+                <label>USERNAME / USER IDENTITY</label>
+                <input type="text" id="usernameInput" placeholder="输入用户名 (如: Tafu / Wallace / Guest)">
+            </div>
+            <div class="form-group">
+                <label>PASSCODE</label>
+                <input type="password" id="passwordInput" placeholder="密码 (Tafu对应Schnell)">
+            </div>
+            <button class="auth-btn" onclick="login()">建立 VPN 隧道 (CONNECT)</button>
+            <div class="auth-hint" id="authErrorMsg">
+                说明：未预设账号提交后将自动注册（默认密码：123456）。
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="logo-area">
+            <div class="logo-icon">▲</div>
+            <div>
+                <div class="title-text">Gateway VPN</div>
+                <div class="subtitle">v2.4.18-p2 [高密通道协议已建立]</div>
+            </div>
+        </div>
+        <div class="status-bar">
+            <div class="user-tag" id="currentUserTag">身份: 尚未登录</div>
+            <button class="tab-btn" onclick="openHistoryModal()">[搜索历史]</button>
+            <button class="tab-btn" onclick="logout()">[切换身份]</button>
+            <button class="tab-btn" onclick="openConsole()">[检视抓包]</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="search-card">
+            <div class="search-box-wrapper">
+                <input type="text" id="searchInput" placeholder="在全域分布式网络与加密节点中检索..." onkeypress="handleKeyPress(event)">
+                <button class="search-btn" onclick="executeSearch()">全局检索</button>
+            </div>
+        </div>
+
+        <div class="results-section" id="resultsContainer">
+            <!-- 动态渲染搜索结果 -->
+        </div>
+    </div>
+
+    <div class="watermark">SECURE TERMINAL // GATEWAY VPN HIGH-SPEED TUNNEL</div>
+
+    <!-- Notification Modal -->
+    <div class="modal-overlay" id="notifyModal">
+        <div class="modal-card">
+            <div class="modal-header">⚠️ [系统同步通信提示]</div>
+            <div class="modal-body" id="modalText">通信收到...</div>
+            <button class="modal-btn" onclick="closeModal()">确认并忽略 (ACKNOWLEDGE)</button>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div class="modal-overlay" id="historyModal">
+        <div class="modal-card">
+            <div class="modal-header">📜 [当前账号本地加密检索缓存/搜索历史]</div>
+            <div class="modal-body">
+                <div id="historyContainer">暂无检索历史。</div>
+            </div>
+            <button class="modal-btn" onclick="closeHistoryModal()">关闭历史记录</button>
+        </div>
+    </div>
+
+    <!-- Forensics Console -->
+    <div class="modal-overlay" id="consoleModal">
+        <div class="console-card">
+            <div style="display:flex; justify-content:space-between; margin-bottom:12px; border-bottom:1px solid #2d3748; padding-bottom:6px;">
+                <span style="color:#00e5ff; font-weight:bold;">[固件抓包与底层电路报告]</span>
+                <span style="cursor:pointer; color:#ff3366;" onclick="closeConsole()">[关闭 ESC]</span>
+            </div>
+            <div class="console-log" id="consoleLogText"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let searchCount = 0;
+
+        const accountDb = {
+            "tafu": { password: "Schnell", profileKey: "tafu" },
+            "schnell": { password: "Tafu", profileKey: "schnell" },
+            "wallace": { password: "123456", profileKey: "wallace" },
+            "cool": { password: "mit2016", profileKey: "cool" },
+            "vicki": { password: "kick408", profileKey: "vicki" },
+            "guest": { password: "", profileKey: "guest" }
+        };
+
+        const userProfiles = {
+            "tafu": {
+                name: "Tafu [主控专属节点]",
+                welcome: "欢迎回来，Tafu。高密通道已成功建立，算法正在为您自动整理关联线索。",
+                consoleLog: "[SYSTEM LOG]\nUser: Tafu\nGateway Protocol: SECURE_TUNNEL\nNote: 关联节点 Schnell 处于连线就绪状态。",
+                history: ["Schnell", "Gateway VPN 核心架构", "麻省理工学院 库尔教授", "周五屠杀夜 视频提取"]
+            },
+            "schnell": {
+                name: "Schnell [高级协同节点]",
+                welcome: "通道已链接，Schnell。量子纠缠签名对齐完毕。",
+                consoleLog: "[SYSTEM LOG]\nUser: Schnell\nGateway Protocol: HIGH_PRIORITY\nNote: 绑定账号 Tafu。",
+                history: ["Tafu", "工业焊接高频谐振", "极右翼拖车公园监控", "班戈市网络日志"]
+            },
+            "wallace": {
+                name: "Robert Wallace [霜橡节点]",
+                welcome: "注意：已接入沃尔斯将军的私有服务器（Proliant dl380）。",
+                consoleLog: "[SYSTEM LOG]\nUser: Robert Wallace (General Wallace)\nNode: Frost Pine Trailer Park\nWarning: ANTIFA 数据流防御壁垒开启。",
+                history: [
+                    "ANTIFA 超级战士 威胁评估",
+                    "霜松拖车公园 极右翼抵抗运动",
+                    "惠普 Proliant dl380 服务器 硬件固件更新",
+                    "U盘 标签:表弟快醒醒 恢复代码"
+                ]
+            },
+            "cool": {
+                name: "Wesley Cool [麻省理工节点]",
+                welcome: "欢迎回来，库尔教授。系统正在对齐物理子结构交互算子...",
+                consoleLog: "[SYSTEM LOG]\nUser: Prof. Wesley Cool\nAccess Level: ROOT / ARCHITECT\nNote: 观测者偏置指数 99.4%。底层算子已绑定。",
+                history: ["《无主之谛》 论文出版前言", "博耶教授 戏剧系 协议设置", "维姬·金 门禁日志提取", "物理子结构 交互测试"]
+            },
+            "vicki": {
+                name: "Vicki King [踢泉镇节点]",
+                welcome: "高密通道建立。检测到高频电磁辐射环境。",
+                consoleLog: "[SYSTEM LOG]\nUser: Vicki King\nAccess Level: RESTRICTED\nWarning: 侦测到节点信号源重叠。",
+                history: ["踢泉镇 住宅查封 通知", "孪生姐妹 生理年龄异常 报告", "极高频电磁辐射 屏蔽罩"]
+            },
+            "guest": {
+                name: "GUEST / 访客账号",
+                welcome: "本软件通过底层微结构路由协议为您提供无痕访问体验。请输入案宗关键词或人员姓名开始检索。",
+                consoleLog: "[SYSTEM LOG]\nUser: Anonymous Guest\nAccess Level: STANDARD\nGateway Status: ACTIVE",
+                history: ["康奈尔大学 姐妹会枪案", "伊萨卡警方 物证鉴定"]
+            }
+        };
+
+        const database = {
+            "mckay": {
+                title: "康奈尔大学姐妹会枪案 - 嫌疑人布拉德利·麦凯 (Bradley McKay) 案宗记录",
+                domain: "ithaca-pd.gov/restricted/file-CAR-5-58",
+                snippet: "【物证鉴定与矛盾报告】嫌疑人麦凯使用无序列号的定制步枪(5.58mm口径)。其设备缓存中发现多张虐杀照片，显示数名女性在姐妹会解剖艾弗里·贝尔。然而警方物理核查确认：贝尔毫发无损，照片中的女性（加尔珀等）均具有绝对的不在场证明，且现场房间结构与照片严重不符。",
+                footer: "调阅来源: 伊萨卡警方刑事侦查科 / 证据物证室档案"
+            },
+            "cool": {
+                title: "麻省理工学院 (MIT) 韦斯利·库尔教授 (Prof. Wesley Cool) 人事与门禁卷宗",
+                domain: "mit.edu/math/faculty/cool_w_archive",
+                snippet: "【门禁与学术记录】库尔自2016年底后未有离开大楼的影像记录。其著作《无主之谛》(Meaning Without Master)探讨了‘观察者意识与物理子结构之交互’。邮件日志包含发给戏剧系博耶教授与研究生维姬·金的底层协议设置指南。系主任对其道德评价极低。",
+                footer: "状态: 麻省理工学院数学系教员档案 (目前状态异常)"
+            },
+            "king": {
+                title: "宾夕法尼亚州踢泉镇 (Kick Springs) 维姬·金 (Vicki King) 住宅封存记录",
+                domain: "county-registry.pa.gov/kicksprings/property_408",
+                snippet: "【住宅查封与监护通知】‘国家儿童与家庭服务局’通知表明该住宅已被查封。室内住有孪生姐妹艾琳与谢莉雅，虽然出生证明显示其生理年龄仅3岁，但现场两人已呈现出十几岁少女体征。主卧区域存在极高频电磁辐射与严重精神偏执痕迹。",
+                footer: "来源: 地方警长办事处 / 银行止赎通知外包档案"
+            },
+            "wallace": {
+                title: "缅因州班戈市 霜橡拖车公园 - 罗伯特·沃尔斯 (Robert Wallace) 监控简报",
+                domain: "bangor-pd.maine.gov/case_wallace_r",
+                snippet: "【情报记录】罗伯特·沃尔斯自称‘沃尔斯将军’，长期在‘霜松’区域从事极右翼抵抗活动。报告提及该区域面临‘ANTIFA超级战士’威逼。后院拖车影音柜后发现一台惠普 Proliant dl380 服务器（托管有定制数据节点），USB接口插有标签为‘表弟快醒醒’的U盘。",
+                footer: "来源: 缅因州地方执法记录 / 计算机网络日志"
+            },
+            "dabiq": {
+                title: "周五屠杀夜 (Friday Night Slaughter) 涉案枪手设备视频元数据分析",
+                domain: "counter-terrorism-db.gov/dabiq-media-stream",
+                snippet: "【异界圣战视频记录】两名携带‘神之和平·全球哈里发国’证件的枪手在球赛现场开火。设备中提取出达比格镇战场视频：B-21轰炸机投下的核弹在落地前化为盐粒，成千上万士兵凝滞。视频元数据创建于2121年（未来时间标记），音频语言为未知古老方言。",
+                footer: "来源: 纳尼亚联合工作组 (Working Group NARNIA) 证据库"
+            }
+        };
+
+        function login() {
+            const userIn = document.getElementById('usernameInput').value.trim();
+            const passIn = document.getElementById('passwordInput').value.trim();
+            const errorMsg = document.getElementById('authErrorMsg');
+
+            if (!userIn) {
+                currentUser = "guest";
+            } else {
+                const lowerUser = userIn.toLowerCase();
+                
+                if (accountDb[lowerUser]) {
+                    if (accountDb[lowerUser].password && accountDb[lowerUser].password !== passIn) {
+                        errorMsg.style.color = "#ff3366";
+                        errorMsg.innerText = `❌ 鉴权失败：密码错误！(提示：Tafu 与 Schnell 互为密钥)`;
+                        return;
+                    }
+                    currentUser = lowerUser;
+                } else {
+                    let localUsers = JSON.parse(localStorage.getItem('gateway_users') || '{}');
+                    if (localUsers[lowerUser]) {
+                        if (localUsers[lowerUser].password !== passIn) {
+                            errorMsg.style.color = "#ff3366";
+                            errorMsg.innerText = `❌ 鉴权失败：该注册账号密码不正确！`;
+                            return;
+                        }
+                    } else {
+                        localUsers[lowerUser] = { password: passIn || "123456" };
+                        localStorage.setItem('gateway_users', JSON.stringify(localUsers));
+                    }
+                    currentUser = lowerUser;
+                }
+            }
+
+            document.getElementById('authOverlay').style.display = 'none';
+            
+            let pKey = accountDb[currentUser] ? accountDb[currentUser].profileKey : "guest";
+            let profile = userProfiles[pKey] || {
+                name: `${currentUser.toUpperCase()} [自定义网关节点]`,
+                welcome: `欢迎，${currentUser}。已经为您成功建立 Gateway VPN 加密会话。`,
+                consoleLog: `[SYSTEM DIAGNOSTIC START]\nUser Identity: ${currentUser}\nGateway Node: ACTIVE PROTOCOL\nPower Strain Index: +380%`,
+                history: ["Gateway VPN 终端配置", "本地网络包侦听"]
+            };
+
+            window.activeProfile = profile;
+
+            document.getElementById('currentUserTag').innerText = `身份: ${profile.name}`;
+            document.getElementById('consoleLogText').innerText = profile.consoleLog;
+            
+            renderWelcomeCard(profile.welcome);
+        }
+
+        function logout() {
+            document.getElementById('authOverlay').style.display = 'flex';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('authErrorMsg').style.color = 'var(--text-dim)';
+            document.getElementById('authErrorMsg').innerText = '说明：未预设账号提交后将自动注册（默认密码：123456）。';
+            document.body.className = '';
+            searchCount = 0;
+        }
+
+        function renderWelcomeCard(welcomeText) {
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = `
+                <div class="result-card">
+                    <div class="result-meta">
+                        <span>GATEWAY-VPN-READY</span>
+                        <span>NODE #${Math.floor(Math.random()*900 + 100)}</span>
+                    </div>
+                    <div class="result-title">Gateway VPN 极速隐私网络网关</div>
+                    <div class="result-snippet">${welcomeText}</div>
+                    <div class="result-footer">提示：全域高密 VPN 节点已就绪。非暗网案宗检索将自动接驳真实 Google 索引。</div>
+                </div>
+            `;
+        }
+
+        function handleKeyPress(e) {
+            if (e.keyCode === 13) executeSearch();
+        }
+
+        function executeSearch() {
+            const input = document.getElementById('searchInput').value.trim();
+            const lowerInput = input.toLowerCase();
+            const container = document.getElementById('resultsContainer');
+            if (!input) return;
+
+            searchCount++;
+            updateStageEffects();
+            container.innerHTML = '';
+
+            if (window.activeProfile && window.activeProfile.history) {
+                if (!window.activeProfile.history.includes(input)) {
+                    window.activeProfile.history.unshift(input);
+                }
+            }
+
+            let matchedKeys = [];
+            if (lowerInput.includes("mckay") || lowerInput.includes("麦凯") || lowerInput.includes("康奈尔")) matchedKeys.push("mckay");
+            if (lowerInput.includes("cool") || lowerInput.includes("库尔") || lowerInput.includes("mit")) matchedKeys.push("cool");
+            if (lowerInput.includes("king") || lowerInput.includes("维姬") || lowerInput.includes("金")) matchedKeys.push("king");
+            if (lowerInput.includes("wallace") || lowerInput.includes("罗伯特") || lowerInput.includes("沃尔斯")) matchedKeys.push("wallace");
+            if (lowerInput.includes("dabiq") || lowerInput.includes("屠杀") || lowerInput.includes("周五")) matchedKeys.push("dabiq");
+
+            if (matchedKeys.length > 0) {
+                matchedKeys.forEach(key => {
+                    container.appendChild(createResultCard(database[key], 'anomaly'));
+                });
+            } else {
+                const googleResults = generateGoogleMockResults(input);
+                googleResults.forEach(item => {
+                    container.appendChild(createResultCard(item, 'google-style'));
+                });
+            }
+
+            if (searchCount === 3) {
+                triggerNotifyModal("【设备通知】\n收到来自个人通讯录的加密短信：'亲爱的，家里一切都好，你永远是对的。'\n\n(提示：请注意检查您的物理联系。)");
+            } else if (searchCount === 6) {
+                triggerNotifyModal("【硬件温度警告】\n检测到当前设备芯片温度升至 72°C。某些数据抓包可能在后台持续占用算力。");
+            }
+        }
+
+        function generateGoogleMockResults(query) {
+            const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            return [
+                {
+                    title: `🌐 [已建立全域 VPN 节点] 在 Google 上搜索: "${query}"`,
+                    domain: googleSearchUrl,
+                    snippet: `点击此处可直接打开 Gateway VPN 代理的真实 Google 搜索引擎页面，调取全网关于“${query}”的即时公开资讯与网页数据。`,
+                    footer: "来源: Google Search Engine / Gateway VPN Direct Tunnel",
+                    isDirectUrl: true
+                },
+                {
+                    title: `${query} - 维基百科，自由的百科全书`,
+                    domain: `https://zh.wikipedia.org/wiki/${encodeURIComponent(query)}`,
+                    snippet: `${query}（英文：${query}）通常指相关领域中的核心概念或事件。根据最新的公开学术文献与历史记载，该词条在现代信息学及社会学分析中具有多维度的解释……`,
+                    footer: "来源: Wikipedia / 开放知识库网关"
+                }
+            ];
+        }
+
+        function createResultCard(data, styleClass) {
+            const card = document.createElement('div');
+            card.className = `result-card ${styleClass}`;
+            
+            const targetHref = data.isDirectUrl ? data.domain : "#";
+            const targetAttr = data.isDirectUrl ? 'target="_blank"' : '';
+            const clickHandler = data.isDirectUrl ? '' : `onclick="alert('提示：当前暗网文件被 Gateway VPN 协议沙盒化保护。'); return false;"`;
+
+            card.innerHTML = `
+                <div class="result-meta">
+                    <span>${data.domain}</span>
+                    <span>${styleClass === 'anomaly' ? 'ENCRYPTED NODE' : 'GOOGLE / PUBLIC WEB'}</span>
+                </div>
+                <a class="result-title" href="${targetHref}" ${targetAttr} ${clickHandler}>${data.title}</a>
+                <div class="result-snippet">${data.snippet}</div>
+                <div class="result-footer">${data.footer}</div>
+            `;
+            return card;
+        }
+
+        function updateStageEffects() {
+            if (searchCount >= 6) document.body.className = 'stage-3';
+            else if (searchCount >= 3) document.body.className = 'stage-2';
+            else if (searchCount >= 1) document.body.className = 'stage-1';
+        }
+
+        function triggerNotifyModal(text) {
+            document.getElementById('modalText').innerText = text;
+            document.getElementById('notifyModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('notifyModal').style.display = 'none';
+        }
+
+        function openConsole() {
+            document.getElementById('consoleModal').style.display = 'flex';
+        }
+
+        function closeConsole() {
+            document.getElementById('consoleModal').style.display = 'none';
+        }
+
+        function openHistoryModal() {
+            const historyContainer = document.getElementById('historyContainer');
+            if (window.activeProfile && window.activeProfile.history && window.activeProfile.history.length > 0) {
+                let html = '<ul class="history-list">';
+                window.activeProfile.history.forEach(item => {
+                    html += `<li class="history-item">🔍 ${item}</li>`;
+                });
+                html += '</ul>';
+                historyContainer.innerHTML = html;
+            } else {
+                historyContainer.innerHTML = '暂无本地检索历史。';
+            }
+            document.getElementById('historyModal').style.display = 'flex';
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('historyModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
