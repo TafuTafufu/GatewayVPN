@@ -70,11 +70,12 @@ const database = {
         detailText: "【高维度图谱鉴定】\n视频帧逐帧解析显示，爆炸产生的冲击波在扩散至半径30米时出现了明显的帧率断层，盐粒化过程不符合已知热力学定律。",
         footer: "来源: 纳尼亚联合工作组 (Working Group NARNIA) 证据库"
     },
+    // 小游戏彩蛋词条（路径已为你更新为 games/dwarf_adventure/index.html）
     "dwarf": {
-        title: "【程序】矮人模拟器.exe",
-        domain: "aegis.gateway.internal/games/dwarf",
+        title: "【矮人模拟器】.exe",
+        domain: "aegis.gateway.internal/games/dwarf_adventure",
         snippet: "检测到像素协议数据包。点击展开右侧抽屉启动内置小游戏模拟器。",
-        detailText: "【小程序挂载成功】\n\n可以直接在右侧面板游玩，或点击链接在新窗口打开：\n<a href='games/dwarf.html' target='_blank' style='color:#00e5ff; font-weight:bold;'>[在新标签页全屏打开小游戏]</a>",
+        detailText: "【小程序挂载成功】\n\n可以直接在右侧面板游玩，或点击链接在新窗口打开：\n<a href='games/dwarf_adventure/index.html' target='_blank' style='color:#00e5ff; font-weight:bold;'>[在新标签页全屏打开小游戏]</a>",
         footer: "SYSTEM // MINI-GAME MODULE"
     }
 };
