@@ -3,10 +3,12 @@ const customUserResults = {
         "schnell": {
             title: "【今日速报】",
             domain: "aegis.gateway.internal/user/peanut/schnell-telemetry",
-            snippet: "来自异世界的二尺旋风为您带来问候！",
-            image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600",
-            detailText: "【协同节点传输文案】\n来自异世界的二尺旋风为您带来问候！\n\n数据包签名一致，通道状态正常。",
-            footer: "机密等级: ROOT ONLY / 独家解读权限"
+            snippet: "Peanut 今日战利品：极品伊斯班克，全新标签，纯净如水！",
+            // 1. 将图片路径更换为图1（Ithbank）的本地图片路径或网络链接
+            image: "images/ithbank.png", 
+            detailText: "【战利品检视日志】\nPeanut 今日战利品：极品伊斯班克，全新标签，纯净如水！",
+            // 2. 将底部标签替换为你指定的三条标签
+            footer: "#我用了动物交谈药水  #幸好我跑的飞快 #奇怪今天城镇守卫怎么没来抓我"
         }
     },
     "schnell": {
@@ -14,9 +16,9 @@ const customUserResults = {
             title: "【今日速报】",
             domain: "aegis.gateway.internal/user/schnell/peanut-telemetry",
             snippet: "Peanut 今日战利品：极品伊斯班克，全新标签，纯净如水！",
-            image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600",
+            image: "images/ithbank.png",
             detailText: "【战利品检视日志】\nPeanut 今日战利品：极品伊斯班克，全新标签，纯净如水！",
-            footer: "机密等级: ROOT ONLY / 独家解读权限"
+            footer: "#我用了动物交谈药水  #幸好我跑的飞快 #奇怪今天城镇守卫怎么没来抓我"
         }
     }
 };
