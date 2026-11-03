@@ -1,8 +1,3 @@
-// ============================
-// Gateway VPN - 数据库与彩蛋配置
-// ============================
-
-// 1. 预设账号与密钥（彩蛋密码）
 const accountDb = {
     "tafu": { password: "Schnell", profileKey: "tafu" },
     "schnell": { password: "Tafu", profileKey: "schnell" },
@@ -12,7 +7,6 @@ const accountDb = {
     "guest": { password: "", profileKey: "guest" }
 };
 
-// 2. 不同账号登录后的欢迎语与初始历史记录
 const userProfiles = {
     "tafu": {
         name: "Tafu [主控专属节点]",
@@ -57,7 +51,6 @@ const userProfiles = {
     }
 };
 
-// 3. 自定义特定账号专属搜索词条
 const customUserResults = {
     "tafu": {
         "schnell": {
@@ -77,7 +70,6 @@ const customUserResults = {
     }
 };
 
-// 4. 全局模组/暗网案宗数据库
 const database = {
     "mckay": {
         title: "康奈尔大学姐妹会枪案 - 嫌疑人布拉德利·麦凯 (Bradley McKay) 案宗记录",
