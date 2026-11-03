@@ -106,7 +106,7 @@ function executeSearch() {
         }
     }
 
-    // 1. 恒定第一个展示 Google 搜索卡片（修饰文案已去掉多余错字）
+    // 1. 恒定第一个展示 Google 搜索卡片
     const googleCardData = {
         title: `🌐 在 Google 上搜索: "${input}"`,
         domain: `https://www.google.com/search?q=${encodeURIComponent(input)}`,
@@ -116,7 +116,7 @@ function executeSearch() {
     };
     container.appendChild(createResultCard(googleCardData, 'google-style'));
 
-    // 2. 如果存在当前用户特定互打暗号结果（例如 tafu 搜 schnell）
+    // 2. 如果存在当前用户特定互打暗号结果（例如 peanut 搜 schnell）
     if (window.customUserResults[activeUser] && window.customUserResults[activeUser][lowerInput]) {
         const customItem = window.customUserResults[activeUser][lowerInput];
         container.appendChild(createResultCard(customItem, 'anomaly'));
@@ -134,12 +134,9 @@ function executeSearch() {
         container.appendChild(createResultCard(window.database[key], 'anomaly'));
     });
 
-    // 随机输入的关键词在这里不会添加任何维基百科卡片，直接保持只有上方 Google 卡片的效果。
-
-    if (searchCount === 3) {
-        triggerNotifyModal("【设备通知】\n收到来自个人通讯录的加密短信：'亲爱的，家里一切都好，你永远是对的。'\n\n(提示：请注意检查您的物理联系。)");
-    } else if (searchCount === 6) {
-        triggerNotifyModal("【硬件温度警告】\n检测到当前设备芯片温度升至 72°C。某些数据抓包可能在后台持续占用算力。");
+    // 4. 调用外部独立的弹窗检测机制
+    if (typeof checkTriggerNotifications === 'function') {
+        checkTriggerNotifications(activeUser, searchCount);
     }
 }
 
@@ -165,13 +162,18 @@ function openPageTunnel(title, url, isDirect) {
     const loader = document.getElementById('loaderOverlay');
     const statusText = document.getElementById('loaderStatusText');
     
+    let newTab = null;
+    if (isDirect) {
+        newTab = window.open('about:blank', '_blank');
+    }
+
     loader.style.display = 'flex';
     statusText.innerText = `正在建立加密代理隧道，传输数据: ${title}...`;
 
     setTimeout(() => {
         loader.style.display = 'none';
-        if (isDirect) {
-            window.open(url, '_blank');
+        if (isDirect && newTab) {
+            newTab.location.href = url;
         } else {
             alert(`[Gateway VPN 提示]\n目标文件: ${title}\n状态: 档案已被本地安全协议锁存，无法访问外部服务器。`);
         }
@@ -240,3 +242,4 @@ window.openConsole = openConsole;
 window.openHistoryModal = openHistoryModal;
 window.clearHistory = clearHistory;
 window.openPageTunnel = openPageTunnel;
+window.triggerNotifyModal = triggerNotifyModal;
