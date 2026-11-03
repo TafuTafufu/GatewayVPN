@@ -1,13 +1,13 @@
 const customUserResults = {
     "peanut": {
-    "schnell": {
-        title: "【今日速报】",
-        domain: "aegis.gateway.internal/user/peanut/schnell-telemetry",
-        snippet: "来自异世界的二尺旋风为您带来问候！",
-        image: "assets/Gardengnome.png",
-        footer: "#真的还能长 #两尺不是我的极限 #哎这是我家不是松鼠洞！！"
-    }
-},
+        "schnell": {
+            title: "【今日速报】",
+            domain: "aegis.gateway.internal/user/peanut/schnell-telemetry",
+            snippet: "来自异世界的二尺旋风为您带来问候！",
+            image: "assets/Gardengnome.png",
+            footer: "#真的还能长 #两尺不是我的极限 #哎这是我家不是松鼠洞！！"
+        }
+    },
     "schnell": {
         "peanut": {
             title: "【今日速报】",
@@ -26,7 +26,7 @@ const database = {
         title: "档案分类: Delta Green 掌局者 / 局外观察者 (Tafu)",
         domain: "aegis.gateway.internal/classified/handler-tafu-overview",
         snippet: "作为掌握异常真相与剧本走向的掌局者（Handler），其在幕后操纵着所有现实算力与数据线的交错。请时刻保持警惕，你所经历的一切并非偶然，而是早已被观测与规划好的网格。",
-        image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600", // 👈 这里换成你的 Handout 图片路径
+        image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600",
         detailText: "【详细解密档案】\n掌局者（Handler）不仅负责调度绿色三角洲的特别行动小组，还掌握着整个系统的底层协议。在过去的多次行动报告中，凡是试图破解其真实身份的操作，均触发了物理层面的逻辑坍坍。",
         footer: "来源: 局外高维观察者档案 / 权限锁定: CLEARANCE Delta"
     },
@@ -34,7 +34,7 @@ const database = {
         title: "康奈尔大学姐妹会枪案 - 嫌疑人布拉德利·麦凯 (Bradley McKay) 案宗记录",
         domain: "ithaca-pd.gov/restricted/file-CAR-5-58",
         snippet: "【物证鉴定与矛盾报告】嫌疑人麦凯使用无序列号的定制步枪(5.58mm口径)。其设备缓存中发现多张虐杀照片，显示数名女性在姐妹会解剖艾弗里·贝尔。然而警方物理核查确认：贝尔毫发无损，照片中的女性（加尔珀等）均具有绝对的不在场证明，且现场房间结构与照片严重不符。",
-        image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600", // 👈 案宗照片线索
+        image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600",
         detailText: "【深层次证据链分析】\n现场提取到多张高清晰度拍立得照片。值得注意的是，照片物证的底片呈现出严重的电磁辐射灼痕。伊萨卡警方物证科认为图像存在高度人为伪造或非欧几何透视倾斜。",
         footer: "调阅来源: 伊萨卡警方刑事侦查科 / 证据物证室档案"
     },
@@ -51,7 +51,7 @@ const database = {
         domain: "county-registry.pa.gov/kicksprings/property_408",
         snippet: "【住宅查封与监护通知】‘国家儿童与家庭服务局’通知表明该住宅已被查封。室内住有孪生姐妹艾琳与谢莉雅，虽然出生证明显示其生理年龄仅3岁，但现场两人已呈现出十几岁少女体征。主卧区域存在极高频电磁辐射与严重精神偏执痕迹。",
         image: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=600",
-        detailText: "【现场现场搜查报告】\n住宅主卧墙壁贴满了带有屏蔽金箔的报纸。辐射检测仪在靠近壁橱区域时读数剧烈飙升，地下室入口被用电焊接死。",
+        detailText: "【现场搜查报告】\n住宅主卧墙壁贴满了带有屏蔽金箔的报纸。辐射检测仪在靠近壁橱区域时读数剧烈飙升，地下室入口被用电焊接死。",
         footer: "来源: 地方警长办事处 / 银行止赎通知外包档案"
     },
     "wallace": {
@@ -69,6 +69,13 @@ const database = {
         image: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=600",
         detailText: "【高维度图谱鉴定】\n视频帧逐帧解析显示，爆炸产生的冲击波在扩散至半径30米时出现了明显的帧率断层，盐粒化过程不符合已知热力学定律。",
         footer: "来源: 纳尼亚联合工作组 (Working Group NARNIA) 证据库"
+    },
+    "dwarf": {
+        title: "【程序】矮人模拟器.exe",
+        domain: "aegis.gateway.internal/games/dwarf",
+        snippet: "检测到像素协议数据包。点击展开右侧抽屉启动内置小游戏模拟器。",
+        detailText: "【小程序挂载成功】\n\n可以直接在右侧面板游玩，或点击链接在新窗口打开：\n<a href='games/dwarf.html' target='_blank' style='color:#00e5ff; font-weight:bold;'>[在新标签页全屏打开小游戏]</a>",
+        footer: "SYSTEM // MINI-GAME MODULE"
     }
 };
 
