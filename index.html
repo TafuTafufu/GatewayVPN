@@ -8,7 +8,7 @@
 </head>
 <body>
 
-    <!-- 模拟高密隧道解密跳转动画 -->
+    <!-- 模拟加密隧道解密跳转动画 -->
     <div class="loader-overlay" id="loaderOverlay">
         <div class="spinner"></div>
         <div id="loaderStatusText">正在解密数据流...</div>
@@ -29,7 +29,7 @@
             </div>
             <button class="auth-btn" onclick="login()">连接 (CONNECT)</button>
             <div class="auth-hint" id="authErrorMsg">
-                说明：终端将建立高密量子隧道。
+                说明：终端将建立高密加密隧道。
             </div>
         </div>
     </div>
@@ -72,7 +72,7 @@
         </div>
     </div>
 
-    <!-- 搜索历史弹窗（含清除按钮） -->
+    <!-- 搜索历史弹窗 -->
     <div class="modal-overlay" id="historyModal">
         <div class="modal-card">
             <div class="modal-header">📜 [当前账号本地加密检索缓存/搜索历史]</div>
@@ -95,7 +95,7 @@
         </div>
     </div>
 
-    <!-- 加载脚本文件 -->
+    <!-- 脚本加载 -->
     <script src="database.js"></script>
     <script src="main.js"></script>
 </body>
