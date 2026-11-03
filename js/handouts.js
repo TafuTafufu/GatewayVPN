@@ -5,8 +5,8 @@
  */
 
 /**
- * 方式一：打开右侧滑动抽屉 (Side Drawer) 并加载 Handout 图文细节
- * @param {Object|string} inputData - 包含 title, detailText, image, footer 等字段的对象（或 JSON 字符串）
+ * 方式一：打开右侧滑动抽屉 (Side Drawer) 并加载 Handout 图文细节或内嵌小游戏
+ * @param {Object|string} inputData - 包含 title, detailText, image, domain, footer 等字段的对象（或 JSON 字符串）
  */
 function openDrawerWithData(inputData) {
     let data = inputData;
@@ -23,28 +23,48 @@ function openDrawerWithData(inputData) {
     const drawer = document.getElementById('sideDrawer');
     const overlay = document.getElementById('drawerOverlay');
     const imgEl = document.getElementById('drawerImage');
+    const contentEl = document.getElementById('drawerContent');
     
-    if (!drawer || !overlay) {
-        console.warn("未找到侧边抽屉 DOM 容器 (#sideDrawer / #drawerOverlay)");
+    if (!drawer || !overlay || !contentEl) {
+        console.warn("未找到侧边抽屉 DOM 容器 (#sideDrawer / #drawerOverlay / #drawerContent)");
         return;
     }
 
-    // 写入标题与长文描述
+    // 写入标题与页脚元数据
     document.getElementById('drawerTitle').innerText = data.title || "CLASSIFIED FILE // 机密线索";
-    document.getElementById('drawerContent').innerText = data.detailText || data.snippet || "无额外详情记录。";
     
     const footerEl = document.getElementById('drawerFooterMeta');
     if (footerEl) {
         footerEl.innerText = data.footer || "来源: GATEWAY INTERNAL DB";
     }
 
-    // 加载 Handout 图片
-    if (data.image) {
-        imgEl.src = data.image;
-        imgEl.style.display = 'inline-block';
-    } else {
-        imgEl.style.display = 'none';
-        imgEl.src = '';
+    // 1. 判断是否为内嵌小游戏 / HTML 独立页面挂载请求
+    if (data.domain && (data.domain.includes('/games/') || data.domain.includes('dwarf_adventure'))) {
+        // 隐藏静态图片
+        if (imgEl) imgEl.style.display = 'none';
+        
+        // 构建内嵌 iframe 容器，在右侧抽屉直接运行小游戏
+        contentEl.innerHTML = `
+            <div style="margin-bottom: 12px; font-size: 13px; color: #a0aec0; line-height: 1.6; white-space: pre-line;">
+                ${data.detailText || data.snippet || ''}
+            </div>
+            <div style="width: 100%; height: 320px; border: 1px solid #00e5ff; border-radius: 6px; overflow: hidden; background: #000;">
+                <iframe src="games/dwarf_adventure/index.html" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+        `;
+    } 
+    // 2. 普通 Handout 线索（富文本/长描述 + 图片）
+    else {
+        contentEl.innerText = data.detailText || data.snippet || "无额外详情记录。";
+
+        // 加载 Handout 图片
+        if (data.image) {
+            imgEl.src = data.image;
+            imgEl.style.display = 'inline-block';
+        } else {
+            imgEl.style.display = 'none';
+            imgEl.src = '';
+        }
     }
 
     // 展开展屏
