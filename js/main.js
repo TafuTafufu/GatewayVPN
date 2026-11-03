@@ -209,7 +209,7 @@ function createResultCard(data, styleClass) {
     return card;
 }
 
-// 点击线索卡片，经过 0.8 秒解密动画后拉出右侧 Handout 抽屉
+// 点击线索卡片，经过 0.8 秒解密动画后拉出右侧 Handout 抽屉或挂载小游戏
 function triggerCardAction(encodedData) {
     const data = JSON.parse(decodeURIComponent(encodedData));
     const loader = document.getElementById('loaderOverlay');
