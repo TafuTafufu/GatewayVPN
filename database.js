@@ -1,56 +1,3 @@
-const accountDb = {
-    "peanut": { password: "Tiefling", profileKey: "peanut" },
-    "schnell": { password: "Ithbank", profileKey: "schnell" },
-    "wallace": { password: "123456", profileKey: "wallace" },
-    "cool": { password: "mit2016", profileKey: "cool" },
-    "vicki": { password: "kick408", profileKey: "vicki" },
-    "guest": { password: "", profileKey: "guest" }
-};
-
-const userProfiles = {
-    "peanut": {
-        name: "Peanut [主控专属节点]",
-        welcome: "欢迎回来，Peanut。高密通道已成功建立，算法正在为您自动整理关联线索。",
-        consoleLog: "[SYSTEM LOG]\nUser: Peanut\nGateway Protocol: SECURE_TUNNEL\nNote: 关联节点 Schnell 处于连线就绪状态。",
-        history: ["Schnell", "Gateway VPN 核心架构", "麻省理工学院 库尔教授", "周五屠杀夜 视频提取"]
-    },
-    "schnell": {
-        name: "Schnell [高级协同节点]",
-        welcome: "通道已链接，Schnell。加密签名对齐完毕。",
-        consoleLog: "[SYSTEM LOG]\nUser: Schnell\nGateway Protocol: HIGH_PRIORITY\nNote: 绑定账号 Peanut。",
-        history: ["Peanut", "工业焊接高频谐振", "极右翼拖车公园监控", "班戈市网络日志"]
-    },
-    "wallace": {
-        name: "Robert Wallace [霜橡节点]",
-        welcome: "注意：已接入沃尔斯将军的私有服务器（Proliant dl380）。",
-        consoleLog: "[SYSTEM LOG]\nUser: Robert Wallace (General Wallace)\nNode: Frost Pine Trailer Park\nWarning: ANTIFA 数据流防御壁垒开启。",
-        history: [
-            "ANTIFA 超级战士 威胁评估",
-            "霜松拖车公园 极右翼抵抗运动",
-            "惠普 Proliant dl380 服务器 硬件固件更新",
-            "U盘 标签:表弟快醒醒 恢复代码"
-        ]
-    },
-    "cool": {
-        name: "Wesley Cool [麻省理工节点]",
-        welcome: "欢迎回来，库尔教授。系统正在对齐物理子结构交互算子...",
-        consoleLog: "[SYSTEM LOG]\nUser: Prof. Wesley Cool\nAccess Level: ROOT / ARCHITECT\nNote: 观测者偏置指数 99.4%。底层算子已绑定。",
-        history: ["《无主之谛》 论文出版前言", "博耶教授 戏剧系 协议设置", "维姬·金 门禁日志提取", "物理子结构 交互测试"]
-    },
-    "vicki": {
-        name: "Vicki King [踢泉镇节点]",
-        welcome: "高密通道建立。检测到高频电磁辐射环境。",
-        consoleLog: "[SYSTEM LOG]\nUser: Vicki King\nAccess Level: RESTRICTED\nWarning: 侦测到节点信号源重叠。",
-        history: ["踢泉镇 住宅查封 通知", "孪生姐妹 生理年龄异常 报告", "极高频电磁辐射 屏蔽罩"]
-    },
-    "guest": {
-        name: "GUEST / 访客账号",
-        welcome: "本软件通过底层微结构路由协议为您提供无痕访问体验。请输入案宗关键词或人员姓名开始检索。",
-        consoleLog: "[SYSTEM LOG]\nUser: Anonymous Guest\nAccess Level: STANDARD\nGateway Status: ACTIVE",
-        history: ["康奈尔大学 姐妹会枪案", "伊萨卡警方 物证鉴定"]
-    }
-};
-
 const customUserResults = {
     "peanut": {
         "schnell": {
@@ -71,6 +18,13 @@ const customUserResults = {
 };
 
 const database = {
+    // 所有人搜 Tafu 时均会触发的掌局者介绍
+    "tafu": {
+        title: "档案分类: Delta Green 掌局者 / 局外观察者 (Tafu)",
+        domain: "aegis.gateway.internal/classified/handler-tafu-overview",
+        snippet: "作为掌握异常真相与剧本走向的掌局者（Handler），其在幕后操纵着所有现实算力与数据线的交错。请时刻保持警惕，你所经历的一切并非偶然，而是早已被观测与规划好的网格。",
+        footer: "来源: 局外高维观察者档案 / 权限锁定: CLEARANCE Delta"
+    },
     "mckay": {
         title: "康奈尔大学姐妹会枪案 - 嫌疑人布拉德利·麦凯 (Bradley McKay) 案宗记录",
         domain: "ithaca-pd.gov/restricted/file-CAR-5-58",
@@ -103,7 +57,5 @@ const database = {
     }
 };
 
-window.accountDb = accountDb;
-window.userProfiles = userProfiles;
 window.customUserResults = customUserResults;
 window.database = database;
