@@ -39,7 +39,6 @@
             <div class="logo-icon">▲</div>
             <div>
                 <div class="title-text">Gateway VPN</div>
-                <!-- realTimeClock 挂载区域 -->
                 <div class="subtitle">v2.4.18-p2 [已加密] <span id="realTimeClock" style="margin-left: 10px; color: var(--accent-color);"></span></div>
             </div>
         </div>
@@ -64,10 +63,29 @@
 
     <div class="watermark">SECURE TERMINAL // GATEWAY VPN HIGH-SPEED TUNNEL</div>
 
-    <!-- 提示弹窗 -->
+    <!-- 方式一：右侧滑动抽屉 (Side Drawer) - 用于展示案宗细节与 Handout 大图 -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+    <div class="side-drawer" id="sideDrawer">
+        <div class="drawer-header">
+            <span class="drawer-title" id="drawerTitle">CLASSIFIED FILE // 机密线索</span>
+            <button class="drawer-close-btn" onclick="closeDrawer()">✕</button>
+        </div>
+        <div class="drawer-body">
+            <div class="handout-image-wrapper">
+                <img id="drawerImage" src="" alt="Handout Image" style="display: none;">
+            </div>
+            <div class="drawer-content" id="drawerContent"></div>
+            <div class="drawer-footer-meta" id="drawerFooterMeta"></div>
+        </div>
+    </div>
+
+    <!-- 方式二：带图片的通知弹窗 (Modal with Image) - 用于系统告警或插图提醒 -->
     <div class="modal-overlay" id="notifyModal">
         <div class="modal-card">
-            <div class="modal-header">⚠️ [系统同步通信提示]</div>
+            <div class="modal-header" id="modalTitle">⚠️ [系统同步通信提示]</div>
+            <div class="modal-image-wrapper">
+                <img id="modalImage" src="" alt="Notification Graphic" style="display: none;">
+            </div>
             <div class="modal-body" id="modalText">通信收到...</div>
             <button class="modal-btn" onclick="closeModal()">确认并忽略 (ACKNOWLEDGE)</button>
         </div>
@@ -96,10 +114,11 @@
         </div>
     </div>
 
-    <!-- 脚本加载 -->
+    <!-- 脚本按照清晰顺序加载 -->
     <script src="database.js"></script>
     <script src="players.js"></script>
     <script src="notifications.js"></script>
+    <script src="handouts.js"></script> <!-- 👈 专门处理图片抽屉与弹窗的新脚本 -->
     <script src="main.js"></script>
 </body>
 </html>
