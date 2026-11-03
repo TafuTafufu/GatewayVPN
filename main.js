@@ -8,7 +8,7 @@ function setCurrentUserId(userId) {
 
 let searchCount = 0;
 
-// 实时时间刷新功能
+// 1. 实时时间刷新功能
 function startRealTimeClock() {
     function updateClock() {
         const now = new Date();
@@ -169,51 +169,61 @@ function createResultCard(data, styleClass) {
     
     const isDirect = data.isDirectUrl;
 
-    // 核心优化：Google 链接直接采用标准的 <a> 标签跳转，彻底破除弹窗拦截器限制
-    const titleHtml = isDirect 
-        ? `<a class="result-title" href="${data.domain}" target="_blank" style="text-decoration: none; color: inherit;">${data.title}</a>`
-        : `<div class="result-title" onclick="openPageTunnel('${data.title}', '${data.domain}', false)">${data.title}</div>`;
-
-    card.innerHTML = `
-        <div class="result-meta">
-            <span>${data.domain}</span>
-            <span>${styleClass === 'anomaly' ? 'ENCRYPTED NODE' : 'GOOGLE SEARCH'}</span>
-        </div>
-        ${titleHtml}
-        <div class="result-snippet">${data.snippet}</div>
-        <div class="result-footer">${data.footer}</div>
-    `;
+    // 兼容优化：Google 标签原生跳转；暗网线索点击调用右侧滑动抽屉！
+    if (isDirect) {
+        card.innerHTML = `
+            <div class="result-meta">
+                <span>${data.domain}</span>
+                <span>GOOGLE SEARCH</span>
+            </div>
+            <a class="result-title" href="${data.domain}" target="_blank" style="text-decoration: none; color: inherit;">${data.title}</a>
+            <div class="result-snippet">${data.snippet}</div>
+            <div class="result-footer">${data.footer}</div>
+        `;
+    } else {
+        const encodedData = encodeURIComponent(JSON.stringify(data));
+        card.innerHTML = `
+            <div class="result-meta">
+                <span>${data.domain}</span>
+                <span>ENCRYPTED NODE</span>
+            </div>
+            <div class="result-title" onclick="triggerCardAction('${encodedData}')">${data.title}</div>
+            <div class="result-snippet">${data.snippet}</div>
+            <div class="result-footer">${data.footer}</div>
+        `;
+    }
     return card;
 }
 
-// 专门处理暗网专属卡片的加载动画与指定提示文案
-function openPageTunnel(title, url, isDirect) {
+// 点击线索卡片，经过 0.8 秒解密动画后拉出右侧 Handout 抽屉
+function triggerCardAction(encodedData) {
+    const data = JSON.parse(decodeURIComponent(encodedData));
     const loader = document.getElementById('loaderOverlay');
     const statusText = document.getElementById('loaderStatusText');
 
-    loader.style.display = 'flex';
-    statusText.innerText = `正在建立加密代理隧道，传输数据: ${title}...`;
+    if (loader && statusText) {
+        loader.style.display = 'flex';
+        statusText.innerText = `正在建立加密代理隧道，传输数据: ${data.title}...`;
 
-    setTimeout(() => {
-        loader.style.display = 'none';
-        // 修改为指定的文案提示
-        alert(`想喝伊斯班克？带上梯子和手来见我！`);
-    }, 800);
+        setTimeout(() => {
+            loader.style.display = 'none';
+            if (typeof openDrawerWithData === 'function') {
+                openDrawerWithData(data);
+            } else {
+                alert(`想喝伊斯班克？带上梯子和手来见我！`);
+            }
+        }, 800);
+    } else {
+        if (typeof openDrawerWithData === 'function') {
+            openDrawerWithData(data);
+        }
+    }
 }
 
 function updateStageEffects() {
     if (searchCount >= 6) document.body.className = 'stage-3';
     else if (searchCount >= 3) document.body.className = 'stage-2';
     else if (searchCount >= 1) document.body.className = 'stage-1';
-}
-
-function triggerNotifyModal(text) {
-    document.getElementById('modalText').innerText = text;
-    document.getElementById('notifyModal').style.display = 'flex';
-}
-
-function closeModal() {
-    document.getElementById('notifyModal').style.display = 'none';
 }
 
 function openConsole() {
@@ -267,5 +277,4 @@ window.executeSearch = executeSearch;
 window.openConsole = openConsole;
 window.openHistoryModal = openHistoryModal;
 window.clearHistory = clearHistory;
-window.openPageTunnel = openPageTunnel;
-window.triggerNotifyModal = triggerNotifyModal;
+window.triggerCardAction = triggerCardAction;
