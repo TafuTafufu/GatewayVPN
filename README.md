@@ -1,5 +1,5 @@
 # GatewayVPN
-Gateway VPN (v2.4.18-p2) - 跑团电子道具伪终端
+Gateway VPN (v2.4.18-p2) - 跑团伪终端
 
 ------------------------------------------
 
@@ -10,6 +10,10 @@ Gateway VPN (v2.4.18-p2) - 跑团电子道具伪终端
 
 我只有灵机一动又一动。
 下面是AI的介绍，如果你还有问题，问你自己的AI。 
+
+我不想分享这个文件，里面有很多我自己和团员的私货。
+
+如果你想拿走用，请先来问问我。 
 
 -------------------------------------------
 
@@ -30,7 +34,7 @@ Google 直达 + 暗网彩蛋双轨检索：
 
 输入任意关键词时，永远优先展示直达 Google 真实搜索 的卡片（突破浏览器异步弹窗拦截，秒开新标签页）。
 
-匹配预设线索词（如 tafu, mckay, cool, king, wallace, dabiq）时，解锁机密案宗卡片。
+匹配预设线索词时，解锁机密卡片。
 
 双线索展示模式 (Side Drawer & Image Modal)：
 
@@ -40,13 +44,14 @@ Google 直达 + 暗网彩蛋双轨检索：
 
 多账号身份与隔离 (Players & Isolation)：
 
-支持预设账号（如 Peanut, Schnell, Player 1~4 等）与自定义注册登录。
+支持预设账号（如Player 1~4 等）与自定义注册登录。
 
-使用 localStorage 隔离不同账号的检索历史与特定视角专属暗号（例如 Peanut 搜 Schnell 与 Schnell 搜 Peanut 会触发各自专属速报）。
+使用 localStorage 隔离不同账号的检索历史与特定视角专属暗号。
 
 高可扩展性模块化架构：
 
 项目完全解耦，将界面逻辑、数据库、玩家数据、弹窗系统和线索 Handout 分开管理，拒绝“屎山代码”。
+
 
 📁 目录架构说明
 
@@ -59,24 +64,17 @@ Google 直达 + 暗网彩蛋双轨检索：
 ├── main.js           # 页面核心交互逻辑（搜索、时钟、解密跳转）
 └── README.md         # 项目说明文档
 
+
 ⚙️ 快速上手与配置指南
 
 1. 本地运行
 
 直接双击打开 index.html，或通过 VS Code 插件 Live Server 本地启动。
 
+
 2. 添加/修改线索图片与 Handout
 
 打开 database.js，找到对应的关键词项，添加或修改 image 与 detailText 字段：
-
-"mckay": {
-    title: "康奈尔大学姐妹会枪案 - 案宗记录",
-    domain: "ithaca-pd.gov/restricted/file-CAR-5-58",
-    snippet: "【物证鉴定与矛盾报告】现场提取到一张现场照片...",
-    image: "images/mckay_handout.jpg", // 👈 支持本地相对路径或外链 URL
-    detailText: "【详细解密文本】现场房间结构与照片严重不符...",
-    footer: "来源: 伊萨卡警方刑事侦查科"
-}
 
 
 3. 配置不同玩家的搜索弹窗
