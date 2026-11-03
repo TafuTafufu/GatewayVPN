@@ -22,7 +22,7 @@ const userProfiles = {
         name: "Schnell",
         welcome: "松鼠之家十分不欢迎您，这位先生。请您去别的洞。您个子这么高能穿过树洞吧，干扰我们松鼠干什么？",
         consoleLog: "[SYSTEM LOG]\nUser: Schnell\nGateway Protocol: HIGH_PRIORITY\nNote: 绑定账号 Peanut。",
-        history: ["Peanut", "打不到松鸡可以用炸鸡骗过去吗", "Jolibee near me"]
+        history: ["Peanut", "打不到松鸡可以用炸鸡骗过去吗", "Jolibee near me", "如何赶走松鼠"]
     },
     "player1": {
         name: "Player 1",
