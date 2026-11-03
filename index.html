@@ -42,12 +42,12 @@
             <div class="logo-icon">▲</div>
             <div>
                 <div class="title-text">Gateway VPN</div>
+                <!-- 已添加实时时间挂载容器 realTimeClock -->
                 <div class="subtitle">v2.4.18-p2 [已加密] <span id="realTimeClock" style="margin-left: 10px; color: var(--accent-color);"></span></div>
             </div>
         </div>
         <div class="status-bar">
             <div class="user-tag" id="currentUserTag">身份: 尚未登录</div>
-            <!-- 新增 [主页] 按钮 -->
             <button class="tab-btn" onclick="goHome()">[主页]</button>
             <button class="tab-btn" onclick="openHistoryModal()">[搜索历史]</button>
             <button class="tab-btn" onclick="logout()">[切换身份]</button>
@@ -68,7 +68,7 @@
 
     <div class="watermark">SECURE TERMINAL // GATEWAY VPN HIGH-SPEED TUNNEL</div>
 
-    <!-- 方式一：右侧滑动抽屉 (Side Drawer) - 用于展示案宗细节与 Handout 大图 -->
+    <!-- 右侧滑动抽屉 (Side Drawer) - 用于展示案宗细节与 Handout 大图 -->
     <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
     <div class="side-drawer" id="sideDrawer">
         <div class="drawer-header">
@@ -84,7 +84,7 @@
         </div>
     </div>
 
-    <!-- 方式二：带图片的通知弹窗 (Modal with Image) - 用于系统告警或插图提醒 -->
+    <!-- 带图片的通知弹窗 (Modal) -->
     <div class="modal-overlay" id="notifyModal">
         <div class="modal-card">
             <div class="modal-header" id="modalTitle">⚠️ [系统同步通信提示]</div>
@@ -119,7 +119,7 @@
         </div>
     </div>
 
-    <!-- 脚本按照正确逻辑依赖按序加载（已加上 js/ 文件夹路径） -->
+    <!-- JS 路径统一修正为 js/ 文件夹路径 -->
     <script src="js/database.js"></script>
     <script src="js/players.js"></script>
     <script src="js/notifications.js"></script>
