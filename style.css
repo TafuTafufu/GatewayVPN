@@ -308,3 +308,53 @@ button.search-btn {
 
 .drawer-content { font-size: 0.92rem; line-height: 1.7; color: var(--text-main); white-space: pre-wrap; margin-bottom: 1.5rem; }
 .drawer-footer-meta { font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim); border-top: 1px dashed var(--border-color); padding-top: 1rem; }
+
+/* =========================================================
+   移动端/手机适配样式优化 (Responsive Mobile Styles)
+   ========================================================= */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 10px;
+        overflow-x: hidden;
+    }
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .status-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        width: 100%;
+    }
+    .status-bar .tab-btn {
+        flex: 1 1 auto;
+        font-size: 11px;
+        padding: 4px 8px;
+        text-align: center;
+    }
+    .search-box-wrapper {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .search-btn {
+        width: 100%;
+        padding: 12px;
+    }
+    .result-card {
+        padding: 12px;
+    }
+    .result-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        word-break: break-all;
+    }
+    .result-title {
+        font-size: 16px;
+        margin-top: 6px;
+        display: block;
+        line-height: 1.4;
+    }
+}
+
