@@ -4,7 +4,7 @@ const customUserResults = {
         title: "【今日速报】",
         domain: "aegis.gateway.internal/user/peanut/schnell-telemetry",
         snippet: "来自异世界的二尺旋风为您带来问候！",
-        image: "Gardengnome.png",
+        image: "assets/Gardengnome.png",
         footer: "#真的还能长 #两尺不是我的极限 #哎这是我家不是松鼠洞！！"
     }
 },
@@ -13,7 +13,7 @@ const customUserResults = {
             title: "【今日速报】",
             domain: "aegis.gateway.internal/user/schnell/peanut-telemetry",
             snippet: "Peanut 今日战利品：极品伊斯班克，全新标签，纯净如水！",
-            image: "ithbank.png",
+            image: "assets/ithbank.png",
             detailText: "【战利品检视日志】\nPeanut 今日战利品：极品伊斯班克，全新标签，纯净如水！",
             footer: "#我用了动物交谈药水  #幸好我跑的飞快 #奇怪今天城镇守卫怎么没来抓我"
         }
