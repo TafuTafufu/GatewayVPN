@@ -282,11 +282,24 @@ function closeHistoryModal() {
     document.getElementById('historyModal').style.display = 'none';
 }
 
+// 返回主页功能（清空搜索框并重新渲染当前登录角色的初始欢迎页）
+function goHome() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = '';
+    
+    if (window.activeProfile) {
+        renderWelcomeCard(window.activeProfile.welcome);
+    } else {
+        renderWelcomeCard("欢迎访问 Gateway VPN 极速隐私网络网关。");
+    }
+}
+
 // 绑定 DOMContentLoaded 自动启动时钟
 window.addEventListener('DOMContentLoaded', () => {
     startRealTimeClock();
 });
 
+// 全局挂载导出
 window.getCurrentUserId = getCurrentUserId;
 window.setCurrentUserId = setCurrentUserId;
 window.handleAuthKeyPress = handleAuthKeyPress;
@@ -294,6 +307,9 @@ window.login = login;
 window.logout = logout;
 window.executeSearch = executeSearch;
 window.openConsole = openConsole;
+window.closeConsole = closeConsole;
 window.openHistoryModal = openHistoryModal;
+window.closeHistoryModal = closeHistoryModal;
 window.clearHistory = clearHistory;
 window.triggerCardAction = triggerCardAction;
+window.goHome = goHome;
