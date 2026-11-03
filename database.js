@@ -1,6 +1,6 @@
 const accountDb = {
-    "tafu": { password: "Schnell", profileKey: "tafu" },
-    "schnell": { password: "Tafu", profileKey: "schnell" },
+    "peanut": { password: "Tiefling", profileKey: "peanut" },
+    "schnell": { password: "Ithbank", profileKey: "schnell" },
     "wallace": { password: "123456", profileKey: "wallace" },
     "cool": { password: "mit2016", profileKey: "cool" },
     "vicki": { password: "kick408", profileKey: "vicki" },
@@ -8,17 +8,17 @@ const accountDb = {
 };
 
 const userProfiles = {
-    "tafu": {
-        name: "Tafu [主控专属节点]",
-        welcome: "欢迎回来，Tafu。高密通道已成功建立，算法正在为您自动整理关联线索。",
-        consoleLog: "[SYSTEM LOG]\nUser: Tafu\nGateway Protocol: SECURE_TUNNEL\nNote: 关联节点 Schnell 处于连线就绪状态。",
+    "peanut": {
+        name: "Peanut [主控专属节点]",
+        welcome: "欢迎回来，Peanut。高密通道已成功建立，算法正在为您自动整理关联线索。",
+        consoleLog: "[SYSTEM LOG]\nUser: Peanut\nGateway Protocol: SECURE_TUNNEL\nNote: 关联节点 Schnell 处于连线就绪状态。",
         history: ["Schnell", "Gateway VPN 核心架构", "麻省理工学院 库尔教授", "周五屠杀夜 视频提取"]
     },
     "schnell": {
         name: "Schnell [高级协同节点]",
         welcome: "通道已链接，Schnell。加密签名对齐完毕。",
-        consoleLog: "[SYSTEM LOG]\nUser: Schnell\nGateway Protocol: HIGH_PRIORITY\nNote: 绑定账号 Tafu。",
-        history: ["Tafu", "工业焊接高频谐振", "极右翼拖车公园监控", "班戈市网络日志"]
+        consoleLog: "[SYSTEM LOG]\nUser: Schnell\nGateway Protocol: HIGH_PRIORITY\nNote: 绑定账号 Peanut。",
+        history: ["Peanut", "工业焊接高频谐振", "极右翼拖车公园监控", "班戈市网络日志"]
     },
     "wallace": {
         name: "Robert Wallace [霜橡节点]",
@@ -52,19 +52,19 @@ const userProfiles = {
 };
 
 const customUserResults = {
-    "tafu": {
+    "peanut": {
         "schnell": {
-            title: "🔐 [专属加密文档] 关于 Schnell 的通信与协同记录",
-            domain: "aegis.gateway.internal/user/tafu/schnell-telemetry",
-            snippet: "【双向握手成功】关联签名: Schnell。该节点与 Tafu 的物理算子呈现 100% 谐振。历史拦截日志显示多次高频工业谐振数据传输，底盘及信号节点均已锁定。",
+            title: "【今日速报】",
+            domain: "aegis.gateway.internal/user/peanut/schnell-telemetry",
+            snippet: "来自异世界的二尺旋风为您带来问候！",
             footer: "机密等级: ROOT ONLY / 独家解读权限"
         }
     },
     "schnell": {
-        "tafu": {
-            title: "🔐 [专属加密文档] 关于 Tafu 的主控节点联络日志",
-            domain: "aegis.gateway.internal/user/schnell/tafu-telemetry",
-            snippet: "【协同隧道状态: 稳定】关联签名: Tafu。主控节点授权已通过，检测到高密数据映射气泡正常运转。",
+        "peanut": {
+            title: "【今日速报】",
+            domain: "aegis.gateway.internal/user/schnell/peanut-telemetry",
+            snippet: "Peanut 今日战利品：极品伊斯班克，全新标签，纯净如水！",
             footer: "机密等级: ROOT ONLY / 独家解读权限"
         }
     }
