@@ -156,7 +156,7 @@ function executeSearch() {
         container.appendChild(createResultCard(customItem, 'anomaly'));
     }
 
-    // 3. 模组彩蛋关键词（包含 tafu 掌局者与 dwarf 小游戏支持）
+    // 3. 模组彩蛋关键词（捕获 tafu 掌局者与 dwarf 矮人小游戏）
     let matchedKeys = [];
     if (lowerInput.includes("tafu") || lowerInput.includes("塔夫") || lowerInput.includes("掌局者")) matchedKeys.push("tafu");
     if (lowerInput.includes("dwarf") || lowerInput.includes("矮人")) matchedKeys.push("dwarf");
@@ -209,7 +209,7 @@ function createResultCard(data, styleClass) {
     return card;
 }
 
-// 点击线索卡片，经过 0.8 秒解密动画后拉出右侧 Handout 抽屉或挂载小游戏
+// 点击线索卡片，经过 0.8 秒解密动画后拉出右侧 Handout 抽屉
 function triggerCardAction(encodedData) {
     const data = JSON.parse(decodeURIComponent(encodedData));
     const loader = document.getElementById('loaderOverlay');
