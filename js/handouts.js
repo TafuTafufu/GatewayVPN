@@ -135,3 +135,4 @@ window.openDrawerWithData = openDrawerWithData;
 window.closeDrawer = closeDrawer;
 window.triggerNotifyModal = triggerNotifyModal;
 window.closeModal = closeModal;
+
