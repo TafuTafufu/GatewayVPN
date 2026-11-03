@@ -156,7 +156,7 @@ function executeSearch() {
         container.appendChild(createResultCard(customItem, 'anomaly'));
     }
 
-    // 3. 模组彩蛋关键词（捕获 tafu 掌局者与 dwarf 矮人小游戏）
+    // 3. 模组彩蛋关键词（包含 tafu 掌局者与 dwarf 矮人小游戏支持）
     let matchedKeys = [];
     if (lowerInput.includes("tafu") || lowerInput.includes("塔夫") || lowerInput.includes("掌局者")) matchedKeys.push("tafu");
     if (lowerInput.includes("dwarf") || lowerInput.includes("矮人")) matchedKeys.push("dwarf");
