@@ -39,7 +39,8 @@
             <div class="logo-icon">▲</div>
             <div>
                 <div class="title-text">Gateway VPN</div>
-                <div class="subtitle">v2.4.18-p2 [高密通道协议已建立]</div>
+                <!-- 已将 [高密通道协议已建立] 修改为 [已加密] -->
+                <div class="subtitle">v2.4.18-p2 [已加密] <span id="realTimeClock" style="margin-left: 10px; color: var(--accent-color);"></span></div>
             </div>
         </div>
         <div class="status-bar">
@@ -95,9 +96,9 @@
         </div>
     </div>
 
-  <!-- 脚本加载 -->
+    <!-- 脚本加载 -->
     <script src="database.js"></script>
-    <script src="players.js"></script> <!-- 👈 新增引入玩家信息文件 -->
+    <script src="players.js"></script>
     <script src="notifications.js"></script>
     <script src="main.js"></script>
 </body>
