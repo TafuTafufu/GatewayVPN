@@ -8,7 +8,7 @@ function setCurrentUserId(userId) {
 
 let searchCount = 0;
 
-// 1. 实时时间刷新功能
+// 实时时间刷新功能
 function startRealTimeClock() {
     function updateClock() {
         const now = new Date();
@@ -65,7 +65,7 @@ function login() {
     
     let pKey = window.accountDb[currentUser] ? window.accountDb[currentUser].profileKey : "guest";
     
-    // 强制每次登录直接读取 players.js 中最新的干净名称，绝不读取旧的 localStorage 缓存
+    // 强制读取最新配置，防止读取旧的 localStorage 缓存
     let profile = window.userProfiles[pKey] || {
         name: currentUser.toUpperCase(),
         welcome: `欢迎，${currentUser}。已经为您成功建立 Gateway VPN 加密会话。`,
@@ -169,38 +169,35 @@ function createResultCard(data, styleClass) {
     
     const isDirect = data.isDirectUrl;
 
+    // 核心优化：Google 链接直接采用标准的 <a> 标签跳转，彻底破除弹窗拦截器限制
+    const titleHtml = isDirect 
+        ? `<a class="result-title" href="${data.domain}" target="_blank" style="text-decoration: none; color: inherit;">${data.title}</a>`
+        : `<div class="result-title" onclick="openPageTunnel('${data.title}', '${data.domain}', false)">${data.title}</div>`;
+
     card.innerHTML = `
         <div class="result-meta">
             <span>${data.domain}</span>
             <span>${styleClass === 'anomaly' ? 'ENCRYPTED NODE' : 'GOOGLE SEARCH'}</span>
         </div>
-        <div class="result-title" onclick="openPageTunnel('${data.title}', '${data.domain}', ${isDirect})">${data.title}</div>
+        ${titleHtml}
         <div class="result-snippet">${data.snippet}</div>
         <div class="result-footer">${data.footer}</div>
     `;
     return card;
 }
 
-// 核心跳转函数：用户点击同步瞬时打开空白页，播放 800ms 动画后重定向，完美绕过浏览器拦截
+// 专门处理暗网专属卡片的加载动画与指定提示文案
 function openPageTunnel(title, url, isDirect) {
     const loader = document.getElementById('loaderOverlay');
     const statusText = document.getElementById('loaderStatusText');
-    
-    let newTab = null;
-    if (isDirect) {
-        newTab = window.open('about:blank', '_blank');
-    }
 
     loader.style.display = 'flex';
     statusText.innerText = `正在建立加密代理隧道，传输数据: ${title}...`;
 
     setTimeout(() => {
         loader.style.display = 'none';
-        if (isDirect && newTab) {
-            newTab.location.href = url;
-        } else {
-            alert(`[Gateway VPN 提示]\n目标文件: ${title}\n状态: 档案已被本地安全协议锁存，无法访问外部服务器。`);
-        }
+        // 修改为指定的文案提示
+        alert(`想喝伊斯班克？带上梯子和手来见我！`);
     }, 800);
 }
 
