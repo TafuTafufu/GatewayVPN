@@ -8,7 +8,7 @@ function setCurrentUserId(userId) {
 
 let searchCount = 0;
 
-// 实时时间刷新功能
+// 1. 实时时间刷新功能
 function startRealTimeClock() {
     function updateClock() {
         const now = new Date();
@@ -126,23 +126,23 @@ function executeSearch() {
         }
     }
 
-    // 1. Google 卡片
+    // 1. Google 搜索卡片
     const googleCardData = {
         title: `🌐 在 Google 上搜索: "${input}"`,
         domain: `https://www.google.com/search?q=${encodeURIComponent(input)}`,
-        snippet: `点击此处通过 Gateway VPN 通道直接打开 Google 搜索，调取全网关于“${input}”的即时公开资讯与网页数据。`,
-        footer: "来源: Google Search Engine / Gateway VPN Direct Tunnel",
+        snippet: `点击此处通过 Gateway VPN 通道在 Google 搜索引擎中获取全网关于“${input}”的最新搜索结果。`,
+        footer: "来源: Google Search Engine / Direct Tunnel",
         isDirectUrl: true
     };
     container.appendChild(createResultCard(googleCardData, 'google-style'));
 
-    // 2. 专属互打暗号结果
+    // 2. 专属暗号词
     if (window.customUserResults[activeUser] && window.customUserResults[activeUser][lowerInput]) {
         const customItem = window.customUserResults[activeUser][lowerInput];
         container.appendChild(createResultCard(customItem, 'anomaly'));
     }
 
-    // 3. 匹配预设的模组彩蛋关键词（增加 tafu 掌局者支持）
+    // 3. 模组彩蛋关键词
     let matchedKeys = [];
     if (lowerInput.includes("tafu") || lowerInput.includes("塔夫") || lowerInput.includes("掌局者")) matchedKeys.push("tafu");
     if (lowerInput.includes("mckay") || lowerInput.includes("麦凯") || lowerInput.includes("康奈尔")) matchedKeys.push("mckay");
@@ -155,7 +155,7 @@ function executeSearch() {
         container.appendChild(createResultCard(window.database[key], 'anomaly'));
     });
 
-    // 4. 调用外部弹窗
+    // 4. 调用外部 notifications.js 弹窗逻辑
     if (typeof checkTriggerNotifications === 'function') {
         checkTriggerNotifications(activeUser, searchCount);
     }
@@ -179,12 +179,14 @@ function createResultCard(data, styleClass) {
     return card;
 }
 
+// 2. 修正后的隧道打开逻辑：防浏览器静默拦截 + 0.8s 界面加载动画
 function openPageTunnel(title, url, isDirect) {
     const loader = document.getElementById('loaderOverlay');
     const statusText = document.getElementById('loaderStatusText');
     
     let newTab = null;
     if (isDirect) {
+        // 在点击事件发生的同步瞬间立即开新标签页，避免触发浏览器的拦截机制
         newTab = window.open('about:blank', '_blank');
     }
 
@@ -194,7 +196,7 @@ function openPageTunnel(title, url, isDirect) {
     setTimeout(() => {
         loader.style.display = 'none';
         if (isDirect && newTab) {
-            newTab.location.href = url;
+            newTab.location.href = url; // 800ms 动画播放完成后，把空白新页重定向至真实 Google 搜索页
         } else {
             alert(`[Gateway VPN 提示]\n目标文件: ${title}\n状态: 档案已被本地安全协议锁存，无法访问外部服务器。`);
         }
@@ -254,10 +256,10 @@ function closeHistoryModal() {
     document.getElementById('historyModal').style.display = 'none';
 }
 
-// 初始化启动实时时钟
-window.onload = function() {
+// 页面一加载自动启动实时时钟
+window.addEventListener('DOMContentLoaded', () => {
     startRealTimeClock();
-};
+});
 
 window.getCurrentUserId = getCurrentUserId;
 window.setCurrentUserId = setCurrentUserId;
