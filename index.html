@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aegis Quantum Gateway v2.4 - 极速隐私网络</title>
+    <style>
+        :root {
+            --bg-color: #0d0f12;
+            --panel-bg: #151821;
+            --border-color: #262b3a;
+            --accent-color: #00e5ff;
+            --accent-warn: #ffb700;
+            --accent-danger: #ff3366;
+            --text-main: #e2e8f0;
+            --text-dim: #718096;
+            --font-mono: "Fira Code", "Courier New", Consolas, monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            transition: filter 0.8s ease;
+        }
+
+        /* 随检索次数产生的微妙视觉偏移（不剧透机制） */
+        body.stage-1 {
+            filter: hue-rotate(10deg);
+        }
+        body.stage-2 {
+            filter: hue-rotate(35deg) contrast(1.08);
+        }
+        body.stage-3 {
+            filter: hue-rotate(75deg) contrast(1.15);
+            animation: subtle-pulse 4s infinite alternate;
+        }
+
+        @keyframes subtle-pulse {
+            0% { filter: hue-rotate(75deg) contrast(1.15); }
+            100% { filter: hue-rotate(120deg) contrast(1.25); }
+        }
+
+        header {
+            background-color: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-color), #0066ff);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #000;
+            font-family: var(--font-mono);
+        }
+
+        .title-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .subtitle {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 15px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #00ff66;
+            box-shadow: 0 0 8px #00ff66;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+            flex: 1;
+        }
+
+        .search-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            margin-bottom: 2rem;
+        }
+
+        .search-box-wrapper {
+            position: relative;
+            display: flex;
+            gap: 12px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background: #090a0d;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem 1.2rem;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.15);
+        }
+
+        button {
+            background: var(--accent-color);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            padding: 0 1.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .quick-tags {
+            margin-top: 1.2rem;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .tag-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+        }
+
+        .tag {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 4px 12px;
+            border-radius: 14px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tag:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .results-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .result-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.2rem;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card:hover {
+            border-color: #384259;
+        }
+
+        .result-card.anomaly {
+            border-left: 4px solid var(--accent-color);
+            background: linear-gradient(90deg, rgba(0, 229, 255, 0.03) 0%, var(--panel-bg) 100%);
+        }
+
+        .result-meta {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--accent-color);
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .result-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #58a6ff;
+            margin-bottom: 8px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .result-title:hover {
+            text-decoration: underline;
+        }
+
+        .result-snippet {
+            font-size: 0.9rem;
+            color: var(--text-main);
+            line-height: 1.55;
+        }
+
+        .result-footer {
+            margin-top: 10px;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: var(--text-dim);
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .tab-btn:hover {
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-card {
+            background: #161822;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            max-width: 580px;
+            width: 90%;
+            padding: 1.8rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            color: var(--accent-warn);
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-body {
+            font-size: 0.92rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .modal-btn {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn:hover {
+            background: var(--border-color);
+        }
+
+        .console-card {
+            background: #050608;
+            border: 1px solid #2d3748;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            color: #00e5ff;
+            padding: 1.2rem;
+            max-width: 720px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .console-log {
+            font-size: 0.82rem;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            color: #a0aec0;
+        }
+
+        .watermark {
+            position: fixed;
+            bottom: 12px;
+            right: 18px;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.12);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <div class="logo-icon">▲</div>
+            <div>
+                <div class="title-text">Aegis Quantum Gateway</div>
+                <div class="subtitle">v2.4.18-p2 [高密通道协议已建立]</div>
+            </div>
+        </div>
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="indicator"></div>
+                <span>通道状态: 稳定加密</span>
+            </div>
+            <div class="status-item">
+                <span>暗网节点: <strong>14/14</strong></span>
+            </div>
+            <button class="tab-btn" onclick="openConsole()">[检视系统固件与网络抓包]</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="search-card">
+            <div class="search-box-wrapper">
+                <input type="text" id="searchInput" placeholder="在全域分布式网络与加密节点中检索..." onkeypress="handleKeyPress(event)">
+                <button onclick="executeSearch()">全局检索</button>
+            </div>
+            <div class="quick-tags">
+                <span class="tag-label">案宗线索快捷索引:</span>
+                <span class="tag" onclick="quickSearch('Bradley McKay')">布拉德利·麦凯</span>
+                <span class="tag" onclick="quickSearch('Wesley Cool')">韦斯利·库尔</span>
+                <span class="tag" onclick="quickSearch('Vicki King')">维姬·金</span>
+                <span class="tag" onclick="quickSearch('Robert Wallace')">罗伯特·沃尔斯</span>
+                <span class="tag" onclick="quickSearch('Dabiq')">周五屠杀夜</span>
+            </div>
+        </div>
+
+        <div class="results-section" id="resultsContainer">
+            <div class="result-card">
+                <div class="result-meta">
+                    <span>AEGIS-SYSTEM-READY</span>
+                    <span>ENCRYPTED NODE #882</span>
+                </div>
+                <div class="result-title">欢迎使用 Aegis 隐秘网络网关 (Quantum Gateway)</div>
+                <div class="result-snippet">
+                    本软件通过底层微结构路由协议为您提供无痕访问体验。系统内置优化算法可自动识别检索偏好，快速汇聚异质数据流与非公开情报文件。请输入案宗关键词或人员姓名开始检索。
+                </div>
+                <div class="result-footer">提示：持续进行高频数据传输可能会导致设备主板温度升高及电池电力消耗过快。</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="watermark">SECURE TERMINAL // AEGIS QUANTUM GATEWAY</div>
+
+    <!-- Notification Modal (Clean, Immersive) -->
+    <div class="modal-overlay" id="notifyModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <span>⚠️ [系统同步通信提示]</span>
+            </div>
+            <div class="modal-body" id="modalText">
+                通信收到...
+            </div>
+            <button class="modal-btn" onclick="closeModal()">确认并忽略 (ACKNOWLEDGE)</button>
+        </div>
+    </div>
+
+    <!-- Forensics Console -->
+    <div class="modal-overlay" id="consoleModal">
+        <div class="console-card">
+            <div style="display:flex; justify-content:space-between; margin-bottom:12px; border-bottom:1px solid #2d3748; padding-bottom:6px;">
+                <span style="color:#00e5ff; font-weight:bold;">[固件抓包与底层电路报告]</span>
+                <span style="cursor:pointer; color:#ff3366;" onclick="closeConsole()">[关闭 ESC]</span>
+            </div>
+            <div class="console-log" id="consoleLogText">
+[SYSTEM DIAGNOSTIC START]
+Hardware Gateway Version: 2.4.18-p2
+Checking Mainboard Circuits...
+Found Integrated Micro-Circuit: Custom Silicon Deposition Layer
+Printed Component Seal: "TRUMP INDUSTRIES ELECTRONICS DIV"
+Tracing Topology: Non-Standard Gold Micro-geometry
+Power Strain Index: +380% (High Voltage Draw Detected)
+Gateway Tunnel Status: ACTIVE
+Data Reflection Index: 0.9984 (Resonating at Quantum Frequency)
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let searchCount = 0;
+
+        const database = {
+            "mckay": {
+                title: "康奈尔大学姐妹会枪案 - 嫌疑人布拉德利·麦凯 (Bradley McKay) 案宗记录",
+                domain: "ithaca-pd.gov/restricted/file-CAR-5-58",
+                snippet: "【物证鉴定与矛盾报告】嫌疑人麦凯使用无序列号的定制步枪(5.58mm口径)。其设备缓存中发现多张虐杀照片，显示数名女性在姐妹会解剖艾弗里·贝尔。然而警方物理核查确认：贝尔毫发无损，照片中的女性（加尔珀等）均具有绝对的不在场证明，且现场房间结构与照片严重不符。",
+                footer: "调阅来源: 伊萨卡警方刑事侦查科 / 证据物证室档案"
+            },
+            "cool": {
+                title: "麻省理工学院 (MIT) 韦斯利·库尔教授 (Prof. Wesley Cool) 人事与门禁卷宗",
+                domain: "mit.edu/math/faculty/cool_w_archive",
+                snippet: "【门禁与学术记录】库尔自2016年底后未有离开大楼的影像记录。其著作《无主之谛》(Meaning Without Master)探讨了‘观察者意识与物理子结构之交互’。邮件日志包含发给戏剧系博耶教授与研究生维姬·金的底层协议设置指南。系主任对其道德评价极低。",
+                footer: "状态: 麻省理工学院数学系教员档案 (目前状态异常)"
+            },
+            "king": {
+                title: "宾夕法尼亚州踢泉镇 (Kick Springs) 维姬·金 (Vicki King) 住宅封存记录",
+                domain: "county-registry.pa.gov/kicksprings/property_408",
+                snippet: "【住宅查封与监护通知】‘国家儿童与家庭服务局’通知表明该住宅已被查封。室内住有孪生姐妹艾琳与谢莉雅，虽然出生证明显示其生理年龄仅3岁，但现场两人已呈现出十几岁少女体征。主卧区域存在极高频电磁辐射与严重精神偏执痕迹。",
+                footer: "来源: 地方警长办事处 / 银行止赎通知外包档案"
+            },
+            "wallace": {
+                title: "缅因州班戈市 霜橡拖车公园 - 罗伯特·沃尔斯 (Robert Wallace) 监控简报",
+                domain: "bangor-pd.maine.gov/case_wallace_r",
+                snippet: "【情报记录】罗伯特·沃尔斯自称‘沃尔斯将军’，长期在‘霜松’区域从事极右翼抵抗活动。报告提及该区域面临‘ANTIFA超级战士’威逼。后院拖车影音柜后发现一台惠普 Proliant dl380 服务器（托管有定制数据节点），USB接口插有标签为‘表弟快醒醒’的U盘。",
+                footer: "来源: 缅因州地方执法记录 / 计算机网络日志"
+            },
+            "dabiq": {
+                title: "周五屠杀夜 (Friday Night Slaughter) 涉案枪手设备视频元数据分析",
+                domain: "counter-terrorism-db.gov/dabiq-media-stream",
+                snippet: "【异界圣战视频记录】两名携带‘神之和平·全球哈里发国’证件的枪手在球赛现场开火。设备中提取出达比格镇战场视频：B-21轰炸机投下的核弹在落地前化为盐粒，成千上万士兵凝滞。视频元数据创建于2121年（未来时间标记），音频语言为未知古老方言。",
+                footer: "来源: 纳尼亚联合工作组 (Working Group NARNIA) 证据库"
+            }
+        };
+
+        function handleKeyPress(e) {
+            if (e.keyCode === 13) {
+                executeSearch();
+            }
+        }
+
+        function quickSearch(keyword) {
+            document.getElementById('searchInput').value = keyword;
+            executeSearch();
+        }
+
+        function executeSearch() {
+            const input = document.getElementById('searchInput').value.trim().toLowerCase();
+            const container = document.getElementById('resultsContainer');
+            
+            if (!input) return;
+
+            searchCount++;
+            updateStageEffects();
+
+            container.innerHTML = ''; // Clear current
+
+            let matchedKeys = [];
+            if (input.includes("mckay") || input.includes("麦凯") || input.includes("康奈尔")) matchedKeys.push("mckay");
+            if (input.includes("cool") || input.includes("库尔") || input.includes("mit")) matchedKeys.push("cool");
+            if (input.includes("king") || input.includes("维姬") || input.includes("金")) matchedKeys.push("king");
+            if (input.includes("wallace") || input.includes("罗伯特") || input.includes("沃尔斯")) matchedKeys.push("wallace");
+            if (input.includes("dabiq") || input.includes("屠杀") || input.includes("周五")) matchedKeys.push("dabiq");
+
+            if (matchedKeys.length > 0) {
+                matchedKeys.forEach(key => {
+                    const data = database[key];
+                    container.appendChild(createResultCard(data));
+                });
+            } else {
+                const genericData = {
+                    title: `检索结果: "${input}" - 已进行高密数据收敛`,
+                    domain: `aegis.gateway.internal/search?q=${encodeURIComponent(input)}`,
+                    snippet: `在全域分布式暗网节点中找到相关匹配。系统已根据您的查询意图和偏好自动收敛数据源，为您展示最具一致性的信息。`,
+                    footer: `数据验证: 节点匹配率 99.8%`
+                };
+                container.appendChild(createResultCard(genericData));
+            }
+
+            // 微妙的沉浸式失调弹窗（无剧透措辞）
+            if (searchCount === 3) {
+                triggerNotifyModal("【设备通知】\n收到来自个人通讯录的加密短信：'亲爱的，我完全理解你为了工作需要忙碌。家里一切都好，你永远是对的。'\n\n(提示：请注意检查您的通话记录与物理联系。)");
+            } else if (searchCount === 6) {
+                triggerNotifyModal("【硬件温度警告】\n检测到当前设备芯片温度升至 72°C。某些数据抓包可能在后台持续占用处理算力。");
+            }
+        }
+
+        function createResultCard(data) {
+            const card = document.createElement('div');
+            card.className = 'result-card anomaly';
+            
+            card.innerHTML = `
+                <div class="result-meta">
+                    <span>${data.domain}</span>
+                    <span>ENCRYPTED</span>
+                </div>
+                <a class="result-title" href="#" onclick="alert('无法建立物理数据通道：目标节点不存在于公共因特网。'); return false;">${data.title}</a>
+                <div class="result-snippet">${data.snippet}</div>
+                <div class="result-footer">${data.footer}</div>
+            `;
+            return card;
+        }
+
+        function updateStageEffects() {
+            if (searchCount >= 6) {
+                document.body.className = 'stage-3';
+            } else if (searchCount >= 3) {
+                document.body.className = 'stage-2';
+            } else if (searchCount >= 1) {
+                document.body.className = 'stage-1';
+            }
+        }
+
+        function triggerNotifyModal(text) {
+            document.getElementById('modalText').innerText = text;
+            document.getElementById('notifyModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('notifyModal').style.display = 'none';
+        }
+
+        function openConsole() {
+            document.getElementById('consoleModal').style.display = 'flex';
+        }
+
+        function closeConsole() {
+            document.getElementById('consoleModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
