@@ -14,13 +14,13 @@ const accountDb = {
 const userProfiles = {
     "peanut": {
         name: "Peanut",
-        welcome: "欢迎回来，Peanut。高密通道已成功建立，算法正在为您自动整理关联线索。",
-        consoleLog: "[SYSTEM LOG]\nUser: Peanut\nGateway Protocol: SECURE_TUNNEL\nNote: 关联节点 Schnell 处于连线就绪状态。",
+        welcome: "欢迎回来，Peanut。法师之手已为您准备好，让我们来痛饮伊斯班克吧！。",
+        consoleLog: "[SYSTEM LOG]\nUser: Peanut\nGateway Protocol: SECURE_TUNNEL\n任务：伊斯班克[1/3]。",
         history: ["Schnell", "Gateway VPN 核心架构", "空军怎么办"]
     },
     "schnell": {
         name: "Schnell",
-        welcome: "通道已链接，Schnell。加密签名对齐完毕。",
+        welcome: "松鼠之家十分不欢迎您，这位先生。请您去别的洞。您个子这么高能穿过树洞吧，干扰我们松鼠干什么？",
         consoleLog: "[SYSTEM LOG]\nUser: Schnell\nGateway Protocol: HIGH_PRIORITY\nNote: 绑定账号 Peanut。",
         history: ["Peanut", "打不到松鸡可以用炸鸡骗过去吗", "Jolibee near me"]
     },
