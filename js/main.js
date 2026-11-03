@@ -140,7 +140,7 @@ function executeSearch() {
         }
     }
 
-    // 1. Google 搜索卡片
+    // 1. Google 搜索卡片（原生 <a> 标签跳转，绕过弹窗拦截）
     const googleCardData = {
         title: `🌐 在 Google 上搜索: "${input}"`,
         domain: `https://www.google.com/search?q=${encodeURIComponent(input)}`,
@@ -209,7 +209,7 @@ function createResultCard(data, styleClass) {
     return card;
 }
 
-// 核心改进：解密动画结束后，直接在主窗口挂载“内嵌游戏视窗”或打开抽屉
+// 解密动画结束后，直接在页面中央渲染内嵌游戏视窗或提示
 function triggerCardAction(encodedData) {
     const data = JSON.parse(decodeURIComponent(encodedData));
     const loader = document.getElementById('loaderOverlay');
@@ -221,11 +221,11 @@ function triggerCardAction(encodedData) {
 
         setTimeout(() => {
             loader.style.display = 'none';
-            // 如果是矮人模拟器/小游戏，直接在主界面渲染全屏视窗！
+            // 如果是矮人模拟器/小游戏，直接在主界面渲染内嵌视窗！
             if (data.domain && (data.domain.includes('/games/') || data.domain.includes('dwarf_adventure'))) {
                 renderGameInMainView(data);
-            } else if (typeof openDrawerWithData === 'function') {
-                openDrawerWithData(data);
+            } else if (typeof window.openDrawerWithData === 'function') {
+                window.openDrawerWithData(data);
             } else {
                 alert(`想喝伊斯班克？带上梯子和手来见我！`);
             }
@@ -233,13 +233,13 @@ function triggerCardAction(encodedData) {
     } else {
         if (data.domain && (data.domain.includes('/games/') || data.domain.includes('dwarf_adventure'))) {
             renderGameInMainView(data);
-        } else if (typeof openDrawerWithData === 'function') {
-            openDrawerWithData(data);
+        } else if (typeof window.openDrawerWithData === 'function') {
+            window.openDrawerWithData(data);
         }
     }
 }
 
-// 🌟 新增：直接在终端中央替换为小游戏仿真控制面板
+// 在终端中央直接替换为小游戏仿真控制面板
 function renderGameInMainView(data) {
     const container = document.getElementById('resultsContainer');
     if (!container) return;
