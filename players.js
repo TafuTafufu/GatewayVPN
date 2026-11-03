@@ -14,7 +14,7 @@ const accountDb = {
 const userProfiles = {
     "peanut": {
         name: "Peanut",
-        welcome: "欢迎回来，Peanut。法师之手已为您准备好，让我们来痛饮伊斯班克吧！。",
+        welcome: "欢迎回来，Peanut。法师之手已就绪，让我们来痛饮伊斯班克吧！。",
         consoleLog: "[SYSTEM LOG]\nUser: Peanut\nGateway Protocol: SECURE_TUNNEL\n任务：伊斯班克[1/3]。",
         history: ["Schnell", "如何分辨真假伊斯班克", "空军怎么办"]
     },
