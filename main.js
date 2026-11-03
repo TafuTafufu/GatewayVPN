@@ -8,6 +8,26 @@ function setCurrentUserId(userId) {
 
 let searchCount = 0;
 
+// 实时时间刷新功能
+function startRealTimeClock() {
+    function updateClock() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        
+        const clockEl = document.getElementById('realTimeClock');
+        if (clockEl) {
+            clockEl.innerText = `[${year}-${month}-${day} ${hours}:${minutes}:${seconds}]`;
+        }
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+}
+
 function login() {
     const userIn = document.getElementById('usernameInput').value.trim();
     const passIn = document.getElementById('passwordInput').value.trim();
@@ -45,9 +65,9 @@ function login() {
     
     let pKey = window.accountDb[currentUser] ? window.accountDb[currentUser].profileKey : "guest";
     let profile = window.userProfiles[pKey] || {
-        name: `${currentUser.toUpperCase()} [自定义网关节点]`,
+        name: currentUser.toUpperCase(),
         welcome: `欢迎，${currentUser}。已经为您成功建立 Gateway VPN 加密会话。`,
-        consoleLog: `[SYSTEM DIAGNOSTIC START]\nUser Identity: ${currentUser}\nGateway Node: ACTIVE PROTOCOL\nPower Strain Index: +380%`,
+        consoleLog: `[SYSTEM DIAGNOSTIC START]\nUser Identity: ${currentUser}\nGateway Node: ACTIVE PROTOCOL`,
         history: ["Gateway VPN 终端配置", "本地网络包侦听"]
     };
 
@@ -106,7 +126,7 @@ function executeSearch() {
         }
     }
 
-    // 1. 恒定第一个展示 Google 搜索卡片
+    // 1. Google 卡片
     const googleCardData = {
         title: `🌐 在 Google 上搜索: "${input}"`,
         domain: `https://www.google.com/search?q=${encodeURIComponent(input)}`,
@@ -116,14 +136,15 @@ function executeSearch() {
     };
     container.appendChild(createResultCard(googleCardData, 'google-style'));
 
-    // 2. 如果存在当前用户特定互打暗号结果（例如 peanut 搜 schnell）
+    // 2. 专属互打暗号结果
     if (window.customUserResults[activeUser] && window.customUserResults[activeUser][lowerInput]) {
         const customItem = window.customUserResults[activeUser][lowerInput];
         container.appendChild(createResultCard(customItem, 'anomaly'));
     }
 
-    // 3. 匹配预设的模组彩蛋关键词
+    // 3. 匹配预设的模组彩蛋关键词（增加 tafu 掌局者支持）
     let matchedKeys = [];
+    if (lowerInput.includes("tafu") || lowerInput.includes("塔夫") || lowerInput.includes("掌局者")) matchedKeys.push("tafu");
     if (lowerInput.includes("mckay") || lowerInput.includes("麦凯") || lowerInput.includes("康奈尔")) matchedKeys.push("mckay");
     if (lowerInput.includes("cool") || lowerInput.includes("库尔") || lowerInput.includes("mit")) matchedKeys.push("cool");
     if (lowerInput.includes("king") || lowerInput.includes("维姬") || lowerInput.includes("金")) matchedKeys.push("king");
@@ -134,7 +155,7 @@ function executeSearch() {
         container.appendChild(createResultCard(window.database[key], 'anomaly'));
     });
 
-    // 4. 调用外部独立的弹窗检测机制
+    // 4. 调用外部弹窗
     if (typeof checkTriggerNotifications === 'function') {
         checkTriggerNotifications(activeUser, searchCount);
     }
@@ -232,6 +253,11 @@ function clearHistory() {
 function closeHistoryModal() {
     document.getElementById('historyModal').style.display = 'none';
 }
+
+// 初始化启动实时时钟
+window.onload = function() {
+    startRealTimeClock();
+};
 
 window.getCurrentUserId = getCurrentUserId;
 window.setCurrentUserId = setCurrentUserId;
