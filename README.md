@@ -1,1 +1,87 @@
 # GatewayVPN
+Gateway VPN (v2.4.18-p2) - 跑团电子道具伪终端
+
+一个专为跑团（Delta Green 绿色三角洲 / Call of Cthulhu 克苏鲁的呼唤 / ARG 游戏）设计的拟真电子道具网页（Interactive Fake Terminal）。
+
+玩家可以通过登录不同的终端账号，在拟真的暗网/VPN 界面中进行全局情报检索，调取真实的公开 Google 搜索，或解密剧情相关的机密线索、Handout 照片与暗号档案。
+
+🌟 核心特性与亮点
+
+拟真伪终端交互 (ARG Immersion)：
+
+包含代理解密动画（0.8s 加载动画）、固件电路抓包日志、搜索历史记录缓存等深度沉浸式交互。
+
+动态 SAN 值 / 阶段视觉效果：随检索次数增加，背景会自动触发色相偏移（hue-rotate）与高频辐射脉冲警告，模拟理智值下降或硬件过热。
+
+Google 直达 + 暗网彩蛋双轨检索：
+
+输入任意关键词时，永远优先展示直达 Google 真实搜索 的卡片（突破浏览器异步弹窗拦截，秒开新标签页）。
+
+匹配预设线索词（如 tafu, mckay, cool, king, wallace, dabiq）时，解锁机密案宗卡片。
+
+双线索展示模式 (Side Drawer & Image Modal)：
+
+右侧滑动抽屉 (Side Drawer)：点击暗网线索卡片后，右侧展开高科技抽屉面板，展示 Handout 大图、详细案宗文本与机密元数据。
+
+集中通知弹窗 (Image Modal)：搜索达到指定次数后，跳出带有短信截图或警告图像的集中通知。
+
+多账号身份与隔离 (Players & Isolation)：
+
+支持预设账号（如 Peanut, Schnell, Player 1~4 等）与自定义注册登录。
+
+使用 localStorage 隔离不同账号的检索历史与特定视角专属暗号（例如 Peanut 搜 Schnell 与 Schnell 搜 Peanut 会触发各自专属速报）。
+
+高可扩展性模块化架构：
+
+项目完全解耦，将界面逻辑、数据库、玩家数据、弹窗系统和线索 Handout 分开管理，拒绝“屎山代码”。
+
+📁 目录架构说明
+
+├── index.html         # 网页主结构（DOM 骨架、侧边栏抽屉与弹窗容器）
+├── style.css          # 全局伪终端视觉样式（深色赛博/黑客极客风）
+├── database.js       # 线索案宗与专属暗号数据库（含图片与 Handout 长文）
+├── players.js        # 玩家账号凭证与节点 Profile 配置
+├── notifications.js  # 多用户差异化搜索触发弹窗规则配置
+├── handouts.js       # 核心 Handout 控制器（右侧抽屉与图片弹窗逻辑）
+├── main.js           # 页面核心交互逻辑（搜索、时钟、解密跳转）
+└── README.md         # 项目说明文档
+
+⚙️ 快速上手与配置指南
+
+1. 本地运行
+
+直接双击打开 index.html，或通过 VS Code 插件 Live Server 本地启动。
+
+2. 添加/修改线索图片与 Handout
+
+打开 database.js，找到对应的关键词项，添加或修改 image 与 detailText 字段：
+
+"mckay": {
+    title: "康奈尔大学姐妹会枪案 - 案宗记录",
+    domain: "ithaca-pd.gov/restricted/file-CAR-5-58",
+    snippet: "【物证鉴定与矛盾报告】现场提取到一张现场照片...",
+    image: "images/mckay_handout.jpg", // 👈 支持本地相对路径或外链 URL
+    detailText: "【详细解密文本】现场房间结构与照片严重不符...",
+    footer: "来源: 伊萨卡警方刑事侦查科"
+}
+
+
+3. 配置不同玩家的搜索弹窗
+
+打开 notifications.js，按搜索次数自由配置针对特定玩家的触发弹窗：
+
+const userNotifications = {
+    "peanut": {
+        3: "【设备通知】收到来自个人通讯录的加密短信...",
+        6: "【硬件温度警告】检测到芯片温度升至 72°C..."
+    }
+};
+
+
+🛠️ 技术栈
+
+HTML5 / CSS3：采用 Flexbox 布局、CSS Variables 自定义变量、backdrop-filter 高斯模糊与动画。
+
+Vanilla JavaScript (ES6+)：无第三方库依赖，轻量快速，纯原生态 DOM 操作。
+
+Web Storage API：localStorage 本地状态记忆与多账号缓存机制。
