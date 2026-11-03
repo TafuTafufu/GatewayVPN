@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gateway VPN v2.4 - 极速隐私网络</title>
+    <title>Gateway VPN v2.4 - 您的极速隐私网络</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -21,11 +21,13 @@
             <div class="subtitle">请输入硬件凭证或终端身份代号</div>
             <div class="form-group">
                 <label>USERNAME / USER IDENTITY</label>
-                <input type="text" id="usernameInput" placeholder="输入用户名">
+                <!-- 支持回车直接登录 -->
+                <input type="text" id="usernameInput" placeholder="输入用户名" onkeypress="handleAuthKeyPress(event)">
             </div>
             <div class="form-group">
                 <label>PASSCODE</label>
-                <input type="password" id="passwordInput" placeholder="密码">
+                <!-- 支持回车直接登录 -->
+                <input type="password" id="passwordInput" placeholder="密码" onkeypress="handleAuthKeyPress(event)">
             </div>
             <button class="auth-btn" onclick="login()">连接 (CONNECT)</button>
             <div class="auth-hint" id="authErrorMsg">
@@ -114,11 +116,11 @@
         </div>
     </div>
 
-  <!-- 脚本加载 -->
+    <!-- 脚本按照正确逻辑依赖按序加载 -->
     <script src="database.js"></script>
     <script src="players.js"></script>
     <script src="notifications.js"></script>
-    <script src="handouts.js"></script>  <!-- 👈 引入新建的 handouts.js -->
+    <script src="handouts.js"></script>
     <script src="main.js"></script>
 </body>
 </html>
