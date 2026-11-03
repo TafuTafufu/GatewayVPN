@@ -1,1 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TERMINAL MINI-GAME // DWARF ADVENTURE</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #0b0f19;
+            color: #00e5ff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            height: 100vh; overflow: hidden;
+        }
+        .game-container {
+            width: 600px; background: #111827;
+            border: 2px solid #00e5ff; border-radius: 8px;
+            padding: 20px; box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
+            position: relative;
+        }
+        .game-header {
+            display: flex; justify-content: space-between;
+            margin-bottom: 10px; font-weight: bold; border-bottom: 1px solid #1f293d; padding-bottom: 5px;
+        }
+        canvas {
+            background: #050811; border: 1px solid #1f293b;
+            display: block; margin: 0 auto;
+            image-rendering: pixelated; /* 强制像素化渲染 */
+        }
+        /* 对话框与道具交互 overlay */
+        .dialog-box {
+            position: absolute; bottom: 30px; left: 30px; right: 30px;
+            background: rgba(15, 23, 42, 0.95); border: 1px solid #00e5ff;
+            border-radius: 4px; padding: 15px; display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+        }
+        .dialog-speaker { color: #ff0055; font-weight: bold; margin-bottom: 5px; }
+        .dialog-text { color: #e2e8f0; font-size: 14px; line-height: 1.5; margin-bottom: 10px; }
+        .dialog-btn {
+            background: #00e5ff; color: #0b0f19; border: none;
+            padding: 5px 12px; font-weight: bold; cursor: pointer;
+            font-family: inherit; border-radius: 3px;
+        }
+        .dialog-btn:hover { background: #33ebd; }
+        .controls-hint {
+            text-align: center; margin-top: 10px; color: #64748b; font-size: 12px;
+        }
+    </style>
+</head>
+<body>
 
+<div class="game-container">
+    <div class="game-header">
+        <span>DWARF RUNNER v1.0</span>
+        <span id="score">距离: 0m</span>
+    </div>
+    
+    <canvas id="gameCanvas" width="560" height="200"></canvas>
+
+    <!-- 交互对话框 -->
+    <div class="dialog-box" id="dialogBox">
+        <div class="dialog-speaker" id="dialogSpeaker">【未知实体】</div>
+        <div class="dialog-text" id="dialogText">前方发现异样波动...</div>
+        <button class="dialog-btn" onclick="nextDialog()">[按 ENTER 继续]</button>
+    </div>
+
+    <div class="controls-hint">按 [SPACE / 空格键] 或 [方向键 ↑] 跳过障碍 | 靠近事件触发对话</div>
+</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let distance = 0;
+let isPaused = false;
+let currentEvent = null;
+
+// 矮人主角（像素块模拟）
+const dwarf = {
+    x: 50, y: 140, width: 20, height: 25,
+    velocityY: 0, gravity: 0.8, isJumping: false,
+    color: '#ff9900'
+};
+
+// 障碍物/交互道具队列
+let obstacles = [];
+let gameFrame = 0;
+
+// 剧情事件节点 (距离触发)
+const storyEvents = [
+    {
+        dist: 100,
+        speaker: "【路过的松鼠】",
+        text: "前面有地精守卫！拿着这瓶 [伊斯班克药水]，可能有用！",
+        item: "伊斯班克药水"
+    },
+    {
+        dist: 250,
+        speaker: "【地牢看守者】",
+        text: "站住！口令是什么？输入正确的指令才能通过！",
+        item: null
+    }
+];
+
+function drawDwarf() {
+    // 简单绘制一个带胡子的像素小矮人
+    ctx.fillStyle = dwarf.color; // 身体/帽子
+    ctx.fillRect(dwarf.x, dwarf.y, dwarf.width, dwarf.height);
+    
+    ctx.fillStyle = '#ffffff'; // 脸
+    ctx.fillRect(dwarf.x + 12, dwarf.y + 4, 8, 6);
+    
+    ctx.fillStyle = '#8B4513'; // 矮人胡子
+    ctx.fillRect(dwarf.x + 10, dwarf.y + 10, 10, 10);
+}
+
+function updateDwarf() {
+    dwarf.y += dwarf.velocityY;
+    if (dwarf.y < 140) {
+        dwarf.velocityY += dwarf.gravity;
+    } else {
+        dwarf.y = 140;
+        dwarf.isJumping = false;
+    }
+}
+
+function handleJump() {
+    if (!dwarf.isJumping && !isPaused) {
+        dwarf.velocityY = -12;
+        dwarf.isJumping = true;
+    }
+}
+
+// 游戏主循环
+function loop() {
+    if (!isPaused) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 画地面
+        ctx.fillStyle = '#1f293d';
+        ctx.fillRect(0, 165, canvas.width, 35);
+        ctx.fillStyle = '#00e5ff';
+        ctx.fillRect(0, 165, canvas.width, 2);
+
+        // 更新并画矮人
+        updateDwarf();
+        drawDwarf();
+
+        // 增加里程
+        gameFrame++;
+        if (gameFrame % 5 === 0) {
+            distance++;
+            document.getElementById('score').innerText = `距离: ${distance}m`;
+            checkStoryEvents();
+        }
+    }
+    requestAnimationFrame(loop);
+}
+
+// 检查剧情触发点
+function checkStoryEvents() {
+    const ev = storyEvents.find(e => e.dist === distance);
+    if (ev) {
+        triggerDialog(ev);
+    }
+}
+
+function triggerDialog(ev) {
+    isPaused = true;
+    currentEvent = ev;
+    document.getElementById('dialogSpeaker').innerText = ev.speaker;
+    document.getElementById('dialogText').innerText = ev.text;
+    document.getElementById('dialogBox').style.display = 'block';
+}
+
+function nextDialog() {
+    document.getElementById('dialogBox').style.display = 'none';
+    isPaused = false;
+}
+
+// 监听键盘按键
+window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' || e.code === 'ArrowUp') {
+        handleJump();
+    }
+    if (e.code === 'Enter' && isPaused) {
+        nextDialog();
+    }
+});
+
+loop();
+</script>
+</body>
+</html>
