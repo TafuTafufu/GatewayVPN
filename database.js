@@ -1,6 +1,5 @@
 // ============================
 // Gateway VPN - 数据库与彩蛋配置
-// 你可以随时在这里增加/修改关键词与自定义搜索结果
 // ============================
 
 // 1. 预设账号与密钥（彩蛋密码）
@@ -23,7 +22,7 @@ const userProfiles = {
     },
     "schnell": {
         name: "Schnell [高级协同节点]",
-        welcome: "通道已链接，Schnell。量子纠缠签名对齐完毕。",
+        welcome: "通道已链接，Schnell。加密签名对齐完毕。",
         consoleLog: "[SYSTEM LOG]\nUser: Schnell\nGateway Protocol: HIGH_PRIORITY\nNote: 绑定账号 Tafu。",
         history: ["Tafu", "工业焊接高频谐振", "极右翼拖车公园监控", "班戈市网络日志"]
     },
@@ -58,11 +57,11 @@ const userProfiles = {
     }
 };
 
-// 3. 【你自定义的特定账号专属搜素结果】（如 Tafu 账号下搜 Schnell）
+// 3. 自定义特定账号专属搜索词条
 const customUserResults = {
     "tafu": {
         "schnell": {
-            title: "🔐 [专属加密文档] 关于 Schnell 的量子谐振通信与协同记录",
+            title: "🔐 [专属加密文档] 关于 Schnell 的通信与协同记录",
             domain: "aegis.gateway.internal/user/tafu/schnell-telemetry",
             snippet: "【双向握手成功】关联签名: Schnell。该节点与 Tafu 的物理算子呈现 100% 谐振。历史拦截日志显示多次高频工业谐振数据传输，底盘及信号节点均已锁定。",
             footer: "机密等级: ROOT ONLY / 独家解读权限"
@@ -78,7 +77,7 @@ const customUserResults = {
     }
 };
 
-// 4. 全局公共暗网数据库
+// 4. 全局模组/暗网案宗数据库
 const database = {
     "mckay": {
         title: "康奈尔大学姐妹会枪案 - 嫌疑人布拉德利·麦凯 (Bradley McKay) 案宗记录",
