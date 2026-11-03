@@ -47,6 +47,8 @@
         </div>
         <div class="status-bar">
             <div class="user-tag" id="currentUserTag">身份: 尚未登录</div>
+            <!-- 新增 [主页] 按钮 -->
+            <button class="tab-btn" onclick="goHome()">[主页]</button>
             <button class="tab-btn" onclick="openHistoryModal()">[搜索历史]</button>
             <button class="tab-btn" onclick="logout()">[切换身份]</button>
             <button class="tab-btn" onclick="openConsole()">[检视抓包]</button>
@@ -117,7 +119,7 @@
         </div>
     </div>
 
-  <!-- 脚本按照正确逻辑依赖按序加载（已加上 js/ 文件夹路径） -->
+    <!-- 脚本按照正确逻辑依赖按序加载（已加上 js/ 文件夹路径） -->
     <script src="js/database.js"></script>
     <script src="js/players.js"></script>
     <script src="js/notifications.js"></script>
