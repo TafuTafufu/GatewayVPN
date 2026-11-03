@@ -35,7 +35,7 @@ function handleAuthKeyPress(e) {
     }
 }
 
-// 严谨登录鉴权逻辑
+// 登录鉴权逻辑
 function login() {
     const userIn = document.getElementById('usernameInput').value.trim();
     const passIn = document.getElementById('passwordInput').value.trim();
@@ -156,7 +156,7 @@ function executeSearch() {
         container.appendChild(createResultCard(customItem, 'anomaly'));
     }
 
-    // 3. 模组彩蛋关键词（包含 tafu 掌局者与 dwarf 矮人小游戏支持）
+    // 3. 模组彩蛋关键词（捕获 tafu 掌局者与 dwarf 矮人小游戏）
     let matchedKeys = [];
     if (lowerInput.includes("tafu") || lowerInput.includes("塔夫") || lowerInput.includes("掌局者")) matchedKeys.push("tafu");
     if (lowerInput.includes("dwarf") || lowerInput.includes("矮人")) matchedKeys.push("dwarf");
@@ -201,7 +201,7 @@ function createResultCard(data, styleClass) {
                 <span>${data.domain}</span>
                 <span>ENCRYPTED NODE</span>
             </div>
-            <div class="result-title" onclick="triggerCardAction('${encodedData}')">${data.title}</div>
+            <div class="result-title" style="cursor:pointer;" onclick="triggerCardAction('${encodedData}')">${data.title}</div>
             <div class="result-snippet">${data.snippet}</div>
             <div class="result-footer">${data.footer}</div>
         `;
@@ -209,7 +209,7 @@ function createResultCard(data, styleClass) {
     return card;
 }
 
-// 点击线索卡片，经过 0.8 秒解密动画后拉出右侧 Handout 抽屉
+// 核心改进：解密动画结束后，直接在主窗口挂载“内嵌游戏视窗”或打开抽屉
 function triggerCardAction(encodedData) {
     const data = JSON.parse(decodeURIComponent(encodedData));
     const loader = document.getElementById('loaderOverlay');
@@ -221,17 +221,44 @@ function triggerCardAction(encodedData) {
 
         setTimeout(() => {
             loader.style.display = 'none';
-            if (typeof openDrawerWithData === 'function') {
+            // 如果是矮人模拟器/小游戏，直接在主界面渲染全屏视窗！
+            if (data.domain && (data.domain.includes('/games/') || data.domain.includes('dwarf_adventure'))) {
+                renderGameInMainView(data);
+            } else if (typeof openDrawerWithData === 'function') {
                 openDrawerWithData(data);
             } else {
                 alert(`想喝伊斯班克？带上梯子和手来见我！`);
             }
         }, 800);
     } else {
-        if (typeof openDrawerWithData === 'function') {
+        if (data.domain && (data.domain.includes('/games/') || data.domain.includes('dwarf_adventure'))) {
+            renderGameInMainView(data);
+        } else if (typeof openDrawerWithData === 'function') {
             openDrawerWithData(data);
         }
     }
+}
+
+// 🌟 新增：直接在终端中央替换为小游戏仿真控制面板
+function renderGameInMainView(data) {
+    const container = document.getElementById('resultsContainer');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="result-card anomaly" style="border-color: #00e5ff; background: rgba(0, 229, 255, 0.05); padding: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(0, 229, 255, 0.3); padding-bottom: 8px;">
+                <span style="color: #00e5ff; font-weight: bold; font-size: 16px;">🎮 [虚拟终端内嵌程序]: ${data.title}</span>
+                <button onclick="goHome()" style="background: #ff3366; color: #fff; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">✖ 退出程序 (CLOSE)</button>
+            </div>
+            <div style="width: 100%; height: 500px; border: 1px solid #00e5ff; border-radius: 6px; overflow: hidden; background: #000; margin-bottom: 10px;">
+                <iframe src="games/dwarf_adventure/index.html" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; color: var(--text-dim); font-size: 12px;">
+                <span>${data.footer || "SYSTEM // MINI-GAME MODULE"}</span>
+                <a href="games/dwarf_adventure/index.html" target="_blank" style="color: #00e5ff; text-decoration: underline;">[在新窗口单独全屏打开]</a>
+            </div>
+        </div>
+    `;
 }
 
 function updateStageEffects() {
@@ -308,4 +335,5 @@ window.openHistoryModal = openHistoryModal;
 window.closeHistoryModal = closeHistoryModal;
 window.clearHistory = clearHistory;
 window.triggerCardAction = triggerCardAction;
+window.renderGameInMainView = renderGameInMainView;
 window.goHome = goHome;
