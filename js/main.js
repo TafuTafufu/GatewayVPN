@@ -35,7 +35,7 @@ function handleAuthKeyPress(e) {
     }
 }
 
-// 登录鉴权控制（防报错增强版）
+// 登录鉴权控制
 function login() {
     const userInEl = document.getElementById('usernameInput');
     const passInEl = document.getElementById('passwordInput');
@@ -78,7 +78,6 @@ function login() {
             }
             currentUser = lowerUser;
         } else {
-            // 拒绝未知身份进入
             if (errorMsg) {
                 errorMsg.style.color = "#ff3366";
                 errorMsg.innerText = `无法识别的终端身份代号！`;
@@ -87,7 +86,6 @@ function login() {
         }
     }
 
-    // 成功连接，强制隐藏登录框
     setCurrentUserId(currentUser);
     const authOverlay = document.getElementById('authOverlay');
     if (authOverlay) authOverlay.style.display = 'none';
@@ -185,7 +183,7 @@ function executeSearch() {
         container.appendChild(createResultCard(customItem, 'anomaly'));
     }
 
-    // 3. 模组彩蛋关键词（捕获 tafu 掌局者与 dwarf 矮人小游戏）
+    // 3. 模组彩蛋关键词（精准捕获 tafu 与 dwarf 矮人小游戏）
     let matchedKeys = [];
     if (lowerInput.includes("tafu") || lowerInput.includes("塔夫") || lowerInput.includes("掌局者")) matchedKeys.push("tafu");
     if (lowerInput.includes("dwarf") || lowerInput.includes("矮人")) matchedKeys.push("dwarf");
@@ -250,6 +248,7 @@ function triggerCardAction(encodedData) {
 
         setTimeout(() => {
             loader.style.display = 'none';
+            // 判断是否是小游戏（无需弹窗与抽屉，直接内嵌主界面）
             if (data.domain && (data.domain.includes('/games/') || data.domain.includes('dwarf_adventure'))) {
                 renderGameInMainView(data);
             } else if (typeof window.openDrawerWithData === 'function') {
