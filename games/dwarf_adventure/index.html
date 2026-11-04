@@ -15,10 +15,10 @@
             height: 100vh; overflow: hidden;
         }
         .game-container {
-            width: 680px; background: #12161a;
+            width: 100%; max-width: 680px; background: #12161a;
             border: 1px solid #37474f; border-radius: 6px;
             padding: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-            position: relative;
+            position: relative; margin: 0 auto;
         }
         .game-header {
             display: flex; justify-content: space-between; align-items: center;
@@ -26,11 +26,12 @@
             color: #90a4ae; font-size: 13px;
         }
         canvas {
-            background: #080a0c; border: 1px solid #1c242b;
+            background: #0f141a; border: 1px solid #263238;
             display: block; margin: 0 auto;
             image-rendering: pixelated;
+            width: 100%; max-width: 640px; height: 220px;
         }
-        /* 低饱和度 / 黑灰复古对话框 */
+        /* 低饱和度对话框 */
         .dialog-box {
             position: absolute; bottom: 30px; left: 30px; right: 30px;
             background: rgba(18, 22, 26, 0.95); border: 1px solid #546e7a;
@@ -59,9 +60,8 @@
         <span id="score">探索进度: 0m</span>
     </div>
     
-    <canvas id="gameCanvas" width="640" height="220"></canvas>
+    <canvas id="gameCanvas" width="640" height="220">您的浏览器不支持 Canvas 渲染。</canvas>
 
-    <!-- 剧情对话框 -->
     <div class="dialog-box" id="dialogBox">
         <div class="dialog-speaker" id="dialogSpeaker">【未知实体】</div>
         <div class="dialog-text" id="dialogText">前方发现异样波动...</div>
@@ -72,42 +72,296 @@
 </div>
 
 <script>
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+// 严格等待 DOM 完全加载后再启动，防止白屏崩溃
+window.addEventListener('DOMContentLoaded', () => {
+    try {
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
 
-let worldX = 0; // 世界全局坐标
-let isPaused = false;
-let gameFrame = 0;
-let currentStoryStep = -1;
+        // 强制初始化内部绘制分辨率
+        canvas.width = 640;
+        canvas.height = 220;
 
-// 控制移动按键标记
-const keys = {
-    left: false,
-    right: false
-};
+        let worldX = 0; 
+        let isPaused = false;
+        let gameFrame = 0;
+        let currentStoryStep = -1;
 
-// 主角矮人法师（高冷黑白灰 / 灰蓝法袍配色）
-const dwarf = {
-    x: 80, y: 150, width: 22, height: 28,
-    vy: 0, gravity: 0.75, isJumping: false,
-    facingRight: true, hasKey: false, catRescued: false
-};
+        // 鲁棒的按键状态管理
+        const keys = { left: false, right: false };
 
-// Jellycat 花生猫（暖浅棕+白色）
-const cat = {
-    x: 50, y: 158, followDistance: 30
-};
+        // 矮人主角（提亮了面部和衣袍颜色以增加对比度）
+        const dwarf = {
+            x: 80, y: 150, width: 22, height: 28,
+            vy: 0, gravity: 0.75, isJumping: false,
+            facingRight: true, hasKey: false, catRescued: false
+        };
 
-// 放置在场景里的世界物体
-const worldObjects = [
-    { type: 'item', x: 280, name: '提夫林散落包' },
-    { type: 'tower', x: 900, name: '古老高塔' }
-];
+        const cat = { x: 50, y: 158, followDistance: 30 };
 
-// 剧情触发顺序
-const storySequence = [
-    {
-        triggerX: 220,
-        speaker: "【路边的遗落物】",
-        text: "矮人法师停下了脚步。\n地面上散落着一些零碎东西：几根淡灰色的羽毛、一柄折断的欧利哈刚鲁特琴弦，以及一把带有羊角纹路的黑色皮质钥匙包。\n矮人法师：“这显然是一个提夫林吟游诗人掉的破烂……嗯？不过这把钥匙看起来挺别致的，收着吧。”",
-        action: () => { dwarf.hasKey = true; }
+        const worldObjects = [
+            { type: 'item', x: 280, name: '提夫林散落包' },
+            { type: 'tower', x: 900, name: '古老高塔' }
+        ];
+
+        const storySequence = [
+            {
+                triggerX: 220, speaker: "【路边的遗落物】",
+                text: "矮人法师停下了脚步。\n地面上散落着一些零碎东西：几根淡灰色的羽毛、一柄折断的欧利哈刚鲁特琴弦，以及一把带有羊角纹路的黑色皮质钥匙包。\n矮人法师：“这显然是一个提夫林吟游诗人掉的破烂……嗯？不过这把钥匙看起来挺别致的，收着吧。”",
+                action: () => { dwarf.hasKey = true; }
+            },
+            {
+                triggerX: 650, speaker: "【高处传来急促的喊声】",
+                text: "“救命啊！救救我！我被邪恶巫术变成花生猫了！”\n“好心的路人！救救我！我被关在高塔顶层的小窗户里了！”",
+                action: () => {}
+            },
+            {
+                triggerX: 850, speaker: "【高塔窗沿的花生猫】",
+                text: "矮人法师走到了高塔下方。高处的小窄窗里，一对猫耳朵在一跳一跳地求救！\n花生猫：“好心人！快用那把钥匙！或者……等等，你也是个法师？！”",
+                action: () => {}
+            },
+            {
+                triggerX: 851, speaker: "【矮人法师】",
+                text: "矮人掏出刚才捡到的提夫林钥匙，挥动法杖吟唱淡色法术：“Alazaster Transmutio!”\n微弱的柔和光辉顺着高塔延伸，锁扣应声解开，小花生猫轻盈地从窗户跳了下来！",
+                action: () => { dwarf.catRescued = true; }
+            },
+            {
+                triggerX: 852, speaker: "【被救出的花生猫】",
+                text: "花生猫拍了拍身上的灰尘，感激地凑上前说：\n“太谢谢你啦，小朋友！这么小就一个人出来冒险了？你长大以后一定会成为一个伟大的英雄的！”\n\n矮人法师顿时瞪大了眼睛，灰色胡子都气得炸了起来：\n“谁是小朋友？！我今年都一百四十二岁了！我是矮人！矮人！懂不懂什么叫高山尊贵血统？！”",
+                action: () => {}
+            }
+        ];
+
+        function drawEnvironment() {
+            // 背景山脉
+            ctx.fillStyle = '#101418';
+            ctx.beginPath();
+            ctx.moveTo(0, 180);
+            for (let i = 0; i <= canvas.width; i += 40) {
+                let mountainY = 135 + Math.sin((i + worldX * 0.2) * 0.015) * 20;
+                ctx.lineTo(i, mountainY);
+            }
+            ctx.lineTo(canvas.width, 220);
+            ctx.lineTo(0, 220);
+            ctx.fill();
+
+            // 地面
+            ctx.fillStyle = '#182026';
+            ctx.fillRect(0, 178, canvas.width, 42);
+            ctx.fillStyle = '#37474f';
+            ctx.fillRect(0, 178, canvas.width, 2);
+
+            // 碎草
+            for (let x = -200; x < 2000; x += 100) {
+                let screenX = x - worldX;
+                if (screenX > -20 && screenX < canvas.width + 20) {
+                    ctx.fillStyle = '#263238';
+                    ctx.fillRect(screenX, 172, 3, 6);
+                }
+            }
+        }
+
+        function drawDwarf() {
+            ctx.save();
+            let drawX = dwarf.x;
+
+            if (!dwarf.facingRight) {
+                ctx.translate(drawX + dwarf.width / 2, 0);
+                ctx.scale(-1, 1);
+                ctx.translate(-(drawX + dwarf.width / 2), 0);
+            }
+
+            // 帽子
+            ctx.fillStyle = '#37474f';
+            ctx.beginPath();
+            ctx.moveTo(drawX + 11, dwarf.y - 10);
+            ctx.lineTo(drawX + 1, dwarf.y + 2);
+            ctx.lineTo(drawX + 21, dwarf.y + 2);
+            ctx.fill();
+
+            // 法袍（颜色提亮，确立存在感）
+            ctx.fillStyle = '#607d8b';
+            ctx.fillRect(drawX + 3, dwarf.y + 2, 16, 17);
+
+            // 深灰裤装
+            ctx.fillStyle = '#263238';
+            ctx.fillRect(drawX + 4, dwarf.y + 19, 14, 7);
+
+            // 脸部（使用高亮纯白，非常显眼）
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(drawX + 12, dwarf.y + 4, 7, 5);
+
+            // 灰色胡须
+            ctx.fillStyle = '#90a4ae';
+            ctx.fillRect(drawX + 9, dwarf.y + 9, 11, 10);
+
+            // 法杖
+            ctx.fillStyle = '#455a64';
+            ctx.fillRect(drawX - 2, dwarf.y, 3, 26);
+            ctx.fillStyle = '#b0bec5';
+            ctx.fillRect(drawX - 4, dwarf.y - 4, 7, 6);
+
+            ctx.restore();
+        }
+
+        function drawCat() {
+            if (dwarf.catRescued) {
+                let targetX = dwarf.facingRight ? dwarf.x - cat.followDistance : dwarf.x + cat.followDistance;
+                cat.x += (targetX - cat.x) * 0.1;
+
+                ctx.fillStyle = '#d7ccc8';
+                ctx.fillRect(cat.x, 158, 14, 16);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(cat.x + 4, 164, 6, 8);
+
+                ctx.fillStyle = '#bcaaa4';
+                ctx.fillRect(cat.x + 2, 153, 3, 5);
+                ctx.fillRect(cat.x + 9, 153, 3, 5);
+
+                ctx.fillStyle = '#37474f';
+                ctx.fillRect(cat.x + 9, 160, 2, 3);
+            }
+        }
+
+        function drawWorldObjects() {
+            worldObjects.forEach(obj => {
+                let screenX = obj.x - worldX;
+
+                if (obj.type === 'item' && !dwarf.hasKey) {
+                    ctx.fillStyle = '#607d8b';
+                    ctx.fillRect(screenX, 170, 12, 9);
+                    ctx.fillStyle = '#cfd8dc';
+                    ctx.fillRect(screenX + 3, 168, 6, 2);
+                }
+
+                if (obj.type === 'tower') {
+                    ctx.fillStyle = '#1c242b';
+                    ctx.fillRect(screenX, 20, 80, 158);
+                    ctx.fillStyle = '#263238';
+                    ctx.fillRect(screenX - 5, 15, 90, 10);
+
+                    ctx.fillStyle = '#0a0d10';
+                    ctx.fillRect(screenX + 30, 45, 20, 25);
+
+                    if (!dwarf.catRescued) {
+                        let catAnimY = 48 + Math.sin(gameFrame * 0.12) * 3;
+                        ctx.fillStyle = '#d7ccc8';
+                        ctx.fillRect(screenX + 32, catAnimY, 5, 6);
+                        ctx.fillRect(screenX + 43, catAnimY, 5, 6);
+                        ctx.fillRect(screenX + 34, catAnimY + 4, 12, 7);
+                    }
+                }
+            });
+        }
+
+        function updatePlayer() {
+            if (isPaused) return;
+
+            if (keys.right) {
+                dwarf.facingRight = true;
+                if (dwarf.x < canvas.width * 0.5) {
+                    dwarf.x += 2.2;
+                } else {
+                    worldX += 2.2;
+                }
+            } else if (keys.left) {
+                dwarf.facingRight = false;
+                if (worldX > 0 && dwarf.x <= canvas.width * 0.5) {
+                    worldX -= 2.2;
+                } else if (dwarf.x > 20) {
+                    dwarf.x -= 2.2;
+                }
+            }
+
+            dwarf.y += dwarf.vy;
+            if (dwarf.y < 150) {
+                dwarf.vy += dwarf.gravity;
+            } else {
+                dwarf.y = 150;
+                dwarf.isJumping = false;
+            }
+
+            let currentTotalX = Math.floor(worldX + dwarf.x);
+            const scoreEl = document.getElementById('score');
+            if(scoreEl) scoreEl.innerText = `探索进度: ${Math.floor(currentTotalX / 10)}m`;
+
+            checkStoryEvents(currentTotalX);
+        }
+
+        function checkStoryEvents(currentTotalX) {
+            let nextStep = currentStoryStep + 1;
+            if (nextStep < storySequence.length) {
+                let ev = storySequence[nextStep];
+                if (currentTotalX >= ev.triggerX) {
+                    currentStoryStep = nextStep;
+                    triggerDialog(ev);
+                }
+            }
+        }
+
+        function triggerDialog(ev) {
+            isPaused = true;
+            keys.left = keys.right = false;
+            if (ev.action) ev.action();
+
+            document.getElementById('dialogSpeaker').innerText = ev.speaker;
+            document.getElementById('dialogText').innerText = ev.text;
+            document.getElementById('dialogBox').style.display = 'block';
+        }
+
+        // 挂载到 window 让 HTML onclick 能够调用
+        window.advanceStory = function() {
+            document.getElementById('dialogBox').style.display = 'none';
+            isPaused = false;
+        };
+
+        function loop() {
+            try {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                gameFrame++;
+                updatePlayer();
+                drawEnvironment();
+                drawWorldObjects();
+                drawCat();
+                drawDwarf();
+                requestAnimationFrame(loop);
+            } catch (err) {
+                // 如果发生渲染错误，直接在黑板上用红字打印出来
+                ctx.fillStyle = '#ff3366';
+                ctx.font = '14px Courier';
+                ctx.fillText("CRASH ERROR: " + err.message, 10, 30);
+            }
+        }
+
+        // 更鲁棒的按键监听 (防 e.code 不兼容问题)
+        window.addEventListener('keydown', (e) => {
+            const key = e.key || e.code || "";
+            if (key.toLowerCase() === 'd' || key === 'ArrowRight') keys.right = true;
+            if (key.toLowerCase() === 'a' || key === 'ArrowLeft') keys.left = true;
+            
+            if ((key === ' ' || key === 'Spacebar' || key === 'ArrowUp') && !dwarf.isJumping && !isPaused) {
+                dwarf.vy = -10.5;
+                dwarf.isJumping = true;
+                e.preventDefault(); // 防止按空格引起网页滚动
+            }
+            if (key === 'Enter' && isPaused) {
+                window.advanceStory();
+                e.preventDefault();
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            const key = e.key || e.code || "";
+            if (key.toLowerCase() === 'd' || key === 'ArrowRight') keys.right = false;
+            if (key.toLowerCase() === 'a' || key === 'ArrowLeft') keys.left = false;
+        });
+
+        loop();
+
+    } catch (criticalError) {
+        console.error("Game Initialization Failed:", criticalError);
+    }
+});
+</script>
+</body>
+</html>
