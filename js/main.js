@@ -35,60 +35,46 @@ function handleAuthKeyPress(e) {
     }
 }
 
-// 登录鉴权控制
+// 严谨登录鉴权逻辑
 function login() {
-    const userInEl = document.getElementById('usernameInput');
-    const passInEl = document.getElementById('passwordInput');
+    const userIn = document.getElementById('usernameInput').value.trim();
+    const passIn = document.getElementById('passwordInput').value.trim();
     const errorMsg = document.getElementById('authErrorMsg');
 
-    const userIn = userInEl ? userInEl.value.trim() : "";
-    const passIn = passInEl ? passInEl.value.trim() : "";
-
     if (!userIn) {
-        if (errorMsg) {
-            errorMsg.style.color = "#ff3366";
-            errorMsg.innerText = `无法识别的终端身份代号！`;
-        }
+        errorMsg.style.color = "#ff3366";
+        errorMsg.innerText = `无法识别的终端身份代号！`;
         return;
     }
 
     const lowerUser = userIn.toLowerCase();
     let currentUser = "";
 
-    // 检查预设数据库 accountDb
     if (window.accountDb && window.accountDb[lowerUser]) {
         if (window.accountDb[lowerUser].password && window.accountDb[lowerUser].password !== passIn) {
-            if (errorMsg) {
-                errorMsg.style.color = "#ff3366";
-                errorMsg.innerText = `口令不正确！`;
-            }
+            errorMsg.style.color = "#ff3366";
+            errorMsg.innerText = `口令不正确！`;
             return;
         }
         currentUser = lowerUser;
     } else {
-        // 检查本地存储用户
         let localUsers = JSON.parse(localStorage.getItem('gateway_users') || '{}');
         if (localUsers[lowerUser]) {
             if (localUsers[lowerUser].password !== passIn) {
-                if (errorMsg) {
-                    errorMsg.style.color = "#ff3366";
-                    errorMsg.innerText = `口令不正确！`;
-                }
+                errorMsg.style.color = "#ff3366";
+                errorMsg.innerText = `口令不正确！`;
                 return;
             }
             currentUser = lowerUser;
         } else {
-            if (errorMsg) {
-                errorMsg.style.color = "#ff3366";
-                errorMsg.innerText = `无法识别的终端身份代号！`;
-            }
+            errorMsg.style.color = "#ff3366";
+            errorMsg.innerText = `无法识别的终端身份代号！`;
             return;
         }
     }
 
     setCurrentUserId(currentUser);
-    const authOverlay = document.getElementById('authOverlay');
-    if (authOverlay) authOverlay.style.display = 'none';
+    document.getElementById('authOverlay').style.display = 'none';
     
     let pKey = window.accountDb && window.accountDb[currentUser] ? window.accountDb[currentUser].profileKey : currentUser;
     
@@ -101,35 +87,24 @@ function login() {
 
     window.activeProfile = profile;
 
-    const userTag = document.getElementById('currentUserTag');
-    if (userTag) userTag.innerText = `身份: ${profile.name}`;
-    
-    const consoleLogText = document.getElementById('consoleLogText');
-    if (consoleLogText) consoleLogText.innerText = profile.consoleLog;
+    document.getElementById('currentUserTag').innerText = `身份: ${profile.name}`;
+    document.getElementById('consoleLogText').innerText = profile.consoleLog;
     
     renderWelcomeCard(profile.welcome);
 }
 
 function logout() {
     setCurrentUserId("visitor");
-    const authOverlay = document.getElementById('authOverlay');
-    if (authOverlay) authOverlay.style.display = 'flex';
-    
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) searchInput.value = '';
-    
-    const errorMsg = document.getElementById('authErrorMsg');
-    if (errorMsg) {
-        errorMsg.style.color = 'var(--text-dim)';
-        errorMsg.innerText = '说明：终端将建立高密加密隧道。';
-    }
+    document.getElementById('authOverlay').style.display = 'flex';
+    document.getElementById('searchInput').value = '';
+    document.getElementById('authErrorMsg').style.color = 'var(--text-dim)';
+    document.getElementById('authErrorMsg').innerText = '说明：终端将建立高密加密隧道。';
     document.body.className = '';
     searchCount = 0;
 }
 
 function renderWelcomeCard(welcomeText) {
     const container = document.getElementById('resultsContainer');
-    if (!container) return;
     container.innerHTML = `
         <div class="result-card">
             <div class="result-meta">
@@ -148,12 +123,10 @@ function handleKeyPress(e) {
 }
 
 function executeSearch() {
-    const searchInput = document.getElementById('searchInput');
-    if (!searchInput) return;
-    const input = searchInput.value.trim();
+    const input = document.getElementById('searchInput').value.trim();
     const lowerInput = input.toLowerCase();
     const container = document.getElementById('resultsContainer');
-    if (!input || !container) return;
+    if (!input) return;
 
     searchCount++;
     updateStageEffects();
@@ -167,7 +140,7 @@ function executeSearch() {
         }
     }
 
-    // 1. Google 搜索卡片
+    // 1. Google 搜索卡片（原生 <a> 标签跳转，绕过弹窗拦截）
     const googleCardData = {
         title: `🌐 在 Google 上搜索: "${input}"`,
         domain: `https://www.google.com/search?q=${encodeURIComponent(input)}`,
@@ -183,7 +156,7 @@ function executeSearch() {
         container.appendChild(createResultCard(customItem, 'anomaly'));
     }
 
-    // 3. 模组彩蛋关键词（精准捕获 tafu 与 dwarf 矮人小游戏）
+    // 3. 模组彩蛋关键词（捕获 tafu 掌局者与 dwarf 矮人小游戏）
     let matchedKeys = [];
     if (lowerInput.includes("tafu") || lowerInput.includes("塔夫") || lowerInput.includes("掌局者")) matchedKeys.push("tafu");
     if (lowerInput.includes("dwarf") || lowerInput.includes("矮人")) matchedKeys.push("dwarf");
@@ -222,7 +195,8 @@ function createResultCard(data, styleClass) {
             <div class="result-footer">${data.footer}</div>
         `;
     } else {
-        const encodedData = encodeURIComponent(JSON.stringify(data));
+        // 关键修复：强制将单引号替换为 %27，防止破坏 HTML 的 onclick 属性
+        const encodedData = encodeURIComponent(JSON.stringify(data)).replace(/'/g, "%27");
         card.innerHTML = `
             <div class="result-meta">
                 <span>${data.domain}</span>
@@ -236,7 +210,7 @@ function createResultCard(data, styleClass) {
     return card;
 }
 
-// 触发解密动画并展开小游戏或抽屉
+// 解密动画结束后，直接在页面中央渲染内嵌游戏视窗或提示
 function triggerCardAction(encodedData) {
     const data = JSON.parse(decodeURIComponent(encodedData));
     const loader = document.getElementById('loaderOverlay');
@@ -248,7 +222,7 @@ function triggerCardAction(encodedData) {
 
         setTimeout(() => {
             loader.style.display = 'none';
-            // 判断是否是小游戏（无需弹窗与抽屉，直接内嵌主界面）
+            // 如果是矮人模拟器/小游戏，直接在主界面渲染内嵌视窗！
             if (data.domain && (data.domain.includes('/games/') || data.domain.includes('dwarf_adventure'))) {
                 renderGameInMainView(data);
             } else if (typeof window.openDrawerWithData === 'function') {
@@ -266,7 +240,7 @@ function triggerCardAction(encodedData) {
     }
 }
 
-// 直接在终端中央替换为小游戏仿真控制面板
+// 在终端中央直接替换为小游戏仿真控制面板
 function renderGameInMainView(data) {
     const container = document.getElementById('resultsContainer');
     if (!container) return;
@@ -295,24 +269,20 @@ function updateStageEffects() {
 }
 
 function openConsole() {
-    const consoleModal = document.getElementById('consoleModal');
-    if (consoleModal) consoleModal.style.display = 'flex';
+    document.getElementById('consoleModal').style.display = 'flex';
 }
 
 function closeConsole() {
-    const consoleModal = document.getElementById('consoleModal');
-    if (consoleModal) consoleModal.style.display = 'none';
+    document.getElementById('consoleModal').style.display = 'none';
 }
 
 function openHistoryModal() {
     renderHistoryList();
-    const historyModal = document.getElementById('historyModal');
-    if (historyModal) historyModal.style.display = 'flex';
+    document.getElementById('historyModal').style.display = 'flex';
 }
 
 function renderHistoryList() {
     const historyContainer = document.getElementById('historyContainer');
-    if (!historyContainer) return;
     if (window.activeProfile && window.activeProfile.history && window.activeProfile.history.length > 0) {
         let html = '<ul class="history-list">';
         window.activeProfile.history.forEach(item => {
@@ -333,11 +303,10 @@ function clearHistory() {
 }
 
 function closeHistoryModal() {
-    const historyModal = document.getElementById('historyModal');
-    if (historyModal) historyModal.style.display = 'none';
+    document.getElementById('historyModal').style.display = 'none';
 }
 
-// 返回主页功能（清空搜索框并重置初始欢迎卡片）
+// 返回主页功能（清空搜索框并重置初始卡片）
 function goHome() {
     const searchInput = document.getElementById('searchInput');
     if (searchInput) searchInput.value = '';
