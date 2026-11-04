@@ -7,46 +7,52 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background-color: #0b0f19;
-            color: #00e5ff;
+            background-color: #0d0f12;
+            color: #cfd8dc;
             font-family: 'Courier New', Courier, monospace;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             height: 100vh; overflow: hidden;
         }
         .game-container {
-            width: 640px; background: #111827;
-            border: 2px solid #00e5ff; border-radius: 8px;
-            padding: 20px; box-shadow: 0 0 25px rgba(0, 229, 255, 0.25);
+            width: 720px; background: #12161a;
+            border: 1px solid #37474f; border-radius: 6px;
+            padding: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
             position: relative;
         }
         .game-header {
-            display: flex; justify-content: space-between;
-            margin-bottom: 12px; font-weight: bold; border-bottom: 1px solid #1f293d; padding-bottom: 6px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px; font-weight: bold; border-bottom: 1px solid #263238; padding-bottom: 6px;
+            color: #90a4ae; font-size: 13px;
         }
         canvas {
-            background: #050811; border: 1px solid #1f293b;
+            background: #080a0c; border: 1px solid #1c242b;
             display: block; margin: 0 auto;
             image-rendering: pixelated;
         }
-        /* 交互对话框Overlay */
+        /* 低饱和度 / 黑灰复古对话框 */
         .dialog-box {
-            position: absolute; bottom: 35px; left: 35px; right: 35px;
-            background: rgba(15, 23, 42, 0.96); border: 1.5px solid #00e5ff;
-            border-radius: 6px; padding: 16px; display: none;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.85);
+            position: absolute; bottom: 30px; left: 30px; right: 30px;
+            background: rgba(18, 22, 26, 0.95); border: 1px solid #546e7a;
+            border-radius: 4px; padding: 14px; display: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.9);
             z-index: 10;
         }
-        .dialog-speaker { color: #ff0055; font-weight: bold; margin-bottom: 6px; font-size: 15px; }
-        .dialog-text { color: #e2e8f0; font-size: 14px; line-height: 1.6; margin-bottom: 12px; white-space: pre-line; }
+        .dialog-speaker { color: #b0bec5; font-weight: bold; margin-bottom: 6px; font-size: 14px; letter-spacing: 1px; }
+        .dialog-text { color: #eceff1; font-size: 13px; line-height: 1.6; margin-bottom: 12px; white-space: pre-line; }
         .dialog-btn {
-            background: #00e5ff; color: #0b0f19; border: none;
-            padding: 6px 14px; font-weight: bold; cursor: pointer;
-            font-family: inherit; border-radius: 4px; transition: background 0.2s;
+            background: #37474f; color: #eceff1; border: 1px solid #546e7a;
+            padding: 5px 12px; font-size: 12px; font-weight: bold; cursor: pointer;
+            font-family: inherit; border-radius: 3px; transition: all 0.2s;
         }
-        .dialog-btn:hover { background: #33ebd1; }
+        .dialog-btn:hover { background: #455a64; color: #fff; }
         .controls-hint {
-            text-align: center; margin-top: 12px; color: #64748b; font-size: 12px;
+            text-align: center; margin-top: 10px; color: #607d8b; font-size: 11px; letter-spacing: 0.5px;
+        }
+        .interactive-prompt {
+            position: absolute; top: 75px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.7); border: 1px solid #90a4ae; color: #eceff1;
+            padding: 4px 10px; font-size: 12px; border-radius: 3px; display: none; pointer-events: none;
         }
     </style>
 </head>
@@ -54,251 +60,154 @@
 
 <div class="game-container">
     <div class="game-header">
-        <span>DWARF MAGE RUNNER v1.2</span>
-        <span id="score">距离: 0m</span>
+        <span>DWARF MAGE // MANUAL EXPLORATION</span>
+        <span id="score">探索进度: 0m</span>
     </div>
     
-    <canvas id="gameCanvas" width="600" height="220"></canvas>
+    <canvas id="gameCanvas" width="680" height="240"></canvas>
+    
+    <!-- 交互按键浮动提示 -->
+    <div class="interactive-prompt" id="interactPrompt">[按 E 键 / 点击进行交互]</div>
 
-    <!-- 交互对话框 -->
+    <!-- 剧情对话框 -->
     <div class="dialog-box" id="dialogBox">
         <div class="dialog-speaker" id="dialogSpeaker">【未知实体】</div>
         <div class="dialog-text" id="dialogText">前方发现异样波动...</div>
         <button class="dialog-btn" id="dialogBtn" onclick="advanceStory()">[按 ENTER / 点击继续]</button>
     </div>
 
-    <div class="controls-hint">按 [SPACE / 空格键] 或 [方向键 ↑] 跳过障碍 | 靠近事件自动停下触发对话</div>
+    <div class="controls-hint">操作说明: [A / D] 或 [← / →] 控制左右移动 | [SPACE / 空格] 跳跃 | [E] 检查交互</div>
 </div>
 
 <script>
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-let distance = 0;
+let worldX = 0; // 世界滚动总偏移距离
 let isPaused = false;
 let gameFrame = 0;
 let currentStoryStep = -1;
 
-// 玩家矮人法师对象（小恐龙式的简单像素组合）
+// 键盘按键状态追踪（实现流畅平滑手动控制）
+const keys = {
+    left: false,
+    right: false,
+    up: false,
+    e: false
+};
+
+// 矮人主角（调色：低饱和度灰蓝衣袍、灰色胡须、暗黄皮靴，符合参考图）
 const dwarf = {
-    x: 60, y: 150, width: 22, height: 28,
-    velocityY: 0, gravity: 0.85, isJumping: false,
+    x: 80, y: 165, width: 22, height: 28,
+    vx: 0, vy: 0, speed: 2.2, gravity: 0.7,
+    isJumping: false, facingRight: true,
     hasKey: false, catRescued: false
 };
 
-// 拾取落物与前方高塔物置
-let itemsOnGround = [
-    { x: 300, type: 'bard_drop', collected: false, name: '【吟游诗人的杂物背包】' }
+// 花生猫（Jellycat 花生猫配色：暖浅棕花生色 #d7ccc8 + 奶白色 #f5f5f5）
+const cat = {
+    x: 50, y: 173, followDistance: 32
+};
+
+// 放置在地图世界中的实体对象
+let worldObjects = [
+    { type: 'item', x: 280, width: 16, triggered: false, name: '提夫林散落包' },
+    { type: 'tower', x: 950, width: 90, triggered: false, name: '古老高塔' }
 ];
 
-let tower = { x: 1200, reached: false };
-let catJumpY = 0; // 高塔小窗猫咪跳跃动画偏移
-
-// 剧情阶段控制
+// 剧情阶段
 const storySequence = [
-    // Step 0: 捡到提夫林吟游诗人的包
     {
-        triggerDist: 40,
+        triggerX: 250,
         speaker: "【路边的遗落物】",
-        text: "矮人法师停下了脚步。\n地面上散落着一些零碎东西：几根彩色羽毛、一柄折断的欧利哈刚鲁特琴弦，以及一把带有恶魔羊角纹路的羊皮钥匙包。\n矮人法师：“这显然是一个提夫林吟游诗人掉的破烂……嗯？不过这把钥匙看起来挺别致的，收着吧。”",
+        text: "矮人法师停下了脚步。\n地面上散落着一些零碎东西：几根淡灰色的羽毛、一柄折断的欧利哈刚鲁特琴弦，以及一把带有羊角纹路的黑色皮质钥匙包。\n矮人法师：“这显然是一个提夫林吟游诗人掉的破烂……嗯？不过这把钥匙看起来挺别致的，收着吧。”",
         action: () => { dwarf.hasKey = true; }
     },
-    // Step 1: 听到高塔呼救
     {
-        triggerDist: 100,
+        triggerX: 720,
         speaker: "【高处传来急促的喊声】",
         text: "“救命啊！救救我！我被邪恶巫术变成花生猫了！”\n“好心的路人！救救我！我被关在高塔顶层的小窗户里了！”",
         action: () => {}
     },
-    // Step 2: 走到高塔下方，展开救援
     {
-        triggerDist: 160,
-        speaker: "【高塔窗沿的猫咪】",
-        text: "矮人法师走到了石塔下方。高处的小窄窗里，一对猫耳朵在一跳一跳地求救！\n花生猫：“好心人！快用那把钥匙！或者……等等，你也是个法师？！”",
+        triggerX: 920,
+        speaker: "【高塔窗沿的花生猫】",
+        text: "矮人法师走到了高塔下方。高处的小窄窗里，一对猫耳朵在一跳一跳地求救！\n花生猫：“好心人！快用那把钥匙！或者……等等，你也是个法师？！”",
         action: () => {}
     },
-    // Step 3: 法术解密与救出
     {
-        triggerDist: 161,
+        triggerX: 921,
         speaker: "【矮人法师】",
-        text: "矮人掏出刚才捡到的提夫林钥匙，挥动法杖吟唱法术：“*Alazaster Transmutio!*”\n法术光辉顺着高塔延伸，锁扣应声解开，小花生猫轻盈地从窗户跳了下来！",
+        text: "矮人掏出刚才捡到的提夫林钥匙，挥动法杖吟唱淡色法术：“Alazaster Transmutio!”\n微弱的柔和光辉顺着高塔延伸，锁扣应声解开，小花生猫轻盈地从窗户跳了下来！",
         action: () => { dwarf.catRescued = true; }
     },
-    // Step 4: 对话冲突与结局
     {
-        triggerDist: 162,
+        triggerX: 922,
         speaker: "【被救出的花生猫】",
-        text: "花生猫拍了拍身上的灰尘，感激地说：\n“太谢谢你啦，小朋友！这么小就一个人出来冒险了？你长大以后一定会成为一个伟大的英雄的！”\n\n矮人法师顿时瞪大了眼睛，胡子都气得炸了起来：\n“谁是小朋友？！我今年都一百四十二岁了！我是矮人！矮人！懂不懂什么叫高山尊贵血统？！”",
+        text: "花生猫拍了拍身上的灰尘，感激地凑上前说：\n“太谢谢你啦，小朋友！这么小就一个人出来冒险了？你长大以后一定会成为一个伟大的英雄的！”\n\n矮人法师顿时瞪大了眼睛，灰色胡子都气得炸了起来：\n“谁是小朋友？！我今年都一百四十二岁了！我是矮人！矮人！懂不懂什么叫高山尊贵血统？！”",
         action: () => {}
     }
 ];
 
-// 绘制像素矮人法师
-function drawDwarf() {
-    // 1. 帽子（尖顶法师帽）
-    ctx.fillStyle = '#7c3aed';
+// 1. 绘制背景与低饱和度风景
+function drawEnvironment() {
+    // 远景山丘剪影（黑灰极简）
+    ctx.fillStyle = '#101418';
     ctx.beginPath();
-    ctx.moveTo(dwarf.x + 11, dwarf.y - 10);
-    ctx.lineTo(dwarf.x + 2, dwarf.y + 2);
-    ctx.lineTo(dwarf.x + 20, dwarf.y + 2);
+    ctx.moveTo(0, 190);
+    for (let i = 0; i <= canvas.width; i += 40) {
+        let mountainY = 140 + Math.sin((i + worldX * 0.2) * 0.015) * 25;
+        ctx.lineTo(i, mountainY);
+    }
+    ctx.lineTo(canvas.width, 210);
+    ctx.lineTo(0, 210);
     ctx.fill();
 
-    // 2. 身体/长袍
-    ctx.fillStyle = '#4c1d95';
-    ctx.fillRect(dwarf.x + 3, dwarf.y + 2, 16, 18);
+    // 地面（黑灰色石块路）
+    ctx.fillStyle = '#182026';
+    ctx.fillRect(0, 193, canvas.width, 47);
+    ctx.fillStyle = '#37474f';
+    ctx.fillRect(0, 193, canvas.width, 2);
 
-    // 3. 脸部像素点
-    ctx.fillStyle = '#fde047';
-    ctx.fillRect(dwarf.x + 12, dwarf.y + 4, 7, 6);
-
-    // 4. 大胡子（标志性像素块）
-    ctx.fillStyle = '#ea580c';
-    ctx.fillRect(dwarf.x + 10, dwarf.y + 10, 10, 10);
-
-    // 5. 法杖
-    ctx.fillStyle = '#78350f';
-    ctx.fillRect(dwarf.x - 2, dwarf.y, 3, 26);
-    // 法杖顶部宝石
-    ctx.fillStyle = '#00e5ff';
-    ctx.fillRect(dwarf.x - 4, dwarf.y - 4, 7, 7);
-}
-
-// 绘制地面的零碎物品
-function drawItems() {
-    itemsOnGround.forEach(item => {
-        let screenX = item.x - (distance * 10);
-        if (screenX > -20 && screenX < canvas.width + 20) {
-            // 画一个紫色亮光的拾取包
-            ctx.fillStyle = '#ec4899';
-            ctx.fillRect(screenX, 168, 12, 10);
-            ctx.fillStyle = '#f472b6';
-            ctx.fillRect(screenX + 3, 165, 6, 3);
-        }
-    });
-}
-
-// 绘制高塔与上面的花生猫
-function drawTowerAndCat() {
-    let screenX = 420; // 固定的高塔呈现位置
-
-    if (distance >= 90) {
-        // 画高塔（砖石像素结构）
-        ctx.fillStyle = '#1e293b';
-        ctx.fillRect(screenX, 20, 80, 160);
-        ctx.fillStyle = '#334155';
-        ctx.fillRect(screenX - 5, 15, 90, 10);
-
-        // 高塔小窗户
-        ctx.fillStyle = '#020617';
-        ctx.fillRect(screenX + 30, 45, 20, 25);
-
-        // 如果还没救出，小窗户里漏出两只一跳一跳的猫耳朵
-        if (!dwarf.catRescued) {
-            let catY = 48 + Math.sin(gameFrame * 0.15) * 4;
-            ctx.fillStyle = '#f97316'; // 花生色/橙色
-            // 猫耳朵
-            ctx.fillRect(screenX + 32, catY, 5, 6);
-            ctx.fillRect(screenX + 43, catY, 5, 6);
-            // 窗沿上趴着的花生猫头部
-            ctx.fillRect(screenX + 34, catY + 4, 12, 8);
-        } else {
-            // 如果救出来了，花生猫立在矮人旁边
-            ctx.fillStyle = '#f97316';
-            ctx.fillRect(dwarf.x + 35, 158, 14, 18); // 身体
-            ctx.fillStyle = '#ffedd5';
-            ctx.fillRect(dwarf.x + 43, 161, 4, 4);  // 花生猫斑纹
-            // 耳朵
-            ctx.fillStyle = '#ea580c';
-            ctx.fillRect(dwarf.x + 36, 153, 4, 5);
-            ctx.fillRect(dwarf.x + 43, 153, 4, 5);
+    // 绘制散落的路边细节（枯草/废弃石碑）
+    for (let x = -200; x < 2000; x += 120) {
+        let screenX = x - worldX;
+        if (screenX > -30 && screenX < canvas.width + 30) {
+            ctx.fillStyle = '#263238';
+            ctx.fillRect(screenX, 187, 4, 6);
+            ctx.fillRect(screenX + 2, 185, 2, 8);
         }
     }
 }
 
-function updateDwarf() {
-    dwarf.y += dwarf.velocityY;
-    if (dwarf.y < 150) {
-        dwarf.velocityY += dwarf.gravity;
-    } else {
-        dwarf.y = 150;
-        dwarf.isJumping = false;
+// 2. 绘制矮人法师（参考截图：灰蓝衣服、灰胡子、低饱和度色调）
+function drawDwarf() {
+    ctx.save();
+    let drawX = dwarf.x;
+
+    // 镜像翻转（向左走时）
+    if (!dwarf.facingRight) {
+        ctx.translate(drawX + dwarf.width / 2, 0);
+        ctx.scale(-1, 1);
+        ctx.translate(-(drawX + dwarf.width / 2), 0);
     }
-}
 
-function handleJump() {
-    if (!dwarf.isJumping && !isPaused) {
-        dwarf.velocityY = -12;
-        dwarf.isJumping = true;
-    }
-}
+    // 1. 尖顶法师帽（暗灰褐色）
+    ctx.fillStyle = '#37474f';
+    ctx.beginPath();
+    ctx.moveTo(drawX + 11, dwarf.y - 12);
+    ctx.lineTo(drawX + 1, dwarf.y + 2);
+    ctx.lineTo(drawX + 21, dwarf.y + 2);
+    ctx.fill();
 
-// 主渲染与游戏循环
-function loop() {
-    if (!isPaused) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // 2. 灰蓝色法袍（完美还原参考图颜色）
+    ctx.fillStyle = '#546e7a';
+    ctx.fillRect(drawX + 3, dwarf.y + 2, 16, 17);
 
-        // 1. 画背景地面与网格线
-        ctx.fillStyle = '#0f172a';
-        ctx.fillRect(0, 178, canvas.width, 42);
-        ctx.fillStyle = '#00e5ff';
-        ctx.fillRect(0, 178, canvas.width, 2);
+    // 3. 深灰裤装
+    ctx.fillStyle = '#263238';
+    ctx.fillRect(drawX + 4, dwarf.y + 19, 14, 7);
 
-        // 2. 绘制场景对象
-        drawItems();
-        drawTowerAndCat();
-
-        // 3. 更新与绘制主角
-        updateDwarf();
-        drawDwarf();
-
-        // 4. 行程推进
-        gameFrame++;
-        if (gameFrame % 6 === 0) {
-            distance++;
-            document.getElementById('score').innerText = `距离: ${distance}m`;
-            checkStoryEvents();
-        }
-    }
-    requestAnimationFrame(loop);
-}
-
-// 检查剧情触发点
-function checkStoryEvents() {
-    let nextStep = currentStoryStep + 1;
-    if (nextStep < storySequence.length) {
-        let ev = storySequence[nextStep];
-        if (distance >= ev.triggerDist) {
-            currentStoryStep = nextStep;
-            triggerDialog(ev);
-        }
-    }
-}
-
-function triggerDialog(ev) {
-    isPaused = true;
-    if (ev.action) ev.action();
-    
-    document.getElementById('dialogSpeaker').innerText = ev.speaker;
-    document.getElementById('dialogText').innerText = ev.text;
-    document.getElementById('dialogBox').style.display = 'block';
-}
-
-function advanceStory() {
-    document.getElementById('dialogBox').style.display = 'none';
-    isPaused = false;
-}
-
-// 键盘控制
-window.addEventListener('keydown', (e) => {
-    if (e.code === 'Space' || e.code === 'ArrowUp') {
-        handleJump();
-    }
-    if (e.code === 'Enter' && isPaused) {
-        advanceStory();
-    }
-});
-
-loop();
-</script>
-</body>
-</html>
+    // 4. 脸部（低饱和肤色）
+    ctx.fillStyle = '#cfd8dc';
+    ctx.fillRect(drawX + 12, dwarf.
