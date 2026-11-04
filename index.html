@@ -118,12 +118,12 @@
         </div>
     </div>
 
- <!-- 脚本依赖引入 -->
-    <script src="js/database.js"></script>
-    <script src="js/players.js"></script>
-    <script src="js/notifications.js"></script>
-    <script src="js/handouts.js"></script>
-    <script src="games/dwarf_adventure/game.js"></script> <!-- 👈 引入新拆分的小游戏视窗模块 -->
-    <script src="js/main.js"></script>
+<!-- 脚本按照正确逻辑依赖按序加载 -->
+<script src="js/database.js"></script>
+<script src="js/players.js"></script>
+<script src="js/notifications.js"></script>
+<script src="js/handouts.js"></script>
+<script src="js/main.js"></script>
+    
 </body>
 </html>
