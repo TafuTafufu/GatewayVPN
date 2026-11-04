@@ -35,7 +35,7 @@ function handleAuthKeyPress(e) {
     }
 }
 
-// 严谨登录鉴权控制（防报错增强版）
+// 登录鉴权逻辑
 function login() {
     const userInEl = document.getElementById('usernameInput');
     const passInEl = document.getElementById('passwordInput');
@@ -55,7 +55,6 @@ function login() {
     const lowerUser = userIn.toLowerCase();
     let currentUser = "";
 
-    // 检查预设数据库 accountDb
     if (window.accountDb && window.accountDb[lowerUser]) {
         if (window.accountDb[lowerUser].password && window.accountDb[lowerUser].password !== passIn) {
             if (errorMsg) {
@@ -66,7 +65,6 @@ function login() {
         }
         currentUser = lowerUser;
     } else {
-        // 检查本地存储用户
         let localUsers = JSON.parse(localStorage.getItem('gateway_users') || '{}');
         if (localUsers[lowerUser]) {
             if (localUsers[lowerUser].password !== passIn) {
@@ -78,7 +76,6 @@ function login() {
             }
             currentUser = lowerUser;
         } else {
-            // 拒绝未知身份进入
             if (errorMsg) {
                 errorMsg.style.color = "#ff3366";
                 errorMsg.innerText = `无法识别的终端身份代号！`;
@@ -87,7 +84,6 @@ function login() {
         }
     }
 
-    // 成功连接，隐藏登录框
     setCurrentUserId(currentUser);
     const authOverlay = document.getElementById('authOverlay');
     if (authOverlay) authOverlay.style.display = 'none';
@@ -185,7 +181,7 @@ function executeSearch() {
         container.appendChild(createResultCard(customItem, 'anomaly'));
     }
 
-    // 3. 模组彩蛋关键词（捕获 tafu 掌局者与 dwarf 矮人小游戏）
+    // 3. 模组彩蛋关键词（精准捕获 dwarf 与其他词条）
     let matchedKeys = [];
     if (lowerInput.includes("tafu") || lowerInput.includes("塔夫") || lowerInput.includes("掌局者")) matchedKeys.push("tafu");
     if (lowerInput.includes("dwarf") || lowerInput.includes("矮人")) matchedKeys.push("dwarf");
@@ -238,7 +234,7 @@ function createResultCard(data, styleClass) {
     return card;
 }
 
-// 触发解密动画并展开小游戏或抽屉
+// 关键重点：解密动画结束后，直接在页面中央渲染内嵌小游戏，不弹抽屉！
 function triggerCardAction(encodedData) {
     const data = JSON.parse(decodeURIComponent(encodedData));
     const loader = document.getElementById('loaderOverlay');
@@ -250,6 +246,7 @@ function triggerCardAction(encodedData) {
 
         setTimeout(() => {
             loader.style.display = 'none';
+            // 如果是 dwarf 或小游戏页面，直接主区域渲染内嵌小游戏
             if (data.domain && (data.domain.includes('/games/') || data.domain.includes('dwarf_adventure'))) {
                 renderGameInMainView(data);
             } else if (typeof window.openDrawerWithData === 'function') {
@@ -260,113 +257,3 @@ function triggerCardAction(encodedData) {
         }, 800);
     } else {
         if (data.domain && (data.domain.includes('/games/') || data.domain.includes('dwarf_adventure'))) {
-            renderGameInMainView(data);
-        } else if (typeof window.openDrawerWithData === 'function') {
-            window.openDrawerWithData(data);
-        }
-    }
-}
-
-// 直接在终端中央替换为小游戏仿真控制面板
-function renderGameInMainView(data) {
-    const container = document.getElementById('resultsContainer');
-    if (!container) return;
-
-    container.innerHTML = `
-        <div class="result-card anomaly" style="border-color: #00e5ff; background: rgba(0, 229, 255, 0.05); padding: 15px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(0, 229, 255, 0.3); padding-bottom: 8px;">
-                <span style="color: #00e5ff; font-weight: bold; font-size: 16px;">🎮 [虚拟终端内嵌程序]: ${data.title}</span>
-                <button onclick="goHome()" style="background: #ff3366; color: #fff; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">✖ 退出程序 (CLOSE)</button>
-            </div>
-            <div style="width: 100%; height: 500px; border: 1px solid #00e5ff; border-radius: 6px; overflow: hidden; background: #000; margin-bottom: 10px;">
-                <iframe src="games/dwarf_adventure/index.html" style="width: 100%; height: 100%; border: none;"></iframe>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; color: var(--text-dim); font-size: 12px;">
-                <span>${data.footer || "SYSTEM // MINI-GAME MODULE"}</span>
-                <a href="games/dwarf_adventure/index.html" target="_blank" style="color: #00e5ff; text-decoration: underline;">[在新窗口单独全屏打开]</a>
-            </div>
-        </div>
-    `;
-}
-
-function updateStageEffects() {
-    if (searchCount >= 6) document.body.className = 'stage-3';
-    else if (searchCount >= 3) document.body.className = 'stage-2';
-    else if (searchCount >= 1) document.body.className = 'stage-1';
-}
-
-function openConsole() {
-    const consoleModal = document.getElementById('consoleModal');
-    if (consoleModal) consoleModal.style.display = 'flex';
-}
-
-function closeConsole() {
-    const consoleModal = document.getElementById('consoleModal');
-    if (consoleModal) consoleModal.style.display = 'none';
-}
-
-function openHistoryModal() {
-    renderHistoryList();
-    const historyModal = document.getElementById('historyModal');
-    if (historyModal) historyModal.style.display = 'flex';
-}
-
-function renderHistoryList() {
-    const historyContainer = document.getElementById('historyContainer');
-    if (!historyContainer) return;
-    if (window.activeProfile && window.activeProfile.history && window.activeProfile.history.length > 0) {
-        let html = '<ul class="history-list">';
-        window.activeProfile.history.forEach(item => {
-            html += `<li class="history-item">🔍 ${item}</li>`;
-        });
-        html += '</ul>';
-        historyContainer.innerHTML = html;
-    } else {
-        historyContainer.innerHTML = '暂无本地检索历史。';
-    }
-}
-
-function clearHistory() {
-    if (window.activeProfile) {
-        window.activeProfile.history = [];
-        renderHistoryList();
-    }
-}
-
-function closeHistoryModal() {
-    const historyModal = document.getElementById('historyModal');
-    if (historyModal) historyModal.style.display = 'none';
-}
-
-// 返回主页功能（清空搜索框并重置初始欢迎卡片）
-function goHome() {
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) searchInput.value = '';
-    
-    if (window.activeProfile) {
-        renderWelcomeCard(window.activeProfile.welcome);
-    } else {
-        renderWelcomeCard("欢迎访问 Gateway VPN 极速隐私网络网关。");
-    }
-}
-
-// 绑定 DOMContentLoaded 自动启动时钟
-window.addEventListener('DOMContentLoaded', () => {
-    startRealTimeClock();
-});
-
-// 全局导出挂载
-window.getCurrentUserId = getCurrentUserId;
-window.setCurrentUserId = setCurrentUserId;
-window.handleAuthKeyPress = handleAuthKeyPress;
-window.login = login;
-window.logout = logout;
-window.executeSearch = executeSearch;
-window.openConsole = openConsole;
-window.closeConsole = closeConsole;
-window.openHistoryModal = openHistoryModal;
-window.closeHistoryModal = closeHistoryModal;
-window.clearHistory = clearHistory;
-window.triggerCardAction = triggerCardAction;
-window.renderGameInMainView = renderGameInMainView;
-window.goHome = goHome;
