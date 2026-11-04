@@ -15,7 +15,7 @@
             height: 100vh; overflow: hidden;
         }
         .game-container {
-            width: 720px; background: #12161a;
+            width: 680px; background: #12161a;
             border: 1px solid #37474f; border-radius: 6px;
             padding: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
             position: relative;
@@ -49,11 +49,6 @@
         .controls-hint {
             text-align: center; margin-top: 10px; color: #607d8b; font-size: 11px; letter-spacing: 0.5px;
         }
-        .interactive-prompt {
-            position: absolute; top: 75px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.7); border: 1px solid #90a4ae; color: #eceff1;
-            padding: 4px 10px; font-size: 12px; border-radius: 3px; display: none; pointer-events: none;
-        }
     </style>
 </head>
 <body>
@@ -64,10 +59,7 @@
         <span id="score">探索进度: 0m</span>
     </div>
     
-    <canvas id="gameCanvas" width="680" height="240"></canvas>
-    
-    <!-- 交互按键浮动提示 -->
-    <div class="interactive-prompt" id="interactPrompt">[按 E 键 / 点击进行交互]</div>
+    <canvas id="gameCanvas" width="640" height="220"></canvas>
 
     <!-- 剧情对话框 -->
     <div class="dialog-box" id="dialogBox">
@@ -76,138 +68,46 @@
         <button class="dialog-btn" id="dialogBtn" onclick="advanceStory()">[按 ENTER / 点击继续]</button>
     </div>
 
-    <div class="controls-hint">操作说明: [A / D] 或 [← / →] 控制左右移动 | [SPACE / 空格] 跳跃 | [E] 检查交互</div>
+    <div class="controls-hint">操作说明: [A / D] 或 [← / →] 控制左右移动 | [SPACE / 空格] 跳跃</div>
 </div>
 
 <script>
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-let worldX = 0; // 世界滚动总偏移距离
+let worldX = 0; // 世界全局坐标
 let isPaused = false;
 let gameFrame = 0;
 let currentStoryStep = -1;
 
-// 键盘按键状态追踪（实现流畅平滑手动控制）
+// 控制移动按键标记
 const keys = {
     left: false,
-    right: false,
-    up: false,
-    e: false
+    right: false
 };
 
-// 矮人主角（调色：低饱和度灰蓝衣袍、灰色胡须、暗黄皮靴，符合参考图）
+// 主角矮人法师（高冷黑白灰 / 灰蓝法袍配色）
 const dwarf = {
-    x: 80, y: 165, width: 22, height: 28,
-    vx: 0, vy: 0, speed: 2.2, gravity: 0.7,
-    isJumping: false, facingRight: true,
-    hasKey: false, catRescued: false
+    x: 80, y: 150, width: 22, height: 28,
+    vy: 0, gravity: 0.75, isJumping: false,
+    facingRight: true, hasKey: false, catRescued: false
 };
 
-// 花生猫（Jellycat 花生猫配色：暖浅棕花生色 #d7ccc8 + 奶白色 #f5f5f5）
+// Jellycat 花生猫（暖浅棕+白色）
 const cat = {
-    x: 50, y: 173, followDistance: 32
+    x: 50, y: 158, followDistance: 30
 };
 
-// 放置在地图世界中的实体对象
-let worldObjects = [
-    { type: 'item', x: 280, width: 16, triggered: false, name: '提夫林散落包' },
-    { type: 'tower', x: 950, width: 90, triggered: false, name: '古老高塔' }
+// 放置在场景里的世界物体
+const worldObjects = [
+    { type: 'item', x: 280, name: '提夫林散落包' },
+    { type: 'tower', x: 900, name: '古老高塔' }
 ];
 
-// 剧情阶段
+// 剧情触发顺序
 const storySequence = [
     {
-        triggerX: 250,
+        triggerX: 220,
         speaker: "【路边的遗落物】",
         text: "矮人法师停下了脚步。\n地面上散落着一些零碎东西：几根淡灰色的羽毛、一柄折断的欧利哈刚鲁特琴弦，以及一把带有羊角纹路的黑色皮质钥匙包。\n矮人法师：“这显然是一个提夫林吟游诗人掉的破烂……嗯？不过这把钥匙看起来挺别致的，收着吧。”",
         action: () => { dwarf.hasKey = true; }
-    },
-    {
-        triggerX: 720,
-        speaker: "【高处传来急促的喊声】",
-        text: "“救命啊！救救我！我被邪恶巫术变成花生猫了！”\n“好心的路人！救救我！我被关在高塔顶层的小窗户里了！”",
-        action: () => {}
-    },
-    {
-        triggerX: 920,
-        speaker: "【高塔窗沿的花生猫】",
-        text: "矮人法师走到了高塔下方。高处的小窄窗里，一对猫耳朵在一跳一跳地求救！\n花生猫：“好心人！快用那把钥匙！或者……等等，你也是个法师？！”",
-        action: () => {}
-    },
-    {
-        triggerX: 921,
-        speaker: "【矮人法师】",
-        text: "矮人掏出刚才捡到的提夫林钥匙，挥动法杖吟唱淡色法术：“Alazaster Transmutio!”\n微弱的柔和光辉顺着高塔延伸，锁扣应声解开，小花生猫轻盈地从窗户跳了下来！",
-        action: () => { dwarf.catRescued = true; }
-    },
-    {
-        triggerX: 922,
-        speaker: "【被救出的花生猫】",
-        text: "花生猫拍了拍身上的灰尘，感激地凑上前说：\n“太谢谢你啦，小朋友！这么小就一个人出来冒险了？你长大以后一定会成为一个伟大的英雄的！”\n\n矮人法师顿时瞪大了眼睛，灰色胡子都气得炸了起来：\n“谁是小朋友？！我今年都一百四十二岁了！我是矮人！矮人！懂不懂什么叫高山尊贵血统？！”",
-        action: () => {}
-    }
-];
-
-// 1. 绘制背景与低饱和度风景
-function drawEnvironment() {
-    // 远景山丘剪影（黑灰极简）
-    ctx.fillStyle = '#101418';
-    ctx.beginPath();
-    ctx.moveTo(0, 190);
-    for (let i = 0; i <= canvas.width; i += 40) {
-        let mountainY = 140 + Math.sin((i + worldX * 0.2) * 0.015) * 25;
-        ctx.lineTo(i, mountainY);
-    }
-    ctx.lineTo(canvas.width, 210);
-    ctx.lineTo(0, 210);
-    ctx.fill();
-
-    // 地面（黑灰色石块路）
-    ctx.fillStyle = '#182026';
-    ctx.fillRect(0, 193, canvas.width, 47);
-    ctx.fillStyle = '#37474f';
-    ctx.fillRect(0, 193, canvas.width, 2);
-
-    // 绘制散落的路边细节（枯草/废弃石碑）
-    for (let x = -200; x < 2000; x += 120) {
-        let screenX = x - worldX;
-        if (screenX > -30 && screenX < canvas.width + 30) {
-            ctx.fillStyle = '#263238';
-            ctx.fillRect(screenX, 187, 4, 6);
-            ctx.fillRect(screenX + 2, 185, 2, 8);
-        }
-    }
-}
-
-// 2. 绘制矮人法师（参考截图：灰蓝衣服、灰胡子、低饱和度色调）
-function drawDwarf() {
-    ctx.save();
-    let drawX = dwarf.x;
-
-    // 镜像翻转（向左走时）
-    if (!dwarf.facingRight) {
-        ctx.translate(drawX + dwarf.width / 2, 0);
-        ctx.scale(-1, 1);
-        ctx.translate(-(drawX + dwarf.width / 2), 0);
-    }
-
-    // 1. 尖顶法师帽（暗灰褐色）
-    ctx.fillStyle = '#37474f';
-    ctx.beginPath();
-    ctx.moveTo(drawX + 11, dwarf.y - 12);
-    ctx.lineTo(drawX + 1, dwarf.y + 2);
-    ctx.lineTo(drawX + 21, dwarf.y + 2);
-    ctx.fill();
-
-    // 2. 灰蓝色法袍（完美还原参考图颜色）
-    ctx.fillStyle = '#546e7a';
-    ctx.fillRect(drawX + 3, dwarf.y + 2, 16, 17);
-
-    // 3. 深灰裤装
-    ctx.fillStyle = '#263238';
-    ctx.fillRect(drawX + 4, dwarf.y + 19, 14, 7);
-
-    // 4. 脸部（低饱和肤色）
-    ctx.fillStyle = '#cfd8dc';
-    ctx.fillRect(drawX + 12, dwarf.
