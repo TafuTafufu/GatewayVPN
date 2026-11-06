@@ -141,23 +141,25 @@ function renderMcKayPhoneScreen() {
     `;
 }
 
-// 点击“挑食者 (Picky Eater)” App 后展开抓包弹窗
+// 点击“挑食者 (Picky Eater)” App 后展开原始抓包数据（绝不剧透，让玩家自行推演）
 function openPickyEaterDetail() {
     if (typeof triggerNotifyModal === 'function') {
         triggerNotifyModal(
-            "【挑食者 (Picky Eater) VPN - 抓包数据日志】\n\n" +
-            "• 硬件信息：购买自 AT&T 家庭套餐的 Smart Phone\n" +
-            "• 历史起点：2018 年 8 月 (没有保存更早的数据)\n\n" +
-            "[捕获到的异常 URL / IP 记录]：\n" +
-            "1. 192.168.300.999 (格式错误：数字过多)\n" +
-            "2. 10.256.0.1 (格式错误：数值越界)\n" +
-            "3. http://non-existent-domain-2018.internal (指向不存在的域名)\n" +
-            "4. https://avery-bell-slaughter-cache.null/img_09.png (死链接)",
+            "【挑食者 (Picky Eater) VPN - 数据隧道抓包日志】\n\n" +
+            "• DEVICE_INFO: AT&T Mobile Line #408-201-XXXX [Family Plan]\n" +
+            "• CACHE_FIRST_RECORD: 2018-08-14 03:12:09 UTC\n" +
+            "• STATUS: NO EARLIER CACHE PRESERVED\n\n" +
+            "[CACHED URL / PROXY TELEMETRY DUMP]\n" +
+            "1. http://192.168.300.999/gateway/index.php\n" +
+            "2. https://10.256.0.1:8443/auth/handshake\n" +
+            "3. http://non-existent-domain-2018.internal/forum/thread-409\n" +
+            "4. https://avery-bell-slaughter-cache.null/img_09.png\n" +
+            "5. http://172.16.0.404/substructure/tunnel_node",
             null,
-            "🤮 Picky Eater VPN [抓包日志]"
+            "🤮 Picky Eater [Raw Traffic Dump]"
         );
     } else {
-        alert("挑食者 (Picky Eater) 历史缓存：捕获到数字溢出的非法 IP 地址及不存在的死链接（数据追溯至2018年8月）。");
+        alert("Picky Eater RAW CACHE: 追溯至 2018 年 8 月。无更早数据。");
     }
 }
 
