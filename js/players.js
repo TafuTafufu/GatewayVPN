@@ -4,15 +4,23 @@
  * =========================================================
  */
 
-// 1. 登录凭证与密码配置 (包含麦凯专用账号 mckay)
+// 1. 登录凭证与密码配置 (包含麦凯专用账号与 CCTV 监控专用账号)
 const accountDb = {
+    // 闭路电视 (CCTV) 专属独立登录凭证
+    "cctv-ithaca-cam01": { password: "delta2019", profileKey: "cctv" },
+
+    // 麦凯手机抓包账号
     "mckay": { password: "201808", profileKey: "mckay" },
+
+    // 调查员/玩家专属账号
     "peanut": { password: "Tiefling", profileKey: "peanut" },
     "schnell": { password: "Ithbank", profileKey: "schnell" },
     "player1": { password: "123456", profileKey: "player1" },
     "player2": { password: "123456", profileKey: "player2" },
     "player3": { password: "123456", profileKey: "player3" },
     "player4": { password: "123456", profileKey: "player4" },
+
+    // NPC 节点凭证
     "wallace": { password: "123456", profileKey: "wallace" },
     "cool": { password: "mit2016", profileKey: "cool" },
     "vicki": { password: "kick408", profileKey: "vicki" },
@@ -21,12 +29,23 @@ const accountDb = {
 
 // 2. 玩家节点属性与个人界面配置
 const userProfiles = {
+    // CCTV 监控面板配置
+    "cctv": {
+        name: "ITHACA-PD CCTV VAULT [伊萨卡警局安防监控中心]",
+        welcome: "【警局物证系统建立】成功挂载伊萨卡交通与德尔塔斐伊普西隆姐妹会闭路电视（C-C-T-V）数据流。在下方搜索框输入 cctv 调阅完整监控序列。",
+        consoleLog: "[SYSTEM LOG]\nUser: CCTV Archive Node\nAccess Level: RESTRICTED EVIDENCE\nStatus: STREAM READY",
+        history: ["10:12 AM 街角监控", "10:15 AM 姐妹会正门破门", "10:29 AM 停车场开火"]
+    },
+
+    // 麦凯手机抓包配置
     "mckay": {
         name: "Bradley McKay [麦凯镜像]",
         welcome: "警告：已成功挂载麦凯手机“挑食者 (Picky Eater)”隧道镜像。",
         consoleLog: "[SYSTEM LOG]\nUser: Bradley McKay\nVPN Mode: Picky Eater (🤮)\nStatus: HARDWARE DUMP MOUNTED",
         history: ["192.168.300.999", "艾弗里·贝尔 解剖照片", "挑食者VPN历史数据"]
     },
+
+    // 玩家节点配置
     "peanut": {
         name: "Peanut",
         welcome: "欢迎回来，Peanut。法师之手已就绪，让我们来痛饮伊斯班克吧！",
