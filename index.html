@@ -3,64 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> ACCESS</title>
+    <title>TERMINAL ACCESS</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body style="background-color: #0b0e14; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
 
-    <!-- 模拟解密动画 overlay -->
-    <div class="loader-overlay" id="loaderOverlay">
+    <!-- 模拟代理/隧道建立 Overlay -->
+    <div class="loader-overlay" id="loaderOverlay" style="display: none;">
         <div class="spinner"></div>
-        <div id="loaderStatusText">正在解密数据流...</div>
+        <div id="loaderStatusText">正在建立通信隧道...</div>
     </div>
 
-    <!-- 极简暗网/VPN 登录遮罩弹窗 -->
-    <div class="auth-overlay" id="authOverlay" style="display: flex;">
-        <div class="auth-card">
-            <div class="auth-title">GATEWAY VPN ACCESS</div>
-            <div class="subtitle">请输入硬件凭证或终端身份代号</div>
-            <div class="form-group">
-                <label>USERNAME / USER IDENTITY</label>
-                <input type="text" id="usernameInput" placeholder="输入用户名" onkeypress="handleAuthKeyPress(event)">
+    <!-- 极简硬件凭证登录面板（完全无标志、纯黑框） -->
+    <div class="auth-overlay" id="authOverlay" style="display: flex; width: 100%; height: 100vh; justify-content: center; align-items: center; background: #0b0e14;">
+        <div class="auth-card" style="width: 360px; background: #12161f; border: 1px solid #1a2332; border-radius: 8px; padding: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+            
+            <div style="font-size: 13px; color: #8a99ad; margin-bottom: 20px; font-family: monospace;">
+                请输入硬件凭证或终端身份代号
             </div>
-            <div class="form-group">
-                <label>PASSCODE</label>
-                <input type="password" id="passwordInput" placeholder="密码" onkeypress="handleAuthKeyPress(event)">
+            
+            <div class="form-group" style="margin-bottom: 18px;">
+                <label style="display: block; font-size: 11px; color: #5c6b73; font-family: monospace; letter-spacing: 1px; margin-bottom: 8px;">USERNAME / USER IDENTITY</label>
+                <input type="text" id="usernameInput" placeholder="输入用户名" onkeypress="handleAuthKeyPress(event)" style="width: 100%; background: #080a0f; border: 1px solid #1e293b; border-radius: 6px; padding: 12px; color: #e2e8f0; font-size: 14px; box-sizing: border-box; outline: none;">
             </div>
-            <button class="auth-btn" onclick="login()">连接 (CONNECT)</button>
-            <div class="auth-hint" id="authErrorMsg" style="margin-top: 15px; text-align: center;">
-                说明：终端将建立高密加密隧道。
+            
+            <div class="form-group" style="margin-bottom: 24px;">
+                <label style="display: block; font-size: 11px; color: #5c6b73; font-family: monospace; letter-spacing: 1px; margin-bottom: 8px;">PASSCODE</label>
+                <input type="password" id="passwordInput" placeholder="密码" onkeypress="handleAuthKeyPress(event)" style="width: 100%; background: #080a0f; border: 1px solid #1e293b; border-radius: 6px; padding: 12px; color: #e2e8f0; font-size: 14px; box-sizing: border-box; outline: none;">
             </div>
+            
+            <button class="auth-btn" onclick="login()" style="width: 100%; background: #00e5ff; color: #000; border: none; border-radius: 6px; padding: 14px; font-weight: bold; font-size: 15px; cursor: pointer; transition: background 0.2s;">
+                连接 (CONNECT)
+            </button>
+            
+            <div id="authErrorMsg" style="margin-top: 16px; font-size: 12px; color: #ff4757; font-family: monospace; text-align: center; min-height: 18px;"></div>
         </div>
     </div>
 
-    <!-- 登录成功后的主控制台 Header -->
-    <header style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
-        <div class="logo-area" onclick="goHome()" style="cursor: pointer; display: flex; align-items: center; gap: 10px;">
-            <div class="logo-icon">▲</div>
-            <div>
-                <div class="title-text" style="font-weight: bold;">Gateway VPN</div>
-                <div class="subtitle" style="font-size: 12px; color: #718096;">v2.4.18-p2 [已加密] <span id="realTimeClock" style="margin-left: 10px; color: #00e5ff;"></span></div>
+    <!-- 登录成功后展示的主内容容器（根据账号自动渲染 A/B 界面） -->
+    <div class="container" id="mainContainer" style="display: none; width: 100%; max-width: 860px; padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #1e293b; padding-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div id="currentUserTag" style="color: #00e5ff; font-family: monospace; font-size: 13px; font-weight: bold;"></div>
+                <!-- 实时时间组件：保留在此处以供主界面读取显示 -->
+                <span id="realTimeClock" style="color: #718096; font-family: monospace; font-size: 12px;"></span>
             </div>
+            <button onclick="logout()" style="background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">[ 断开连接 ]</button>
         </div>
-        <div class="status-bar" style="display: flex; gap: 10px; align-items: center;">
-            <div class="user-tag" id="currentUserTag" style="color: #00e5ff; font-weight: bold;">身份: 尚未登录</div>
-            <button class="tab-btn" onclick="logout()">[断开连接 / 切换身份]</button>
-        </div>
-    </header>
-
-    <!-- 主展示区域（根据登录凭证不同渲染不同界面） -->
-    <div class="container" style="max-width: 900px; margin: 20px auto; padding: 0 15px;">
         <div class="results-section" id="resultsContainer"></div>
     </div>
-
-    <div class="watermark" style="position: fixed; bottom: 10px; right: 10px; opacity: 0.2; font-size: 11px;">SECURE TERMINAL // GATEWAY VPN HIGH-SPEED TUNNEL</div>
 
     <!-- 右侧 Handout 抽屉 -->
     <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
     <div class="side-drawer" id="sideDrawer">
         <div class="drawer-header">
-            <span class="drawer-title" id="drawerTitle">CLASSIFIED FILE // 机密线索</span>
+            <span class="drawer-title" id="drawerTitle">CLASSIFIED FILE</span>
             <button class="drawer-close-btn" onclick="closeDrawer()">✕</button>
         </div>
         <div class="drawer-body">
@@ -72,10 +69,9 @@
         </div>
     </div>
 
-    <!-- 引入 JS 脚本 -->
+    <!-- 脚本引用 -->
     <script src="js/database.js"></script>
     <script src="js/players.js"></script>
-    <script src="js/notifications.js"></script>
     <script src="js/handouts.js"></script>
     <script src="js/main.js"></script>
 </body>
