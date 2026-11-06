@@ -29,7 +29,7 @@
         </div>
     </div>
 
-    <!-- 2. 顶部导航与控制栏 Header (登录后永久可见) -->
+    <!-- 2. 顶部导航与控制栏 Header -->
     <header>
         <div class="logo-area" onclick="goHome()" style="cursor: pointer;">
             <div class="logo-icon">▲</div>
@@ -48,7 +48,7 @@
         </div>
     </header>
 
-    <!-- 3. 中央全局搜索框与检索结果区 -->
+    <!-- 3. 中央主视图区域 -->
     <div class="container">
         <div class="search-card">
             <div class="search-box-wrapper">
@@ -58,11 +58,11 @@
         </div>
 
         <div class="results-section" id="resultsContainer">
-            <!-- 登录后初始欢迎卡片或搜索结果将动态渲染在此处 -->
+            <!-- 登录后根据账号类型动态渲染 CCTV 控制台、iPhone 屏幕或标准搜索卡片 -->
         </div>
     </div>
 
-    <!-- 4. 右侧滑动抽屉 (Handout 线索面板 & 监控播放器面板) -->
+    <!-- 4. 右侧滑动抽屉 (Side Drawer) -->
     <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
     <div class="side-drawer" id="sideDrawer">
         <div class="drawer-header">
@@ -73,16 +73,12 @@
             <div class="handout-image-wrapper" id="drawerImageWrapper" style="display: none;">
                 <img id="drawerImage" src="" alt="Handout Graphic">
             </div>
-            
-            <!-- 动态渲染 CCTV 播放器与文字线索的容器 -->
-            <div id="drawerCustomContainer"></div>
-            
             <div class="drawer-content" id="drawerContent"></div>
-            <div class="drawer-footer-meta" id="drawerFooter"></div>
+            <div class="drawer-footer-meta" id="drawerFooterMeta"></div>
         </div>
     </div>
 
-    <!-- 5. 搜索历史弹窗 (History Modal) -->
+    <!-- 5. 搜索历史弹窗 -->
     <div class="modal-overlay" id="historyModal">
         <div class="modal-card">
             <div class="modal-header">📜 [当前账号本地加密检索缓存/搜索历史]</div>
@@ -94,7 +90,7 @@
         </div>
     </div>
 
-    <!-- 6. 固件抓包弹窗 (Console Modal) -->
+    <!-- 6. 固件抓包弹窗 -->
     <div class="modal-overlay" id="consoleModal">
         <div class="console-card">
             <div style="display:flex; justify-content:space-between; margin-bottom:12px; border-bottom:1px solid #2d3748; padding-bottom:6px;">
@@ -105,26 +101,31 @@
         </div>
     </div>
 
-    <!-- 7. 系统通知弹窗 (Notify Modal) -->
+    <!-- 7. 系统通知弹窗 -->
     <div class="modal-overlay" id="notifyModal">
         <div class="modal-card">
             <div class="modal-header" id="modalTitle">⚠️ [系统同步通信提示]</div>
+            <div class="modal-image-wrapper">
+                <img id="modalImage" src="" alt="Notification Graphic" style="display: none;">
+            </div>
             <div class="modal-body" id="modalText">通信收到...</div>
             <button class="modal-btn" onclick="closeModal()">确认并忽略 (ACKNOWLEDGE)</button>
         </div>
     </div>
 
-    <!-- 8. 加载遮罩 (Loader Overlay) -->
+    <!-- 8. 加载遮罩 -->
     <div class="loader-overlay" id="loaderOverlay">
         <div class="spinner"></div>
         <div id="loaderStatusText">正在建立高密隧道...</div>
     </div>
 
-    <!-- 脚本按照逻辑顺序依赖加载 -->
+    <!-- 依赖脚本按依赖顺序加载 -->
     <script src="js/database.js"></script>
     <script src="js/players.js"></script>
     <script src="js/notifications.js"></script>
     <script src="js/handouts.js"></script>
+    <script src="js/phone_simulator.js"></script>
+    <script src="js/cctv_simulator.js"></script>
     <script src="js/main.js"></script>
 
 </body>
