@@ -3,69 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TERMINAL ACCESS</title>
+    <title>GATEWAY TERMINAL // 极速加密网关</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body style="background-color: #0b0e14; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+<body>
 
-    <!-- 模拟加密隧道解密跳转动画 -->
-    <div class="loader-overlay" id="loaderOverlay" style="display: none;">
+    <!-- 1. 最外层极简登录鉴权弹窗 (Auth Overlay) -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-card">
+            <div class="auth-title">AEGIS GATEWAY TUNNEL</div>
+            <div class="auth-subtitle">请输入硬件凭证或终端身份代号</div>
+            
+            <div class="form-group">
+                <label for="usernameInput">USERNAME / USER IDENTITY</label>
+                <input type="text" id="usernameInput" placeholder="输入身份代号..." onkeypress="handleAuthKeyPress(event)">
+            </div>
+            
+            <div class="form-group">
+                <label for="passwordInput">PASSCODE</label>
+                <input type="password" id="passwordInput" placeholder="密码" onkeypress="handleAuthKeyPress(event)">
+            </div>
+            
+            <button class="auth-btn" onclick="login()">连接 (CONNECT)</button>
+            <div class="auth-hint" id="authErrorMsg">说明：终端将建立高密加密隧道。</div>
+        </div>
+    </div>
+
+    <!-- 2. 顶部导航与控制栏 Header (登录后永久可见) -->
+    <header>
+        <div class="logo-area" onclick="goHome()" style="cursor: pointer;">
+            <div class="logo-icon">▲</div>
+            <div>
+                <div class="title-text">Gateway VPN</div>
+                <div class="subtitle">v2.4.18-p2 [已加密] <span id="realTimeClock" style="margin-left: 10px; color: var(--accent-color);"></span></div>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <div class="user-tag" id="currentUserTag">身份: 尚未登录</div>
+            <button class="tab-btn" onclick="goHome()">[主页]</button>
+            <button class="tab-btn" onclick="openHistoryModal()">[搜索历史]</button>
+            <button class="tab-btn" onclick="openConsole()">[检视抓包]</button>
+            <button class="tab-btn" onclick="logout()">[断开连接]</button>
+        </div>
+    </header>
+
+    <!-- 3. 中央全局搜索框与检索结果区 -->
+    <div class="container">
+        <div class="search-card">
+            <div class="search-box-wrapper">
+                <input type="text" id="searchInput" placeholder="输入案宗编号、关键词或域名 (如: cctv / mckay / cool)..." onkeypress="handleKeyPress(event)">
+                <button class="search-btn" onclick="executeSearch()">全局检索</button>
+            </div>
+        </div>
+
+        <div class="results-section" id="resultsContainer">
+            <!-- 登录后初始欢迎卡片或搜索结果将动态渲染在此处 -->
+        </div>
+    </div>
+
+    <!-- 4. 右侧滑动抽屉 (Handout 线索面板 & 监控播放器面板) -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+    <div class="side-drawer" id="sideDrawer">
+        <div class="drawer-header">
+            <span class="drawer-title" id="drawerTitle">📄 线索物证详情</span>
+            <button class="drawer-close-btn" onclick="closeDrawer()">✕</button>
+        </div>
+        <div class="drawer-body">
+            <div class="handout-image-wrapper" id="drawerImageWrapper" style="display: none;">
+                <img id="drawerImage" src="" alt="Handout Graphic">
+            </div>
+            
+            <!-- 动态渲染 CCTV 播放器与文字线索的容器 -->
+            <div id="drawerCustomContainer"></div>
+            
+            <div class="drawer-content" id="drawerContent"></div>
+            <div class="drawer-footer-meta" id="drawerFooter"></div>
+        </div>
+    </div>
+
+    <!-- 5. 搜索历史弹窗 (History Modal) -->
+    <div class="modal-overlay" id="historyModal">
+        <div class="modal-card">
+            <div class="modal-header">📜 [当前账号本地加密检索缓存/搜索历史]</div>
+            <div class="modal-body">
+                <div id="historyContainer">暂无检索历史。</div>
+            </div>
+            <button class="modal-btn danger" onclick="clearHistory()">🗑️ 清除历史记录</button>
+            <button class="modal-btn" onclick="closeHistoryModal()">关闭历史记录</button>
+        </div>
+    </div>
+
+    <!-- 6. 固件抓包弹窗 (Console Modal) -->
+    <div class="modal-overlay" id="consoleModal">
+        <div class="console-card">
+            <div style="display:flex; justify-content:space-between; margin-bottom:12px; border-bottom:1px solid #2d3748; padding-bottom:6px;">
+                <span style="color:#00e5ff; font-weight:bold;">[固件抓包与底层电路报告]</span>
+                <span style="cursor:pointer; color:#ff3366;" onclick="closeConsole()">[关闭 ESC]</span>
+            </div>
+            <div class="console-log" id="consoleLogText"></div>
+        </div>
+    </div>
+
+    <!-- 7. 系统通知弹窗 (Notify Modal) -->
+    <div class="modal-overlay" id="notifyModal">
+        <div class="modal-card">
+            <div class="modal-header" id="modalTitle">⚠️ [系统同步通信提示]</div>
+            <div class="modal-body" id="modalText">通信收到...</div>
+            <button class="modal-btn" onclick="closeModal()">确认并忽略 (ACKNOWLEDGE)</button>
+        </div>
+    </div>
+
+    <!-- 8. 加载遮罩 (Loader Overlay) -->
+    <div class="loader-overlay" id="loaderOverlay">
         <div class="spinner"></div>
-        <div id="loaderStatusText">正在解密数据流...</div>
+        <div id="loaderStatusText">正在建立高密隧道...</div>
     </div>
 
-    <!-- 极简硬件凭证登录面板（默认正常显示，防止黑屏） -->
-    <div class="auth-overlay" id="authOverlay" style="display: flex; width: 100%; height: 100vh; justify-content: center; align-items: center; background: #0b0e14; position: fixed; top: 0; left: 0; z-index: 9999;">
-        <div class="auth-card" style="width: 360px; background: #12161f; border: 1px solid #1a2332; border-radius: 8px; padding: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
-            
-            <div style="font-size: 13px; color: #8a99ad; margin-bottom: 20px; font-family: monospace;">
-                请输入硬件凭证或终端身份代号
-            </div>
-            
-            <div class="form-group" style="margin-bottom: 18px;">
-                <label style="display: block; font-size: 11px; color: #5c6b73; font-family: monospace; letter-spacing: 1px; margin-bottom: 8px;">USERNAME / USER IDENTITY</label>
-                <input type="text" id="usernameInput" placeholder="输入用户名" onkeypress="handleAuthKeyPress(event)" style="width: 100%; background: #080a0f; border: 1px solid #1e293b; border-radius: 6px; padding: 12px; color: #e2e8f0; font-size: 14px; box-sizing: border-box; outline: none;">
-            </div>
-            
-            <div class="form-group" style="margin-bottom: 24px;">
-                <label style="display: block; font-size: 11px; color: #5c6b73; font-family: monospace; letter-spacing: 1px; margin-bottom: 8px;">PASSCODE</label>
-                <input type="password" id="passwordInput" placeholder="密码" onkeypress="handleAuthKeyPress(event)" style="width: 100%; background: #080a0f; border: 1px solid #1e293b; border-radius: 6px; padding: 12px; color: #e2e8f0; font-size: 14px; box-sizing: border-box; outline: none;">
-            </div>
-            
-            <button class="auth-btn" onclick="login()" style="width: 100%; background: #00e5ff; color: #000; border: none; border-radius: 6px; padding: 14px; font-weight: bold; font-size: 15px; cursor: pointer;">
-                连接 (CONNECT)
-            </button>
-            
-            <div id="authErrorMsg" style="margin-top: 16px; font-size: 12px; color: #ff4757; font-family: monospace; text-align: center; min-height: 18px;"></div>
-        </div>
-    </div>
-
-    <!-- 登录成功后展示的主内容容器 -->
-    <div class="container" id="mainContainer" style="display: none; width: 100%; max-width: 860px; padding: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #1e293b; padding-bottom: 10px;">
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <div id="currentUserTag" style="color: #00e5ff; font-family: monospace; font-size: 13px; font-weight: bold;"></div>
-                <span id="realTimeClock" style="color: #718096; font-family: monospace; font-size: 12px;"></span>
-            </div>
-            <button onclick="logout()" style="background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">[ 断开连接 ]</button>
-        </div>
-        <div class="results-section" id="resultsContainer"></div>
-    </div>
-
-    <!-- 弹窗组件 -->
-    <div class="modal-overlay" id="notifyModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:10000;">
-        <div class="modal-card" style="background:#161b22; border:1px solid #30363d; border-radius:12px; padding:20px; max-width:400px; color:#c9d1d9;">
-            <div id="modalTitle" style="color:#58a6ff; font-weight:bold; margin-bottom:10px;"></div>
-            <div id="modalText" style="font-family:monospace; font-size:13px; white-space:pre-wrap; line-height:1.6;"></div>
-            <button onclick="closeModal()" style="margin-top:15px; width:100%; padding:10px; background:#21262d; border:1px solid #30363d; color:#58a6ff; border-radius:6px; cursor:pointer;">确认 (ACKNOWLEDGE)</button>
-        </div>
-    </div>
-
-    <!-- 准确的脚本引用路径（增加了新文件 phone_simulator.js） -->
+    <!-- 脚本按照逻辑顺序依赖加载 -->
     <script src="js/database.js"></script>
     <script src="js/players.js"></script>
+    <script src="js/notifications.js"></script>
     <script src="js/handouts.js"></script>
-    <script src="js/phone_simulator.js"></script> <!-- 👈 模拟手机模块 -->
     <script src="js/main.js"></script>
+
 </body>
 </html>
