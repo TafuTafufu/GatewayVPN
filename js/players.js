@@ -1,4 +1,12 @@
+/**
+ * =========================================================
+ * 玩家登录账号与凭证库 (Players & Authentication Database)
+ * =========================================================
+ */
+
+// 1. 登录凭证与密码配置 (包含麦凯专用账号 mckay)
 const accountDb = {
+    "mckay": { password: "201808", profileKey: "mckay" },
     "peanut": { password: "Tiefling", profileKey: "peanut" },
     "schnell": { password: "Ithbank", profileKey: "schnell" },
     "player1": { password: "123456", profileKey: "player1" },
@@ -11,10 +19,17 @@ const accountDb = {
     "guest": { password: "", profileKey: "guest" }
 };
 
+// 2. 玩家节点属性与个人界面配置
 const userProfiles = {
+    "mckay": {
+        name: "Bradley McKay [麦凯镜像]",
+        welcome: "警告：已成功挂载麦凯手机“挑食者 (Picky Eater)”隧道镜像。",
+        consoleLog: "[SYSTEM LOG]\nUser: Bradley McKay\nVPN Mode: Picky Eater (🤮)\nStatus: HARDWARE DUMP MOUNTED",
+        history: ["192.168.300.999", "艾弗里·贝尔 解剖照片", "挑食者VPN历史数据"]
+    },
     "peanut": {
         name: "Peanut",
-        welcome: "欢迎回来，Peanut。法师之手已就绪，让我们来痛饮伊斯班克吧！。",
+        welcome: "欢迎回来，Peanut。法师之手已就绪，让我们来痛饮伊斯班克吧！",
         consoleLog: "[SYSTEM LOG]\nUser: Peanut\nGateway Protocol: SECURE_TUNNEL\n任务：伊斯班克[1/3]。",
         history: ["Schnell", "如何分辨真假伊斯班克", "空军怎么办"]
     },
@@ -53,6 +68,18 @@ const userProfiles = {
         welcome: "注意：已接入沃尔斯将军的私有服务器（Proliant dl380）。",
         consoleLog: "[SYSTEM LOG]\nUser: Robert Wallace (General Wallace)\nNode: Frost Pine Trailer Park",
         history: ["ANTIFA 超级战士 威胁评估"]
+    },
+    "vicki": {
+        name: "Vicki King",
+        welcome: "高密通道建立。检测到高频电磁辐射环境。",
+        consoleLog: "[SYSTEM LOG]\nUser: Vicki King\nAccess Level: RESTRICTED",
+        history: ["踢泉镇 住宅查封 通知"]
+    },
+    "cool": {
+        name: "Wesley Cool",
+        welcome: "欢迎回来，库尔教授。系统正在对齐物理子结构交互算子...",
+        consoleLog: "[SYSTEM LOG]\nUser: Prof. Wesley Cool\nAccess Level: ROOT / ARCHITECT",
+        history: ["《无主之谛》 论文出版前言"]
     },
     "guest": {
         name: "GUEST",
