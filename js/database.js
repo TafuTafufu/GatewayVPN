@@ -97,6 +97,57 @@ const database = {
         image: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=600",
         detailText: "【高维度图谱鉴定】\n视频帧逐帧解析显示，爆炸产生的冲击波在扩散至半径30米时出现了明显的帧率断层，盐粒化过程不符合已知热力学定律。",
         footer: "来源: 纳尼亚联合工作组 (Working Group NARNIA) 证据库"
+    },
+
+    // 案宗线索：安防 CCTV 监控序列播放节点
+    "cctv": {
+        title: "【警局安防监控中心】伊萨卡姐妹会枪击案 C-C-T-V 连续截帧 (2019-10-14)",
+        domain: "ithaca-pd.gov/evidence/cctv-vault-20191014",
+        snippet: "【物证编号: CAR-5-58-CCTV】调阅伊萨卡交通与姐妹会内部监控通道。数据流存在物理时间与空间移动异常。",
+        image: "assets/cctv_cover.jpg",
+        detailText: "【查看监控播放器指示】\n点击播放器时间轴切换不同视角截帧。查看 10:15 A.M. 节点将触发暴力场景理智值检定（SAN Loss 0/1）。",
+        footer: "来源: 伊萨卡警察局安防物证备份库",
+        
+        // CCTV 专属的多时间轴数据包
+        cctvTimeline: [
+            {
+                time: "10:12 A.M.",
+                cam: "CAM-01 街角交通监控",
+                img: "assets/cctv_1012.jpg",
+                desc: "10:12 A.M. 行人稀少。麦凯出现在姐妹会两街区外，手持步枪走在街上，武器清晰可见。"
+            },
+            {
+                time: "10:13 A.M.",
+                cam: "CAM-02 十字路口",
+                img: "assets/cctv_1013.jpg",
+                desc: "10:13 A.M. 第二路口。麦凯满脸困惑多次改变方向并操作手机。枪指停下车辆，司机加速逃离后拨打911。"
+            },
+            {
+                time: "10:15 A.M.",
+                cam: "CAM-03 姐妹会正门",
+                img: "assets/cctv_1015.jpg",
+                sanWarning: true,
+                desc: "⚠️ [理智值检定 0/1] 10:15 A.M. 麦凯踢开前门。瓦伦丁于门厅遇害；萨努在壁炉前清理牌匾时遇害；杨拨打911后于后门遇害。"
+            },
+            {
+                time: "10:16 - 10:22 A.M.",
+                cam: "CAM-04 屋内走廊",
+                img: "assets/cctv_1016.jpg",
+                desc: "10:16-10:22 A.M. 无声音。麦凯在逐个房间翻箱倒柜并尖叫胡言乱语，未找到所寻之物后从后门离开。"
+            },
+            {
+                time: "10:23 A.M.",
+                cam: "CAM-05 建筑外围",
+                img: "assets/cctv_1023.jpg",
+                desc: "10:23 A.M. 警察抵达现场并报告伤亡请求增援。初步嫌疑人描述：20多岁白人男子，黑衣持枪。"
+            },
+            {
+                time: "10:29 A.M.",
+                cam: "CAM-06 学生停车场",
+                img: "assets/cctv_1029.jpg",
+                desc: "10:29 A.M. 麦凯在停车场疯狂寻找某物，向路人开火未中。路人躲藏并第三次拨打911，麦凯逃离。"
+            }
+        ]
     }
 };
 
