@@ -6,7 +6,7 @@ function setCurrentUserId(userId) {
     localStorage.setItem("gateway_logged_user", userId.toLowerCase());
 }
 
-// 1. 实时时间刷新
+// 1. 实时时间刷新功能 (完美保留，秒级跟进)
 function startRealTimeClock() {
     function updateClock() {
         const now = new Date();
@@ -26,135 +26,110 @@ function startRealTimeClock() {
     setInterval(updateClock, 1000);
 }
 
-// 2. 回车连接监听
 function handleAuthKeyPress(e) {
     if (e.keyCode === 13 || e.key === 'Enter') {
         login();
     }
 }
 
-// 3. 严格登录鉴权逻辑（拒绝瞎输入/拒绝留空）
+// 2. 严格登录校验
 function login() {
     const userIn = document.getElementById('usernameInput').value.trim();
     const passIn = document.getElementById('passwordInput').value.trim();
     const errorMsg = document.getElementById('authErrorMsg');
 
-    // ❌ 如果完全留空，阻止连接
     if (!userIn) {
-        errorMsg.style.color = "#ff3366";
-        errorMsg.innerText = `❌ 鉴权失败：请输入终端身份代号！`;
+        errorMsg.innerText = "❌ 请输入终端身份代号";
         return;
     }
 
     const lowerUser = userIn.toLowerCase();
     let currentUser = "";
 
-    // 检查预设数据库 accountDb
     if (window.accountDb && window.accountDb[lowerUser]) {
         if (window.accountDb[lowerUser].password && window.accountDb[lowerUser].password !== passIn) {
-            errorMsg.style.color = "#ff3366";
-            errorMsg.innerText = `❌ 鉴权失败：口令不正确！`;
+            errorMsg.innerText = "❌ 口令错误";
             return;
         }
         currentUser = lowerUser;
     } else {
-        // ❌ 乱填一律阻止，不自动创建 Guest
-        errorMsg.style.color = "#ff3366";
-        errorMsg.innerText = `❌ 鉴权失败：无法识别的终端身份代号！`;
+        errorMsg.innerText = "❌ 无法识别的终端凭证";
         return;
     }
 
-    // 鉴权通过，关闭登录遮罩并记录登录
+    // 登录成功：隐藏纯黑登录框，打开主视窗
     setCurrentUserId(currentUser);
     document.getElementById('authOverlay').style.display = 'none';
+    document.getElementById('mainContainer').style.display = 'block';
 
-    // 4. 根据凭证进行 A/B 界面分类切换
+    // 根据账号路由到对应界面
     if (currentUser === "mckay") {
-        renderPhoneSimulator(); // 麦凯专用：模拟手机镜像
+        renderPhoneSimulator(); // 麦凯专用：手机抓包镜像
     } else {
-        renderDefaultDashboard(currentUser); // 其他账号：标准 VPN 控制台
+        renderDefaultDashboard(currentUser); // 其他常规控制台
     }
 }
 
-// A 界面：麦凯手机/挑食者 (Picky Eater) 硬件抓包模拟器
+// 3. 麦凯 (McKay) 手机抓包镜像界面 (完全符合模组原案)
 function renderPhoneSimulator() {
-    document.getElementById('currentUserTag').innerText = `身份: Bradley McKay [麦凯手机镜像]`;
+    document.getElementById('currentUserTag').innerText = `HARDWARE-DUMP: BRADLEY MCKAY (PHONE)`;
     const container = document.getElementById('resultsContainer');
     container.innerHTML = `
-        <div class="result-card anomaly" style="border: 1px solid #00ffcc; background: #0a0e14; padding: 20px; border-radius: 8px;">
-            <div class="result-meta" style="color: #00ffcc; font-size: 12px; margin-bottom: 10px;">
-                <span>HARDWARE-DUMP: MCKAY_DEVICE</span> | <span>TUNNEL: PICKY EATER (🤮)</span>
+        <div class="result-card anomaly" style="border: 1px solid #00ffcc; background: #0d1117; padding: 20px; border-radius: 8px;">
+            <div class="result-meta" style="color: #00ffcc; font-size: 12px; margin-bottom: 10px; font-family: monospace;">
+                <span>CACHE: 2018-08 ~ PRESENT</span> | <span>VPN APP: PICKY EATER (🤮)</span>
             </div>
-            <div class="result-title" style="font-size: 18px; color: #fff; font-weight: bold; margin-bottom: 12px;">📱 嫌疑人麦凯 (McKay) 的手机硬件镜像与应用数据</div>
-            <div class="result-snippet" style="color: #cbd5e0; line-height: 1.6;">
-                <p>调查人员给麦凯手机充好电后，发现手机展现出下一个异常。应用“挑食者 (Picky Eater)”起到了虚拟专用网络 (VPN) 的作用，提供了令人惊讶的安全性，但细究其历史数据发现了奇怪信息：</p>
+            <div class="result-title" style="font-size: 16px; color: #fff; font-weight: bold; margin-bottom: 12px;">📱 嫌疑人麦凯 (McKay) 手机抓包缓存数据</div>
+            <div class="result-snippet" style="color: #cbd5e0; line-height: 1.6; font-size: 13px;">
+                <p>调查人员给麦凯手机充好电后，发现其安装的“挑食者 (Picky Eater)”应用程序起到了 VPN 加密隧道的伪装作用。细究其历史数据发现了一系列奇怪的信息：</p>
                 
-                <div style="background: #121820; padding: 15px; border-radius: 6px; margin: 15px 0; font-family: monospace; font-size: 13px; border-left: 3px solid #00ffcc;">
-                    <strong>应用程序：</strong> 挑食者 (Picky Eater) [🤮 v2.1.0]<br>
-                    <strong>数据起始时间：</strong> 2018年8月 (没有更早保存的数据)<br>
-                    <strong>路由方式：</strong> 伪装成网页聚合器与图像处理器的 VPN 节点
+                <div style="background: #161b22; padding: 12px; border-radius: 6px; margin: 15px 0; font-family: monospace; font-size: 12px; border-left: 3px solid #00ffcc;">
+                    <strong>捕获到的无意义异常 URL / IP 记录（均为 2018年8月 起的数据）：</strong>
+                    <ul style="color: #ff5577; margin: 8px 0 0 18px; line-height: 1.8;">
+                        <li>192.168.300.999 <span style="color:#6e7681;">(IP 格式不正确：数字溢出)</span></li>
+                        <li>10.256.0.1 <span style="color:#6e7681;">(IP 格式不正确：数值越界)</span></li>
+                        <li>http://non-existent-domain-2018.internal <span style="color:#6e7681;">(指向不存在的域名)</span></li>
+                        <li>https://avery-bell-slaughter-cache.null/img_09.png <span style="color:#6e7681;">(解剖照片死链接)</span></li>
+                    </ul>
                 </div>
-
-                <p style="margin-top: 10px; font-weight: bold; color: #ff5577;">[捕获到的无意义异常 URL 与 IP 记录]：</p>
-                <ul style="color: #ff5577; font-family: monospace; line-height: 1.8; margin-left: 20px;">
-                    <li>192.168.300.999 <span style="color:#718096;">(IP 格式不正确：数字过多)</span></li>
-                    <li>10.256.0.1 <span style="color:#718096;">(IP 格式不正确：数值越界)</span></li>
-                    <li>http://non-existent-domain-2018.internal <span style="color:#718096;">(指向不存在的域名)</span></li>
-                    <li>https://avery-bell-slaughter-cache.null/img_09.png <span style="color:#718096;">(死链接/姐妹会解剖艾弗里·贝尔照片)</span></li>
-                </ul>
             </div>
-            <div class="result-footer" style="margin-top: 15px; font-size: 12px; color: #718096;">提示：这些无意义的网址均可追溯至 2018 年 8 月。</div>
+            <div class="result-footer" style="margin-top: 12px; font-size: 11px; color: #6e7681;">数据说明：无更早的历史记录保存。</div>
         </div>
     `;
 }
 
-// B 界面：常规 Gateway VPN 节点控制台
+// 4. 普通控制台界面
 function renderDefaultDashboard(username) {
     let pKey = window.accountDb[username] ? window.accountDb[username].profileKey : username;
     let profile = (window.userProfiles && window.userProfiles[pKey]) || {
         name: username.toUpperCase(),
-        welcome: `欢迎，${username}。Gateway VPN 高密加密隧道已建立。`
+        welcome: `已成功与硬件凭证 ${username} 建立通信隧道。`
     };
 
-    document.getElementById('currentUserTag').innerText = `身份: ${profile.name}`;
+    document.getElementById('currentUserTag').innerText = `CONNECTED IDENTITY: ${profile.name}`;
     const container = document.getElementById('resultsContainer');
     container.innerHTML = `
-        <div class="result-card" style="border: 1px solid #2d3748; background: #1a202c; padding: 20px; border-radius: 8px;">
-            <div class="result-meta" style="color: #00e5ff; font-size: 12px; margin-bottom: 10px;">GATEWAY-VPN-READY | ENCRYPTED NODE</div>
-            <div class="result-title" style="font-size: 18px; color: #fff; font-weight: bold; margin-bottom: 12px;">Gateway VPN 极速隐私网络网关</div>
-            <div class="result-snippet" style="color: #cbd5e0;">${profile.welcome}</div>
-            <div class="result-footer" style="margin-top: 15px; font-size: 12px; color: #718096;">提示：高密 VPN 节点已就绪。所有查询均通过全域加密节点传输。</div>
+        <div class="result-card" style="border: 1px solid #1e293b; background: #12161f; padding: 20px; border-radius: 8px;">
+            <div class="result-meta" style="color: #00e5ff; font-size: 11px; margin-bottom: 10px; font-family: monospace;">SECURE NODE READY</div>
+            <div class="result-title" style="font-size: 16px; color: #fff; font-weight: bold; margin-bottom: 12px;">终端加密会话</div>
+            <div class="result-snippet" style="color: #cbd5e0; font-size: 13px;">${profile.welcome}</div>
         </div>
     `;
 }
 
-// 断开连接 / 登出
 function logout() {
     setCurrentUserId("");
     document.getElementById('usernameInput').value = '';
     document.getElementById('passwordInput').value = '';
+    document.getElementById('authErrorMsg').innerText = '';
+    document.getElementById('mainContainer').style.display = 'none';
     document.getElementById('authOverlay').style.display = 'flex';
-    document.getElementById('authErrorMsg').style.color = '#718096';
-    document.getElementById('authErrorMsg').innerText = '说明：终端将建立高密加密隧道。';
-    document.getElementById('resultsContainer').innerHTML = '';
 }
 
-function goHome() {
-    const activeUser = getCurrentUserId();
-    if (activeUser === "mckay") {
-        renderPhoneSimulator();
-    } else if (activeUser) {
-        renderDefaultDashboard(activeUser);
-    }
-}
-
-// 自动启动时钟
 window.addEventListener('DOMContentLoaded', () => {
     startRealTimeClock();
 });
 
-// 全局挂载
 window.handleAuthKeyPress = handleAuthKeyPress;
 window.login = login;
 window.logout = logout;
-window.goHome = goHome;
