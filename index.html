@@ -3,71 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gateway VPN v2.4 - 您的极速隐私网络</title>
+    <title> ACCESS</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- 模拟加密隧道解密跳转动画 -->
+    <!-- 模拟解密动画 overlay -->
     <div class="loader-overlay" id="loaderOverlay">
         <div class="spinner"></div>
         <div id="loaderStatusText">正在解密数据流...</div>
     </div>
 
-    <!-- 登录弹窗 -->
-    <div class="auth-overlay" id="authOverlay">
+    <!-- 极简暗网/VPN 登录遮罩弹窗 -->
+    <div class="auth-overlay" id="authOverlay" style="display: flex;">
         <div class="auth-card">
             <div class="auth-title">GATEWAY VPN ACCESS</div>
             <div class="subtitle">请输入硬件凭证或终端身份代号</div>
             <div class="form-group">
                 <label>USERNAME / USER IDENTITY</label>
-                <!-- 支持回车直接登录 -->
                 <input type="text" id="usernameInput" placeholder="输入用户名" onkeypress="handleAuthKeyPress(event)">
             </div>
             <div class="form-group">
                 <label>PASSCODE</label>
-                <!-- 支持回车直接登录 -->
                 <input type="password" id="passwordInput" placeholder="密码" onkeypress="handleAuthKeyPress(event)">
             </div>
             <button class="auth-btn" onclick="login()">连接 (CONNECT)</button>
-            <div class="auth-hint" id="authErrorMsg">
+            <div class="auth-hint" id="authErrorMsg" style="margin-top: 15px; text-align: center;">
                 说明：终端将建立高密加密隧道。
             </div>
         </div>
     </div>
 
-    <header>
-        <!-- 点击 Logo 回到主页 -->
-        <div class="logo-area" onclick="goHome()" style="cursor: pointer;">
+    <!-- 登录成功后的主控制台 Header -->
+    <header style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
+        <div class="logo-area" onclick="goHome()" style="cursor: pointer; display: flex; align-items: center; gap: 10px;">
             <div class="logo-icon">▲</div>
             <div>
-                <div class="title-text">Gateway VPN</div>
-                <div class="subtitle">v2.4.18-p2 [已加密] <span id="realTimeClock" style="margin-left: 10px; color: var(--accent-color);"></span></div>
+                <div class="title-text" style="font-weight: bold;">Gateway VPN</div>
+                <div class="subtitle" style="font-size: 12px; color: #718096;">v2.4.18-p2 [已加密] <span id="realTimeClock" style="margin-left: 10px; color: #00e5ff;"></span></div>
             </div>
         </div>
-        <div class="status-bar">
-            <div class="user-tag" id="currentUserTag">身份: 尚未登录</div>
-            <button class="tab-btn" onclick="goHome()">[主页]</button>
-            <button class="tab-btn" onclick="openHistoryModal()">[搜索历史]</button>
-            <button class="tab-btn" onclick="logout()">[切换身份]</button>
-            <button class="tab-btn" onclick="openConsole()">[检视抓包]</button>
+        <div class="status-bar" style="display: flex; gap: 10px; align-items: center;">
+            <div class="user-tag" id="currentUserTag" style="color: #00e5ff; font-weight: bold;">身份: 尚未登录</div>
+            <button class="tab-btn" onclick="logout()">[断开连接 / 切换身份]</button>
         </div>
     </header>
 
-    <div class="container">
-        <div class="search-card">
-            <div class="search-box-wrapper">
-                <input type="text" id="searchInput" placeholder="在全域分布式网络与加密节点中检索..." onkeypress="handleKeyPress(event)">
-                <button class="search-btn" onclick="executeSearch()">全局检索</button>
-            </div>
-        </div>
-
+    <!-- 主展示区域（根据登录凭证不同渲染不同界面） -->
+    <div class="container" style="max-width: 900px; margin: 20px auto; padding: 0 15px;">
         <div class="results-section" id="resultsContainer"></div>
     </div>
 
-    <div class="watermark">SECURE TERMINAL // GATEWAY VPN HIGH-SPEED TUNNEL</div>
+    <div class="watermark" style="position: fixed; bottom: 10px; right: 10px; opacity: 0.2; font-size: 11px;">SECURE TERMINAL // GATEWAY VPN HIGH-SPEED TUNNEL</div>
 
-    <!-- 右侧滑动抽屉 (Side Drawer) - 用于展示案宗细节与 Handout 大图 -->
+    <!-- 右侧 Handout 抽屉 -->
     <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
     <div class="side-drawer" id="sideDrawer">
         <div class="drawer-header">
@@ -83,47 +72,11 @@
         </div>
     </div>
 
-    <!-- 带图片的通知弹窗 (Modal) -->
-    <div class="modal-overlay" id="notifyModal">
-        <div class="modal-card">
-            <div class="modal-header" id="modalTitle">⚠️ [系统同步通信提示]</div>
-            <div class="modal-image-wrapper">
-                <img id="modalImage" src="" alt="Notification Graphic" style="display: none;">
-            </div>
-            <div class="modal-body" id="modalText">通信收到...</div>
-            <button class="modal-btn" onclick="closeModal()">确认并忽略 (ACKNOWLEDGE)</button>
-        </div>
-    </div>
-
-    <!-- 搜索历史弹窗 -->
-    <div class="modal-overlay" id="historyModal">
-        <div class="modal-card">
-            <div class="modal-header">📜 [当前账号本地加密检索缓存/搜索历史]</div>
-            <div class="modal-body">
-                <div id="historyContainer">暂无检索历史。</div>
-            </div>
-            <button class="modal-btn danger" onclick="clearHistory()">🗑️ 清除历史记录</button>
-            <button class="modal-btn" onclick="closeHistoryModal()">关闭历史记录</button>
-        </div>
-    </div>
-
-    <!-- 固件抓包弹窗 -->
-    <div class="modal-overlay" id="consoleModal">
-        <div class="console-card">
-            <div style="display:flex; justify-content:space-between; margin-bottom:12px; border-bottom:1px solid #2d3748; padding-bottom:6px;">
-                <span style="color:#00e5ff; font-weight:bold;">[固件抓包与底层电路报告]</span>
-                <span style="cursor:pointer; color:#ff3366;" onclick="closeConsole()">[关闭 ESC]</span>
-            </div>
-            <div class="console-log" id="consoleLogText"></div>
-        </div>
-    </div>
-
-<!-- 脚本按照正确逻辑依赖按序加载 -->
-<script src="js/database.js"></script>
-<script src="js/players.js"></script>
-<script src="js/notifications.js"></script>
-<script src="js/handouts.js"></script>
-<script src="js/main.js"></script>
-    
+    <!-- 引入 JS 脚本 -->
+    <script src="js/database.js"></script>
+    <script src="js/players.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/handouts.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
