@@ -1,3 +1,10 @@
+/**
+ * =========================================================
+ * 检索数据库与彩蛋关键词库 (Search & Anomaly Database)
+ * =========================================================
+ */
+
+// 1. 玩家特定暗号专属卡片
 const customUserResults = {
     "peanut": {
         "schnell": {
@@ -21,8 +28,9 @@ const customUserResults = {
     }
 };
 
+// 2. 全局通用彩蛋与案宗线索数据库
 const database = {
-    // 1. 所有人搜索 Tafu / 掌局者 时触发的档案
+    // 所有人搜 tafu / 掌局者 时触发的档案
     "tafu": {
         title: "档案分类: Delta Green 掌局者 / 局外观察者 (Tafu)",
         domain: "aegis.gateway.internal/classified/handler-tafu-overview",
@@ -32,16 +40,16 @@ const database = {
         footer: "来源: 局外高维观察者档案 / 权限锁定: CLEARANCE Delta"
     },
 
-    // 2. 矮人模拟器小游戏彩蛋节点（直接挂载 games/dwarf_adventure/index.html）
+    // 矮人模拟器小游戏彩蛋节点
     "dwarf": {
         title: "【矮人模拟器】.exe",
         domain: "aegis.gateway.internal/games/dwarf_adventure",
         snippet: "检测到像素协议数据包。点击启动内置小游戏模拟器视窗。",
-        detailText: "【小程序挂载成功】\n\n可以直接在主控制台中央视窗游玩，或点击下方链接在新窗口打开：\n<a href='games/dwarf_adventure/index.html' target='_blank' style='color:#00e5ff; font-weight:bold;'>[在新标签页全屏打开小游戏]</a>",
+        detailText: "【小程序挂载成功】\n\n可以直接在主控制台中央视窗游玩，或点击下方链接在新窗口打开：\n<a href=\"games/dwarf_adventure/index.html\" target=\"_blank\" style=\"color:#00e5ff; font-weight:bold;\">[在新标签页全屏打开小游戏]</a>",
         footer: "SYSTEM // MINI-GAME MODULE"
     },
 
-    // 3. 案宗线索：麦凯
+    // 案宗线索：麦凯
     "mckay": {
         title: "康奈尔大学姐妹会枪案 - 嫌疑人布拉德利·麦凯 (Bradley McKay) 案宗记录",
         domain: "ithaca-pd.gov/restricted/file-CAR-5-58",
@@ -51,7 +59,7 @@ const database = {
         footer: "调阅来源: 伊萨卡警方刑事侦查科 / 证据物证室档案"
     },
 
-    // 4. 案宗线索：库尔教授
+    // 案宗线索：库尔教授
     "cool": {
         title: "麻省理工学院 (MIT) 韦斯利·库尔教授 (Prof. Wesley Cool) 人事与门禁卷宗",
         domain: "mit.edu/math/faculty/cool_w_archive",
@@ -61,7 +69,7 @@ const database = {
         footer: "状态: 麻省理工学院数学系教员档案 (目前状态异常)"
     },
 
-    // 5. 案宗线索：维姬·金
+    // 案宗线索：维姬·金
     "king": {
         title: "宾夕法尼亚州踢泉镇 (Kick Springs) 维姬·金 (Vicki King) 住宅封存记录",
         domain: "county-registry.pa.gov/kicksprings/property_408",
@@ -71,7 +79,7 @@ const database = {
         footer: "来源: 地方警长办事处 / 银行止赎通知外包档案"
     },
 
-    // 6. 案宗线索：沃尔斯将军
+    // 案宗线索：沃尔斯将军
     "wallace": {
         title: "缅因州班戈市 霜橡拖车公园 - 罗伯特·沃尔斯 (Robert Wallace) 监控简报",
         domain: "bangor-pd.maine.gov/case_wallace_r",
@@ -81,7 +89,7 @@ const database = {
         footer: "来源: 缅因州地方执法记录 / 计算机网络日志"
     },
 
-    // 7. 案宗线索：达比格 / 周五屠杀夜
+    // 案宗线索：达比格 / 周五屠杀夜
     "dabiq": {
         title: "周五屠杀夜 (Friday Night Slaughter) 涉案枪手设备视频元数据分析",
         domain: "counter-terrorism-db.gov/dabiq-media-stream",
