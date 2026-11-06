@@ -1,261 +1,138 @@
-/**
- * =========================================================
- * GATEWAY TERMINAL 主逻辑控制程序
- * =========================================================
- */
+function getCurrentUserId() {
+    return (localStorage.getItem("gateway_logged_user") || "visitor").toLowerCase();
+}
 
-let activeUser = null;
-let activeProfile = null;
+function setCurrentUserId(userId) {
+    localStorage.setItem("gateway_logged_user", userId.toLowerCase());
+}
+
 let searchCount = 0;
 
-function getCurrentUserId() { return activeUser; }
-function setCurrentUserId(id) { activeUser = id; }
-
 function handleAuthKeyPress(e) {
-    if (e.key === 'Enter') login();
-}
-
-function handleKeyPress(e) {
-    if (e.key === 'Enter') executeSearch();
-}
-
-function updateClock() {
-    const clockEl = document.getElementById('realTimeClock');
-    if (clockEl) {
-        const now = new Date();
-        const timeStr = now.getFullYear() + '-' +
-            String(now.getMonth() + 1).padStart(2, '0') + '-' +
-            String(now.getDate()).padStart(2, '0') + ' ' +
-            String(now.getHours()).padStart(2, '0') + ':' +
-            String(now.getMinutes()).padStart(2, '0') + ':' +
-            String(now.getSeconds()).padStart(2, '0');
-        clockEl.innerText = '[' + timeStr + ']';
+    if (e.key === 'Enter') {
+        login();
     }
 }
 
 function login() {
-    const userInput = document.getElementById('usernameInput').value.trim();
-    const passInput = document.getElementById('passwordInput').value.trim();
-    const errEl = document.getElementById('authErrorMsg');
+    const userIn = document.getElementById('usernameInput').value.trim();
+    const passIn = document.getElementById('passwordInput').value.trim();
+    const errorMsg = document.getElementById('authErrorMsg');
 
-    if (!userInput) {
-        if (errEl) errEl.innerHTML = '<span style="color:var(--accent-danger);">❌ 错误：请输入硬件凭证或终端代号！</span>';
-        return;
+    let currentUser = "guest";
+
+    if (userIn) {
+        const lowerUser = userIn.toLowerCase();
+        if (window.accountDb[lowerUser]) {
+            if (window.accountDb[lowerUser].password && window.accountDb[lowerUser].password !== passIn) {
+                errorMsg.style.color = "#ff3366";
+                errorMsg.innerText = "❌ 鉴权失败：口令不正确！";
+                return;
+            }
+            currentUser = lowerUser;
+        } else {
+            errorMsg.style.color = "#ff3366";
+            errorMsg.innerText = "❌ 鉴权失败：无法识别的终端身份代号！";
+            return;
+        }
     }
 
-    const account = window.accountDb ? window.accountDb[userInput.toLowerCase()] : null;
-
-    if (!account || account.password !== passInput) {
-        if (errEl) errEl.innerHTML = '<span style="color:var(--accent-danger);">❌ 无法识别的终端凭证或通行密码错误！</span>';
-        return;
-    }
-
-    activeUser = userInput.toLowerCase();
-    activeProfile = (window.userProfiles && window.userProfiles[account.profileKey]) 
-        ? window.userProfiles[account.profileKey] 
-        : { name: activeUser, welcome: "控制台已连接。" };
-
-    // 隐藏登录遮罩
+    setCurrentUserId(currentUser);
     document.getElementById('authOverlay').style.display = 'none';
-    document.getElementById('currentUserTag').innerText = `身份: ${activeProfile.name}`;
+    
+    let pKey = window.accountDb[currentUser] ? window.accountDb[currentUser].profileKey : "guest";
+    let profile = window.userProfiles[pKey] || window.userProfiles["guest"];
 
-    // 多视图分发 (A/B/C 路由)
-    routeUserView();
+    window.activeProfile = profile;
+
+    const userTag = document.getElementById('currentUserTag');
+    const consoleLogText = document.getElementById('consoleLogText');
+    if (userTag) userTag.innerText = `身份: ${profile.name}`;
+    if (consoleLogText) consoleLogText.innerText = profile.consoleLog;
+    
+    routeUserView(currentUser);
 }
 
-function routeUserView() {
+// 核心改动：根据 viewType 动态路由，彻底消灭 if-else 屎山
+function routeUserView(currentUser) {
     const header = document.querySelector('header');
     const searchCard = document.querySelector('.search-card');
+    const container = document.getElementById('resultsContainer');
+    
+    const account = window.accountDb[currentUser];
+    const viewType = account ? account.viewType : "terminal";
 
-    // 视图 1：CCTV 安防监控模式 (零搜索框，纯控制台)
-    if (activeUser === "cctv-ithaca-cam01") {
-        if (header) header.style.display = 'flex';
-        if (searchCard) searchCard.style.display = 'none'; // 隐藏搜索框
-        if (typeof renderCctvScreen === 'function') renderCctvScreen();
-    } 
-    // 视图 2：麦凯手机镜像模式
-    else if (activeUser === "mckay") {
-        if (header) header.style.display = 'none'; // 手机端独立 Header
-        if (searchCard) searchCard.style.display = 'none';
-        if (typeof renderMcKayPhoneScreen === 'function') renderMcKayPhoneScreen();
-    } 
-    // 视图 3：标准调查员 Gateway VPN 检索模式
-    else {
-        if (header) header.style.display = 'flex';
-        if (searchCard) searchCard.style.display = 'block';
-        goHome();
+    if (container) container.innerHTML = '';
+    if (header) header.style.display = 'none';
+    if (searchCard) searchCard.style.display = 'none';
+
+    switch(viewType) {
+        case "cctv":
+            if (header) header.style.display = 'flex';
+            if (typeof renderCctvScreen === 'function') renderCctvScreen();
+            break;
+        case "phone":
+            if (typeof renderMcKayPhoneScreen === 'function') renderMcKayPhoneScreen();
+            break;
+        case "server":
+            if (typeof renderWallaceServer === 'function') renderWallaceServer();
+            break;
+        case "terminal":
+        default:
+            if (header) header.style.display = 'flex';
+            if (searchCard) searchCard.style.display = 'block';
+            goHome();
+            break;
     }
 }
 
 function logout() {
-    activeUser = null;
-    activeProfile = null;
+    setCurrentUserId("visitor");
+    const authOverlay = document.getElementById('authOverlay');
+    const errorMsg = document.getElementById('authErrorMsg');
+    const searchInput = document.getElementById('searchInput');
+    
+    if (authOverlay) authOverlay.style.display = 'flex';
+    if (searchInput) searchInput.value = '';
+    if (errorMsg) {
+        errorMsg.style.color = 'var(--text-dim)';
+        errorMsg.innerText = '说明：终端将建立高密加密隧道。';
+    }
+    document.body.className = '';
     searchCount = 0;
-    
-    document.getElementById('authOverlay').style.display = 'flex';
-    document.getElementById('usernameInput').value = '';
-    document.getElementById('passwordInput').value = '';
-    document.getElementById('authErrorMsg').innerText = '说明：终端将建立高密加密隧道。';
-    
-    const resultsContainer = document.getElementById('resultsContainer');
-    if (resultsContainer) resultsContainer.innerHTML = '';
 }
 
 function goHome() {
-    if (activeUser === "mckay" || activeUser === "cctv-ithaca-cam01") {
-        routeUserView();
-        return;
-    }
-
     const searchInput = document.getElementById('searchInput');
     if (searchInput) searchInput.value = '';
-
-    const resultsContainer = document.getElementById('resultsContainer');
-    if (!resultsContainer || !activeProfile) return;
-
-    resultsContainer.innerHTML = `
-        <div class="result-card anomaly">
-            <div class="result-meta">SECURE NODE READY</div>
-            <div class="result-title" style="cursor:default;">终端加密会话</div>
-            <div class="result-snippet">${activeProfile.welcome}</div>
-        </div>
-    `;
+    
+    if (window.activeProfile) {
+        renderWelcomeCard(window.activeProfile.welcome);
+    } else {
+        renderWelcomeCard("欢迎访问 Gateway VPN 极速隐私网络网关。");
+    }
 }
 
-function executeSearch() {
-    const searchInput = document.getElementById('searchInput');
-    if (!searchInput) return;
-    const keyword = searchInput.value.trim().toLowerCase();
-    if (!keyword) return;
-
-    searchCount++;
-    if (typeof updateStageEffects === 'function') updateStageEffects();
-    if (typeof checkTriggerNotifications === 'function') checkTriggerNotifications(activeUser, searchCount);
-
-    const loader = document.getElementById('loaderOverlay');
-    if (loader) loader.style.display = 'flex';
-
-    setTimeout(() => {
-        if (loader) loader.style.display = 'none';
-        renderSearchResults(keyword);
-    }, 600);
-}
-
-function renderSearchResults(keyword) {
+function renderWelcomeCard(welcomeText) {
     const container = document.getElementById('resultsContainer');
     if (!container) return;
-    container.innerHTML = '';
-
-    // 1. 生成 Google 标准搜索卡片
-    const googleCardHTML = `
-        <div class="result-card google-style">
+    container.innerHTML = `
+        <div class="result-card">
             <div class="result-meta">
-                <span>https://www.google.com/search?q=${encodeURIComponent(keyword)}</span>
-                <span>Google Search</span>
+                <span>GATEWAY-VPN-READY</span>
+                <span>NODE #${Math.floor(Math.random()*900 + 100)}</span>
             </div>
-            <a class="result-title" href="https://www.google.com/search?q=${encodeURIComponent(keyword)}" target="_blank">
-                ${keyword} - Google 搜索结果
-            </a>
-            <div class="result-snippet">调阅公共互联网索引库。点击在新的加密标签页中查看真实 Google 搜索结果。</div>
-            <div class="result-footer">来源: PUBLIC INDEX // SECURE PROXY</div>
+            <div class="result-title">Gateway VPN 极速隐私网络网关</div>
+            <div class="result-snippet">${welcomeText}</div>
+            <div class="result-footer">提示：高密 VPN 节点已就绪。所有查询均通过全域节点传输。</div>
         </div>
     `;
-
-    // 2. 匹配 database.js 案宗词条
-    let itemData = null;
-    if (window.customUserResults && window.customUserResults[activeUser] && window.customUserResults[activeUser][keyword]) {
-        itemData = window.customUserResults[activeUser][keyword];
-    } else if (window.database && window.database[keyword]) {
-        itemData = window.database[keyword];
-    }
-
-    if (itemData) {
-        const encodedData = encodeURIComponent(JSON.stringify(itemData));
-        const anomalyCardHTML = `
-            <div class="result-card anomaly">
-                <div class="result-meta">
-                    <span>${itemData.domain || 'aegis.gateway.internal'}</span>
-                    <span>RESTRICTED FILE</span>
-                </div>
-                <div class="result-title" onclick="triggerCardAction('${encodedData}')">
-                    ${itemData.title}
-                </div>
-                <div class="result-snippet">${itemData.snippet}</div>
-                <div class="result-footer">${itemData.footer || '来源: AEGIS DATABASE'}</div>
-            </div>
-        `;
-        container.innerHTML = googleCardHTML + anomalyCardHTML;
-    } else {
-        container.innerHTML = googleCardHTML;
-    }
 }
 
-function triggerCardAction(encodedData) {
-    try {
-        const data = JSON.parse(decodeURIComponent(encodedData));
-        if (typeof openDrawerWithData === 'function') {
-            openDrawerWithData(data);
-        }
-    } catch (e) {
-        console.error("解析 Card 数据失败", e);
-    }
-}
-
-function openConsole() {
-    const modal = document.getElementById('consoleModal');
-    const logText = document.getElementById('consoleLogText');
-    if (modal && logText && activeProfile) {
-        logText.innerText = activeProfile.consoleLog || "[SYSTEM LOG]\nStatus: ACTIVE";
-        modal.style.display = 'flex';
-    }
-}
-
-function closeConsole() {
-    const modal = document.getElementById('consoleModal');
-    if (modal) modal.style.display = 'none';
-}
-
-function openHistoryModal() {
-    const modal = document.getElementById('historyModal');
-    const container = document.getElementById('historyContainer');
-    if (modal && container && activeProfile) {
-        if (activeProfile.history && activeProfile.history.length > 0) {
-            container.innerHTML = `<ul class="history-list">${activeProfile.history.map(item => `<li class="history-item">🔍 ${item}</li>`).join('')}</ul>`;
-        } else {
-            container.innerHTML = '暂无本地检索历史。';
-        }
-        modal.style.display = 'flex';
-    }
-}
-
-function clearHistory() {
-    if (activeProfile) {
-        activeProfile.history = [];
-        openHistoryModal();
-    }
-}
-
-function closeHistoryModal() {
-    const modal = document.getElementById('historyModal');
-    if (modal) modal.style.display = 'none';
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    setInterval(updateClock, 1000);
-    updateClock();
-});
-
+// 全局导出挂载
 window.getCurrentUserId = getCurrentUserId;
 window.setCurrentUserId = setCurrentUserId;
 window.handleAuthKeyPress = handleAuthKeyPress;
-window.handleKeyPress = handleKeyPress;
 window.login = login;
 window.logout = logout;
 window.goHome = goHome;
-window.executeSearch = executeSearch;
-window.openConsole = openConsole;
-window.closeConsole = closeConsole;
-window.openHistoryModal = openHistoryModal;
-window.clearHistory = clearHistory;
-window.closeHistoryModal = closeHistoryModal;
-window.triggerCardAction = triggerCardAction;
