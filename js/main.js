@@ -35,12 +35,13 @@ function handleAuthKeyPress(e) {
     }
 }
 
-// 严谨登录鉴权逻辑
+// 严谨登录鉴权与路由分发逻辑
 function login() {
     const userIn = document.getElementById('usernameInput').value.trim();
     const passIn = document.getElementById('passwordInput').value.trim();
     const errorMsg = document.getElementById('authErrorMsg');
 
+    // 1. 禁用留空登录：如果不填用户名，直接阻止并提示
     if (!userIn) {
         errorMsg.style.color = "#ff3366";
         errorMsg.innerText = `无法识别的终端身份代号！`;
@@ -50,32 +51,43 @@ function login() {
     const lowerUser = userIn.toLowerCase();
     let currentUser = "";
 
+    // 2. 检查预设数据库 accountDb
     if (window.accountDb && window.accountDb[lowerUser]) {
         if (window.accountDb[lowerUser].password && window.accountDb[lowerUser].password !== passIn) {
             errorMsg.style.color = "#ff3366";
             errorMsg.innerText = `口令不正确！`;
-            return;
+            return; // 密码错误，阻止进入
         }
         currentUser = lowerUser;
     } else {
+        // 3. 检查本地存储用户
         let localUsers = JSON.parse(localStorage.getItem('gateway_users') || '{}');
         if (localUsers[lowerUser]) {
             if (localUsers[lowerUser].password !== passIn) {
                 errorMsg.style.color = "#ff3366";
                 errorMsg.innerText = `口令不正确！`;
-                return;
+                return; // 密码错误，阻止进入
             }
             currentUser = lowerUser;
         } else {
+            // ❌ 不是已注册/预设账号，禁止进入！
             errorMsg.style.color = "#ff3366";
             errorMsg.innerText = `无法识别的终端身份代号！`;
-            return;
+            return; // 阻止进入
         }
     }
 
+    // 鉴权通过，保存登录状态
     setCurrentUserId(currentUser);
     document.getElementById('authOverlay').style.display = 'none';
     
+    // 4. 路由切分：判断是否登录麦凯的模拟手机
+    if (currentUser === "mckay") {
+        renderPhoneSimulator();
+        return;
+    }
+
+    // 常规 Gateway VPN 界面初始化
     let pKey = window.accountDb && window.accountDb[currentUser] ? window.accountDb[currentUser].profileKey : currentUser;
     
     let profile = (window.userProfiles && window.userProfiles[pKey]) || {
@@ -91,6 +103,36 @@ function login() {
     document.getElementById('consoleLogText').innerText = profile.consoleLog;
     
     renderWelcomeCard(profile.welcome);
+}
+
+// 渲染麦凯手机/挑食者 (Picky Eater) 模拟器界面
+function renderPhoneSimulator() {
+    const container = document.getElementById('resultsContainer');
+    container.innerHTML = `
+        <div class="result-card anomaly" style="border-color: #00ffcc; background: #0a0e14;">
+            <div class="result-meta">
+                <span>HARDWARE-DUMP: MCKAY_DEVICE</span>
+                <span>STATUS: MOUNTED VIA PICKY EATER</span>
+            </div>
+            <div class="result-title">📱 嫌疑人麦凯 (McKay) 的手机硬件镜像抓包</div>
+            <div class="result-snippet">
+                <p>已通过“挑食者 (Picky Eater)”虚拟专用网络隧道成功挂载该设备缓存镜像。</p>
+                <div style="background: #121820; padding: 12px; border-radius: 6px; margin: 10px 0; font-family: monospace; font-size: 13px;">
+                    <strong>应用名称：</strong> 挑食者 (Picky Eater) [🤮 v2.1.0]<br>
+                    <strong>首批历史数据时间戳：</strong> 2018年8月14日 (早期记录已丢失)<br>
+                    <strong>底层路由机制：</strong> 自定义物理子结构代理
+                </div>
+                <p><strong>[异常缓存 URL / IP 捕获记录]：</strong></p>
+                <ul style="color: #ff5577; font-family: monospace; line-height: 1.6; margin-left: 20px;">
+                    <li>192.168.300.999 (格式错误：数字溢出)</li>
+                    <li>10.256.0.1 (格式错误：段值越界)[cite: 1]</li>
+                    <li>http://non-existent-domain-2018.internal (域名不存在)[cite: 1]</li>
+                    <li>https://avery-bell-slaughter-cache.null/img_09.png (死链接)[cite: 1, 4]</li>
+                </ul>
+            </div>
+            <div class="result-footer">提示：本数据为 2018 年 8 月以来的物理缓存dump。</div>
+        </div>
+    `;
 }
 
 function logout() {
@@ -140,7 +182,7 @@ function executeSearch() {
         }
     }
 
-    // 1. Google 搜索卡片（原生 <a> 标签跳转，绕过弹窗拦截）
+    // 1. Google 搜索卡片
     const googleCardData = {
         title: `🌐 在 Google 上搜索: "${input}"`,
         domain: `https://www.google.com/search?q=${encodeURIComponent(input)}`,
@@ -156,10 +198,9 @@ function executeSearch() {
         container.appendChild(createResultCard(customItem, 'anomaly'));
     }
 
-    // 3. 模组彩蛋关键词（捕获 tafu 掌局者与 dwarf 矮人小游戏）
+    // 3. 模组彩蛋关键词（包含 tafu 掌局者支持）
     let matchedKeys = [];
     if (lowerInput.includes("tafu") || lowerInput.includes("塔夫") || lowerInput.includes("掌局者")) matchedKeys.push("tafu");
-    if (lowerInput.includes("dwarf") || lowerInput.includes("矮人")) matchedKeys.push("dwarf");
     if (lowerInput.includes("mckay") || lowerInput.includes("麦凯") || lowerInput.includes("康奈尔")) matchedKeys.push("mckay");
     if (lowerInput.includes("cool") || lowerInput.includes("库尔") || lowerInput.includes("mit")) matchedKeys.push("cool");
     if (lowerInput.includes("king") || lowerInput.includes("维姬") || lowerInput.includes("金")) matchedKeys.push("king");
@@ -195,14 +236,13 @@ function createResultCard(data, styleClass) {
             <div class="result-footer">${data.footer}</div>
         `;
     } else {
-        // 关键修复：强制将单引号替换为 %27，防止破坏 HTML 的 onclick 属性
-        const encodedData = encodeURIComponent(JSON.stringify(data)).replace(/'/g, "%27");
+        const encodedData = encodeURIComponent(JSON.stringify(data));
         card.innerHTML = `
             <div class="result-meta">
                 <span>${data.domain}</span>
                 <span>ENCRYPTED NODE</span>
             </div>
-            <div class="result-title" style="cursor:pointer;" onclick="triggerCardAction('${encodedData}')">${data.title}</div>
+            <div class="result-title" onclick="triggerCardAction('${encodedData}')">${data.title}</div>
             <div class="result-snippet">${data.snippet}</div>
             <div class="result-footer">${data.footer}</div>
         `;
@@ -210,7 +250,7 @@ function createResultCard(data, styleClass) {
     return card;
 }
 
-// 解密动画结束后，直接在页面中央渲染内嵌游戏视窗或提示
+// 点击线索卡片，经过 0.8 秒解密动画后拉出右侧 Handout 抽屉
 function triggerCardAction(encodedData) {
     const data = JSON.parse(decodeURIComponent(encodedData));
     const loader = document.getElementById('loaderOverlay');
@@ -222,44 +262,17 @@ function triggerCardAction(encodedData) {
 
         setTimeout(() => {
             loader.style.display = 'none';
-            // 如果是矮人模拟器/小游戏，直接在主界面渲染内嵌视窗！
-            if (data.domain && (data.domain.includes('/games/') || data.domain.includes('dwarf_adventure'))) {
-                renderGameInMainView(data);
-            } else if (typeof window.openDrawerWithData === 'function') {
-                window.openDrawerWithData(data);
+            if (typeof openDrawerWithData === 'function') {
+                openDrawerWithData(data);
             } else {
                 alert(`想喝伊斯班克？带上梯子和手来见我！`);
             }
         }, 800);
     } else {
-        if (data.domain && (data.domain.includes('/games/') || data.domain.includes('dwarf_adventure'))) {
-            renderGameInMainView(data);
-        } else if (typeof window.openDrawerWithData === 'function') {
-            window.openDrawerWithData(data);
+        if (typeof openDrawerWithData === 'function') {
+            openDrawerWithData(data);
         }
     }
-}
-
-// 在终端中央直接替换为小游戏仿真控制面板
-function renderGameInMainView(data) {
-    const container = document.getElementById('resultsContainer');
-    if (!container) return;
-
-    container.innerHTML = `
-        <div class="result-card anomaly" style="border-color: #00e5ff; background: rgba(0, 229, 255, 0.05); padding: 15px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(0, 229, 255, 0.3); padding-bottom: 8px;">
-                <span style="color: #00e5ff; font-weight: bold; font-size: 16px;">🎮 [虚拟终端内嵌程序]: ${data.title}</span>
-                <button onclick="goHome()" style="background: #ff3366; color: #fff; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">✖ 退出程序 (CLOSE)</button>
-            </div>
-            <div style="width: 100%; height: 500px; border: 1px solid #00e5ff; border-radius: 6px; overflow: hidden; background: #000; margin-bottom: 10px;">
-                <iframe src="games/dwarf_adventure/index.html" style="width: 100%; height: 100%; border: none;"></iframe>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; color: var(--text-dim); font-size: 12px;">
-                <span>${data.footer || "SYSTEM // MINI-GAME MODULE"}</span>
-                <a href="games/dwarf_adventure/index.html" target="_blank" style="color: #00e5ff; text-decoration: underline;">[在新窗口单独全屏打开]</a>
-            </div>
-        </div>
-    `;
 }
 
 function updateStageEffects() {
@@ -306,7 +319,6 @@ function closeHistoryModal() {
     document.getElementById('historyModal').style.display = 'none';
 }
 
-// 返回主页功能（清空搜索框并重置初始卡片）
 function goHome() {
     const searchInput = document.getElementById('searchInput');
     if (searchInput) searchInput.value = '';
@@ -323,7 +335,7 @@ window.addEventListener('DOMContentLoaded', () => {
     startRealTimeClock();
 });
 
-// 全局导出挂载
+// 全局挂载导出
 window.getCurrentUserId = getCurrentUserId;
 window.setCurrentUserId = setCurrentUserId;
 window.handleAuthKeyPress = handleAuthKeyPress;
@@ -336,5 +348,4 @@ window.openHistoryModal = openHistoryModal;
 window.closeHistoryModal = closeHistoryModal;
 window.clearHistory = clearHistory;
 window.triggerCardAction = triggerCardAction;
-window.renderGameInMainView = renderGameInMainView;
 window.goHome = goHome;
