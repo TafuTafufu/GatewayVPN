@@ -4,7 +4,7 @@
  * =========================================================
  */
 
-// 1. 玩家特定暗号专属卡片
+// 1. 玩家特定暗号专属卡片 (根据当前登录账号展现)
 const customUserResults = {
     "peanut": {
         "schnell": {
@@ -40,12 +40,12 @@ const database = {
         footer: "来源: 局外高维观察者档案 / 权限锁定: CLEARANCE Delta"
     },
 
-    // 矮人模拟器小游戏彩蛋节点
+    // 矮人模拟器小游戏彩蛋节点 (修复嵌入双引号与路径问题)
     "dwarf": {
         title: "【暗网程序】地牢矮人协议模拟器.exe",
-        domain: "aegis.gateway.internal/games/dwarf",
-        snippet: "检测到像素协议数据包。点击展开右侧抽屉启动内置小游戏模拟器。",
-        detailText: "【小程序挂载成功】\n\n可以直接在右侧面板游玩，或点击下方链接在新窗口打开：\n<a href=\"games/dwarf_adventure/index.html\" target=\"_blank\" style=\"color:#00e5ff; font-weight:bold;\">[在新标签页全屏打开小游戏]</a>",
+        domain: "aegis.gateway.internal/games/dwarf_adventure",
+        snippet: "检测到像素协议数据包。点击启动内置小游戏模拟器视窗。",
+        detailText: "【小程序挂载成功】\n\n可以直接在主控制台中央视窗游玩，或点击下方链接在新窗口打开：\n<a href=\"games/dwarf_adventure/index.html\" target=\"_blank\" style=\"color:#00e5ff; font-weight:bold;\">[在新标签页全屏打开小游戏]</a>",
         footer: "SYSTEM // MINI-GAME MODULE"
     },
 
@@ -93,4 +93,13 @@ const database = {
     "dabiq": {
         title: "周五屠杀夜 (Friday Night Slaughter) 涉案枪手设备视频元数据分析",
         domain: "counter-terrorism-db.gov/dabiq-media-stream",
-        snippet: "【
+        snippet: "【异界圣战视频记录】两名携带‘神之和平·全球哈里发国’证件的枪手在球赛现场开火。设备中提取出达比格镇战场视频：B-21轰炸机投下的核弹在落地前化为盐粒，成千上万士兵凝滞。视频元数据创建于2121年（未来时间标记），音频语言为未知古老方言。",
+        image: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=600",
+        detailText: "【高维度图谱鉴定】\n视频帧逐帧解析显示，爆炸产生的冲击波在扩散至半径30米时出现了明显的帧率断层，盐粒化过程不符合已知热力学定律。",
+        footer: "来源: 纳尼亚联合工作组 (Working Group NARNIA) 证据库"
+    }
+};
+
+// 全局导出挂载
+window.customUserResults = customUserResults;
+window.database = database;
