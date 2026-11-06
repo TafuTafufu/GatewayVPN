@@ -5,20 +5,20 @@
  * =========================================================
  */
 
-// 1. App 数据列表（精简集中管理，完全契合麦凯人设，无剧透误导）
+// 1. App 数据列表（修复逻辑漏洞：用 Gmail 替代 Life360，规范设置与人设提示）
 const mckayApps = [
     { name: '挑食者', icon: '🤮', bg: '#10b981', action: () => openPickyEaterDetail() },
-    { name: 'GroupMe', icon: '💬', bg: '#00a8ff', action: () => alert('GroupMe: 没有任何新群聊邀请（麦凯在校园里几乎没有朋友）。') },
+    { name: 'GroupMe', icon: '💬', bg: '#00a8ff', action: () => alert('GroupMe: 没有任何新群聊邀请。') },
     { name: 'Snapchat', icon: '👻', bg: '#fffc00', action: () => alert('Snapchat: 暂无未读快照消息。') },
-    { name: 'Venmo', icon: 'v', bg: '#008cff', action: () => alert('Venmo: 仅包含宿舍网费 AA 与日常支出交易记录。') },
-    { name: 'Life360', icon: '📍', bg: '#8b5cf6', action: () => alert('Life360: 父母已为该设备开启 24 小时实时位置共享。') },
+    { name: 'Venmo', icon: 'v', bg: '#008cff', action: () => alert('Venmo: 包含宿舍网费 AA 与日常支出交易记录。') },
+    { name: 'Gmail', icon: '✉️', bg: '#ea4335', action: () => alert('Gmail: 包含多封来自母亲的未读关怀邮件及大学系统通知。') },
     { name: 'Canvas', icon: '🎓', bg: '#e11d48', action: () => alert('Canvas: 康奈尔大学 2019 秋季学期课程表（考勤显示多次缺勤）。') },
-    { name: '照片', icon: '🖼️', bg: '#3b82f6', action: () => alert('照片库: 存有校园风景及多张曝光损坏呈辐射灼痕痕迹的照片。') },
-    { name: 'Spotify', icon: '🎧', bg: '#1ed760', action: () => alert('Spotify: 正在播放哥特摇滚/电音歌单。') },
+    { name: '照片', icon: '🖼️', bg: '#3b82f6', action: () => alert('照片库: 存有校园风景及多张曝光损坏的照片。') },
+    { name: 'Spotify', icon: '🎧', bg: '#1ed760', action: () => alert('Spotify: 正在播放哥特摇滚歌单。') },
     { name: 'Instagram', icon: '📷', bg: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', action: () => alert('Instagram: @braddd_mckay') },
     { name: 'Tinder', icon: '🔥', bg: 'linear-gradient(45deg, #fd297b, #ff655b)', action: () => alert('Tinder: 暂无新的 Match 匹配。') },
     { name: 'AT&T Guard', icon: '🛡️', bg: '#2563eb', action: () => alert('AT&T Secure: 父母已开启夜间数据流量上限保护。') },
-    { name: '设置', icon: '⚙️', bg: '#4b5563', action: () => alert('系统设置已被限制。') }
+    { name: '设置', icon: '⚙️', bg: '#4b5563', action: () => alert("设置: Bradley's Phone") }
 ];
 
 // 2. 渲染 2019 年 iPhone (iOS 13 刘海屏) 拟真 UI
@@ -26,13 +26,13 @@ function renderMcKayPhoneScreen() {
     const container = document.getElementById('resultsContainer');
     if (!container) return;
 
-    // 获取当前设备真实时间 (格式 HH:MM，不带秒，符合真实 iPhone 状态栏)
+    // 获取当前设备真实时间 (格式 HH:MM，不带秒)
     const now = new Date();
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const currentTimeStr = `${hours}:${minutes}`;
 
-    // 生成 App 网格
+    // 动态生成 App 4×3 图标网格
     const appGridHTML = mckayApps.map((app, index) => `
         <div class="app-item" onclick="mckayApps[${index}].action()" style="cursor: pointer; text-align: center;">
             <div style="width: 52px; height: 52px; background: ${app.bg}; border-radius: 13px; margin: 0 auto; display: flex; justify-content: center; align-items: center; font-size: 24px; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.35);">
@@ -64,10 +64,9 @@ function renderMcKayPhoneScreen() {
             <!-- iOS 13 屏幕区域 -->
             <div style="background: linear-gradient(150deg, #1e293b, #0f172a, #020617); padding: 12px 14px 18px; min-height: 510px; display: flex; flex-direction: column; justify-content: space-between;">
                 
-                <!-- 顶部 AT&T 家庭套餐系统卡片 -->
+                <!-- 顶部 AT&T 家庭套餐系统卡片 (已去除 Bradley's iPhone 字样) -->
                 <div style="background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 14px; padding: 10px 12px; color: #e5e7eb; border: 1px solid rgba(255, 255, 255, 0.1);">
-                    <div style="color: #9ca3af; font-size: 10px; font-weight: 600; text-transform: uppercase;">AT&T Family Plan</div>
-                    <div style="font-weight: 700; font-size: 13px; margin-top: 2px;">Bradley's iPhone</div>
+                    <div style="color: #9ca3af; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">AT&T FAMILY PLAN</div>
                 </div>
 
                 <!-- App 应用网格 -->
@@ -90,14 +89,13 @@ function renderMcKayPhoneScreen() {
     `;
 }
 
-// 3. 点击“挑食者”输出带中文、原汁原味且无剧透的代理日志
+// 3. 点击“挑食者”输出原汁原味且无剧透的代理日志
 function openPickyEaterDetail() {
     const rawLogs = 
         "🤮【挑食者 (Picky Eater) VPN - 访问历史与数据包日志】\n\n" +
         "• 设备账户：AT&T Mobile Line #408-201-XXXX [家庭共享套餐]\n" +
         "• 缓存起点：2018年08月14日 03:12:09 UTC (无更早日志记录)\n" +
-        "• 加密状态：高强度底层隧道连接已激活\n\n" +
-        "[代理网络请求与域名解析记录 (RAW PROXY DUMP)]：\n" +
+        "[代理网络请求与域名解析记录]：\n" +
         "1. [2018-08-14] GET http://192.168.300.999/gateway/index.php\n" +
         "2. [2018-09-02] CONNECT https://10.256.0.1:8443/auth/handshake\n" +
         "3. [2018-11-19] GET http://non-existent-domain-2018.internal/forum/thread-409\n" +
@@ -111,7 +109,7 @@ function openPickyEaterDetail() {
     }
 }
 
-// 全局挂载
+// 全局挂载导出
 window.mckayApps = mckayApps;
 window.renderMcKayPhoneScreen = renderMcKayPhoneScreen;
 window.openPickyEaterDetail = openPickyEaterDetail;
