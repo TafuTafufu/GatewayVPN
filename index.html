@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GATEWAY TERMINAL // 极速加密网关</title>
-    <!-- 1. 修正 CSS 路径：指向 css/ 子目录 -->
+    <!-- CSS 样式表路径 -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -120,7 +120,7 @@
         <div id="loaderStatusText">正在建立高密隧道...</div>
     </div>
 
-    <!-- 2. 修正脚本加载路径：严格按照 [数据层 -> UI/设备层 -> 核心层] 的顺序 -->
+    <!-- 9. 模块化脚本加载顺序：[数据层 -> UI/设备层 -> 核心调度层] -->
     <!-- (A) 数据层 -->
     <script src="js/data/database.js"></script>
     <script src="js/data/players.js"></script>
@@ -130,10 +130,9 @@
     <script src="js/ui/handouts.js"></script>
     <script src="js/ui/inner_world.js"></script>
 
-    <!-- (C) 设备渲染层 (各种异构终端) -->
-    <script src="js/devices/terminal.js"></script>
-    <script src="js/devices/cctv_simulator.js"></script>
+    <!-- (C) 设备渲染层 (异构终端模拟器) -->
     <script src="js/devices/phone_mckay.js"></script>
+    <script src="js/devices/cctv_simulator.js"></script>
 
     <!-- (D) 核心调度层 (最后加载) -->
     <script src="js/core/main.js"></script>
