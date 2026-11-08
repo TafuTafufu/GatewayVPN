@@ -3,35 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GATEWAY TERMINAL // 极速加密网关</title>
-    <!-- CSS 样式表路径 -->
+    <title>Gateway VPN v2.4 - 极速隐私网络</title>
+    <!-- 注意：确保 CSS 路径正确 -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <!-- 1. 最外层极简登录鉴权弹窗 (Auth Overlay) -->
+    <!-- 模拟加密隧道解密跳转动画 -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="spinner"></div>
+        <div id="loaderStatusText">正在解密数据流...</div>
+    </div>
+
+    <!-- 登录弹窗 -->
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-card">
-            <div class="auth-title">AEGIS GATEWAY TUNNEL</div>
-            <div class="auth-subtitle">请输入硬件凭证或终端身份代号</div>
-            
+            <div class="auth-title">GATEWAY VPN ACCESS</div>
+            <div class="subtitle">请输入硬件凭证或终端身份代号</div>
             <div class="form-group">
-                <label for="usernameInput">USERNAME / USER IDENTITY</label>
-                <input type="text" id="usernameInput" placeholder="输入身份代号..." onkeypress="handleAuthKeyPress(event)">
+                <label>USERNAME / USER IDENTITY</label>
+                <input type="text" id="usernameInput" placeholder="输入用户名" onkeypress="handleAuthKeyPress(event)">
             </div>
-            
             <div class="form-group">
-                <label for="passwordInput">PASSCODE</label>
+                <label>PASSCODE</label>
                 <input type="password" id="passwordInput" placeholder="密码" onkeypress="handleAuthKeyPress(event)">
             </div>
-            
             <button class="auth-btn" onclick="login()">连接 (CONNECT)</button>
-            <div class="auth-hint" id="authErrorMsg">说明：终端将建立高密加密隧道。</div>
+            <div class="auth-hint" id="authErrorMsg">
+                说明：终端将建立高密加密隧道。
+            </div>
         </div>
     </div>
 
-    <!-- 2. 顶部导航与控制栏 Header -->
-    <header>
+    <header style="display: none;" id="mainHeader">
+        <!-- 点击 Logo 区域直接触发 goHome() 回到主页 -->
         <div class="logo-area" onclick="goHome()" style="cursor: pointer;">
             <div class="logo-icon">▲</div>
             <div>
@@ -39,70 +44,43 @@
                 <div class="subtitle">v2.4.18-p2 [已加密] <span id="realTimeClock" style="margin-left: 10px; color: var(--accent-color);"></span></div>
             </div>
         </div>
-        
         <div class="status-bar">
             <div class="user-tag" id="currentUserTag">身份: 尚未登录</div>
-            <button class="tab-btn" onclick="goHome()">[主页]</button>
             <button class="tab-btn" onclick="openHistoryModal()">[搜索历史]</button>
+            <button class="tab-btn" onclick="logout()">[切换身份]</button>
             <button class="tab-btn" onclick="openConsole()">[检视抓包]</button>
-            <button class="tab-btn" onclick="logout()">[断开连接]</button>
         </div>
     </header>
 
-    <!-- 3. 中央主视图区域 -->
-    <div class="container">
-        <div class="search-card">
+    <div class="container" id="mainContainer" style="display: none;">
+        <div class="search-card" id="searchCard">
             <div class="search-box-wrapper">
-                <input type="text" id="searchInput" placeholder="输入案宗编号、关键词或域名 (如: cctv / mckay / cool)..." onkeypress="handleKeyPress(event)">
+                <input type="text" id="searchInput" placeholder="在全域分布式网络与加密节点中检索..." onkeypress="handleKeyPress(event)">
                 <button class="search-btn" onclick="executeSearch()">全局检索</button>
             </div>
         </div>
-
-        <div class="results-section" id="resultsContainer">
-            <!-- 登录后根据账号类型动态渲染 CCTV 控制台、iPhone 屏幕或标准搜索卡片 -->
-        </div>
+        <div class="results-section" id="resultsContainer"></div>
     </div>
 
-    <!-- 4. 右侧滑动抽屉 (Side Drawer) -->
+    <div class="watermark">SECURE TERMINAL // GATEWAY VPN HIGH-SPEED TUNNEL</div>
+
+    <!-- 右侧滑动抽屉 (Side Drawer) -->
     <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
     <div class="side-drawer" id="sideDrawer">
         <div class="drawer-header">
-            <span class="drawer-title" id="drawerTitle">📄 线索物证详情</span>
+            <span class="drawer-title" id="drawerTitle">CLASSIFIED FILE // 机密线索</span>
             <button class="drawer-close-btn" onclick="closeDrawer()">✕</button>
         </div>
         <div class="drawer-body">
-            <div class="handout-image-wrapper" id="drawerImageWrapper" style="display: none;">
-                <img id="drawerImage" src="" alt="Handout Graphic">
+            <div class="handout-image-wrapper">
+                <img id="drawerImage" src="" alt="Handout Image" style="display: none;">
             </div>
             <div class="drawer-content" id="drawerContent"></div>
             <div class="drawer-footer-meta" id="drawerFooterMeta"></div>
         </div>
     </div>
 
-    <!-- 5. 搜索历史弹窗 -->
-    <div class="modal-overlay" id="historyModal">
-        <div class="modal-card">
-            <div class="modal-header">📜 [当前账号本地加密检索缓存/搜索历史]</div>
-            <div class="modal-body">
-                <div id="historyContainer">暂无检索历史。</div>
-            </div>
-            <button class="modal-btn danger" onclick="clearHistory()">🗑️ 清除历史记录</button>
-            <button class="modal-btn" onclick="closeHistoryModal()">关闭历史记录</button>
-        </div>
-    </div>
-
-    <!-- 6. 固件抓包弹窗 -->
-    <div class="modal-overlay" id="consoleModal">
-        <div class="console-card">
-            <div style="display:flex; justify-content:space-between; margin-bottom:12px; border-bottom:1px solid #2d3748; padding-bottom:6px;">
-                <span style="color:#00e5ff; font-weight:bold;">[固件抓包与底层电路报告]</span>
-                <span style="cursor:pointer; color:#ff3366;" onclick="closeConsole()">[关闭 ESC]</span>
-            </div>
-            <div class="console-log" id="consoleLogText"></div>
-        </div>
-    </div>
-
-    <!-- 7. 系统通知弹窗 -->
+    <!-- 系统通知弹窗 (带图片支持) -->
     <div class="modal-overlay" id="notifyModal">
         <div class="modal-card">
             <div class="modal-header" id="modalTitle">⚠️ [系统同步通信提示]</div>
@@ -114,28 +92,38 @@
         </div>
     </div>
 
-    <!-- 8. 加载遮罩 -->
-    <div class="loader-overlay" id="loaderOverlay">
-        <div class="spinner"></div>
-        <div id="loaderStatusText">正在建立高密隧道...</div>
+    <!-- 搜索历史弹窗 -->
+    <div class="modal-overlay" id="historyModal">
+        <div class="modal-card">
+            <div class="modal-header">📜 [当前账号本地加密检索缓存/搜索历史]</div>
+            <div class="modal-body">
+                <div id="historyContainer">暂无检索历史。</div>
+            </div>
+            <button class="modal-btn danger" onclick="clearHistory()">🗑️ 清除历史记录</button>
+            <button class="modal-btn" onclick="closeHistoryModal()">关闭历史记录</button>
+        </div>
     </div>
 
-    <!-- 9. 模块化脚本加载顺序：[数据层 -> UI/设备层 -> 核心调度层] -->
-    <!-- (A) 数据层 -->
+    <!-- 固件抓包弹窗 -->
+    <div class="modal-overlay" id="consoleModal">
+        <div class="console-card">
+            <div style="display:flex; justify-content:space-between; margin-bottom:12px; border-bottom:1px solid #2d3748; padding-bottom:6px;">
+                <span style="color:#00e5ff; font-weight:bold;">[固件抓包与底层电路报告]</span>
+                <span style="cursor:pointer; color:#ff3366;" onclick="closeConsole()">[关闭 ESC]</span>
+            </div>
+            <div class="console-log" id="consoleLogText"></div>
+        </div>
+    </div>
+
+    <!-- 严格按照依赖顺序加载脚本 -->
     <script src="js/data/database.js"></script>
     <script src="js/data/players.js"></script>
     <script src="js/data/notifications.js"></script>
-
-    <!-- (B) 界面与通用组件层 -->
     <script src="js/ui/handouts.js"></script>
-    <script src="js/ui/inner_world.js"></script>
-
-    <!-- (C) 设备渲染层 (异构终端模拟器) -->
+    <!-- 设备层：确保手机和 CCTV 脚本在此处加载 -->
     <script src="js/devices/phone_mckay.js"></script>
     <script src="js/devices/cctv_simulator.js"></script>
-
-    <!-- (D) 核心调度层 (最后加载) -->
+    <!-- 核心调度层：最后加载 -->
     <script src="js/core/main.js"></script>
-
 </body>
 </html>
