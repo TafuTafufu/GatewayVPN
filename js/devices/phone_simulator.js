@@ -5,19 +5,39 @@
  * =========================================================
  */
 
-// 1. App 数据列表（修复逻辑漏洞：用 Gmail 替代 Life360，规范设置与人设提示）
+// 1. App 数据列表（符合麦凯人设，绝不提前评判剧透）
 const mckayApps = [
     { name: '挑食者', icon: '🤮', bg: '#10b981', action: () => openPickyEaterDetail() },
-    { name: 'GroupMe', icon: '💬', bg: '#00a8ff', action: () => alert('GroupMe: 罗伯特·沃尔斯：回我电话，我在4Chan上看到好东西了。') },
-    { name: 'Snapchat', icon: '👻', bg: '#fffc00', action: () => alert('Snapchat: 罗伯特·沃尔斯: 女性的掌权就是男性的地狱！……老兄，你得明白这是基因和人种层面的退化。我们需要更激进的清洗和改良……') },
+    { name: 'GroupMe', icon: '💬', bg: '#00a8ff', action: () => alert('GroupMe: 没有任何新群聊邀请。') },
+    { name: 'Snapchat', icon: '👻', bg: '#fffc00', action: () => alert('Snapchat: 暂无未读快照消息。') },
     { name: 'Venmo', icon: 'v', bg: '#008cff', action: () => alert('Venmo: 包含宿舍网费 AA 与日常支出交易记录。') },
-    { name: 'Gmail', icon: '✉️', bg: '#ea4335', action: () => alert('Gmail: 包含多封来自罗伯特·沃尔斯的未读邮件、 挑食者.exe，及大学系统通知。') },
-    { name: 'Canvas', icon: '🎓', bg: '#e11d48', action: () => alert('Canvas: 康奈尔大学 2019 秋季学期课程表（多次缺勤）。') },
-    { name: '照片', icon: '🖼️', bg: '#3b82f6', action: () => alert('照片库: 存有校园风景及多张曝光损坏的照片。') },
-    { name: 'Spotify', icon: '🎧', bg: '#1ed760', action: () => alert('Spotify: 正在播放Scott Pilgrim vs. the World Ruined a Whole Generation of Women。') },
+    { name: 'Gmail', icon: '✉️', bg: '#ea4335', action: () => alert('Gmail: 包含多封来自母亲的未读关怀邮件及大学系统通知。') },
+    { name: 'Canvas', icon: '🎓', bg: '#e11d48', action: () => alert('Canvas: 康奈尔大学 2019 秋季学期课程表（考勤显示多次缺勤）。') },
+    { 
+        name: '照片', 
+        icon: '🖼️', 
+        bg: '#3b82f6', 
+        action: () => {
+            const photoNotice = 
+                "🖼️【相册缓存: IMG_20191014_009.JPG】\n\n" +
+                "• 硬件元数据: 无法识别的镜头光学与感光元件序列号\n" +
+                "• 物理异常: 图像边缘检测出高浓度电磁辐射灼痕(Whiteout)\n" +
+                "• 空间透视: 室内墙面与建筑结构呈现非欧几何倾斜与物理连贯性断层。\n\n" +
+                "【警方核查记录】\n" +
+                "伊萨卡警方物证科核查：照片中出镜女性在现实中均具备完整不在场证明；现场受害者毫发无损。照片数据系由底层高维网络隧道强行复制写入硬件闪存。";
+
+            // 优先使用包含图片的通知弹窗展现物证
+            if (typeof triggerNotifyModal === 'function') {
+                triggerNotifyModal(photoNotice, "assets/mckay_sorority_photo.jpg", "🖼️ 相册缓存 [物证照片分析]");
+            } else {
+                alert(photoNotice);
+            }
+        } 
+    },
+    { name: 'Spotify', icon: '🎧', bg: '#1ed760', action: () => alert('Spotify: 正在播放哥特摇滚歌单。') },
     { name: 'Instagram', icon: '📷', bg: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', action: () => alert('Instagram: @braddd_mckay') },
     { name: 'Tinder', icon: '🔥', bg: 'linear-gradient(45deg, #fd297b, #ff655b)', action: () => alert('Tinder: 暂无新的 Match 匹配。') },
-    { name: 'AT&T Guard', icon: '🛡️', bg: '#2563eb', action: () => alert('AT&T Secure: 已开启夜间数据流量上限保护。') },
+    { name: 'AT&T Guard', icon: '🛡️', bg: '#2563eb', action: () => alert('AT&T Secure: 父母已开启夜间数据流量上限保护。') },
     { name: '设置', icon: '⚙️', bg: '#4b5563', action: () => alert("设置: Bradley's Phone") }
 ];
 
@@ -64,7 +84,7 @@ function renderMcKayPhoneScreen() {
             <!-- iOS 13 屏幕区域 -->
             <div style="background: linear-gradient(150deg, #1e293b, #0f172a, #020617); padding: 12px 14px 18px; min-height: 510px; display: flex; flex-direction: column; justify-content: space-between;">
                 
-                <!-- 顶部 AT&T 家庭套餐系统卡片 (已去除 Bradley's iPhone 字样) -->
+                <!-- 顶部 AT&T 家庭套餐系统卡片 -->
                 <div style="background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 14px; padding: 10px 12px; color: #e5e7eb; border: 1px solid rgba(255, 255, 255, 0.1);">
                     <div style="color: #9ca3af; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">AT&T FAMILY PLAN</div>
                 </div>
@@ -76,9 +96,9 @@ function renderMcKayPhoneScreen() {
 
                 <!-- iOS 底部 Dock 栏 -->
                 <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 24px; padding: 10px; margin-top: 20px; display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(255,255,255,0.12);">
-                    <span style="font-size: 22px; cursor: pointer;" onclick="alert('电话: 最近通话包含罗伯特·沃尔斯多次未接来电。')">📞</span>
-                    <span style="font-size: 22px; cursor: pointer;" onclick="alert('信息: 包含多条来自母亲的问候短信。')">💬</span>
-                    <span style="font-size: 22px; cursor: pointer;" onclick="alert('Safari 提示: 当前网络流量已接入“挑食者 (Picky Eater)”代理。如需查看日志请启动主屏幕应用。')">🌐</span>
+                    <span style="font-size: 22px; cursor: pointer;" onclick="alert('电话: 最近通话包含父母及多次未接来电。')">📞</span>
+                    <span style="font-size: 22px; cursor: pointer;" onclick="alert('信息: 包含多条来自母亲的催促短信。')">💬</span>
+                    <span style="font-size: 22px; cursor: pointer;" onclick="alert('Safari 提示: 当前网络流量已接入“挑食者 (Picky Eater)”代理隧道。如需查看日志请启动主屏幕应用。')">🌐</span>
                     <span style="font-size: 22px; cursor: pointer;" onclick="alert('音乐: 播放历史记录。')">🎵</span>
                 </div>
 
