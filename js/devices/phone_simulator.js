@@ -1,135 +1,75 @@
-/**
- * =========================================================
- * 麦凯 (Bradley McKay) 2019款模拟手机组件 (Phone Simulator)
- * 场景：2019年康奈尔大学大二学生手机 (iOS 13 / AT&T Family Plan)
- * =========================================================
- */
-
-// 1. App 数据列表（符合麦凯人设，绝不提前评判剧透）
-const mckayApps = [
-    { name: '挑食者', icon: '🤮', bg: '#10b981', action: () => openPickyEaterDetail() },
-    { name: 'GroupMe', icon: '💬', bg: '#00a8ff', action: () => alert('GroupMe: 没有任何新群聊邀请。') },
-    { name: 'Snapchat', icon: '👻', bg: '#fffc00', action: () => alert('Snapchat: 暂无未读快照消息。') },
-    { name: 'Venmo', icon: 'v', bg: '#008cff', action: () => alert('Venmo: 包含宿舍网费 AA 与日常支出交易记录。') },
-    { name: 'Gmail', icon: '✉️', bg: '#ea4335', action: () => alert('Gmail: 包含多封来自母亲的未读关怀邮件及大学系统通知。') },
-    { name: 'Canvas', icon: '🎓', bg: '#e11d48', action: () => alert('Canvas: 康奈尔大学 2019 秋季学期课程表（考勤显示多次缺勤）。') },
-    { 
-        name: '照片', 
-        icon: '🖼️', 
-        bg: '#3b82f6', 
-        action: () => {
-            const photoNotice = 
-                "🖼️【相册缓存: IMG_20191014_009.JPG】\n\n" +
-                "• 硬件元数据: 无法识别的镜头光学与感光元件序列号\n" +
-                "• 物理异常: 图像边缘检测出高浓度电磁辐射灼痕(Whiteout)\n" +
-                "• 空间透视: 室内墙面与建筑结构呈现非欧几何倾斜与物理连贯性断层。\n\n" +
-                "【警方核查记录】\n" +
-                "伊萨卡警方物证科核查：照片中出镜女性在现实中均具备完整不在场证明；现场受害者毫发无损。照片数据系由底层高维网络隧道强行复制写入硬件闪存。";
-
-            // 优先使用包含图片的通知弹窗展现物证
-            if (typeof triggerNotifyModal === 'function') {
-                triggerNotifyModal(photoNotice, "assets/mckay_sorority_photo.jpg", "🖼️ 相册缓存 [物证照片分析]");
-            } else {
-                alert(photoNotice);
-            }
-        } 
-    },
-    { name: 'Spotify', icon: '🎧', bg: '#1ed760', action: () => alert('Spotify: 正在播放哥特摇滚歌单。') },
-    { name: 'Instagram', icon: '📷', bg: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', action: () => alert('Instagram: @braddd_mckay') },
-    { name: 'Tinder', icon: '🔥', bg: 'linear-gradient(45deg, #fd297b, #ff655b)', action: () => alert('Tinder: 暂无新的 Match 匹配。') },
-    { name: 'AT&T Guard', icon: '🛡️', bg: '#2563eb', action: () => alert('AT&T Secure: 父母已开启夜间数据流量上限保护。') },
-    { name: '设置', icon: '⚙️', bg: '#4b5563', action: () => alert("设置: Bradley's Phone") }
-];
-
-// 2. 渲染 2019 年 iPhone (iOS 13 刘海屏) 拟真 UI
-function renderMcKayPhoneScreen() {
+window.renderMcKayPhoneScreen = function() {
     const container = document.getElementById('resultsContainer');
     if (!container) return;
 
-    // 获取当前设备真实时间 (格式 HH:MM，不带秒)
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const currentTimeStr = `${hours}:${minutes}`;
-
-    // 动态生成 App 4×3 图标网格
-    const appGridHTML = mckayApps.map((app, index) => `
-        <div class="app-item" onclick="mckayApps[${index}].action()" style="cursor: pointer; text-align: center;">
-            <div style="width: 52px; height: 52px; background: ${app.bg}; border-radius: 13px; margin: 0 auto; display: flex; justify-content: center; align-items: center; font-size: 24px; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.35);">
-                ${app.icon}
-            </div>
-            <span style="display: block; font-size: 10px; color: #f3f4f6; margin-top: 5px; font-weight: 500; letter-spacing: -0.2px;">${app.name}</span>
-        </div>
-    `).join('');
-
+    // 清空主容器并注入手机UI
     container.innerHTML = `
-        <!-- iPhone 11 / iOS 13 经典机身外壳 -->
-        <div class="iphone-shell" style="max-width: 360px; margin: 15px auto; background: #000; border: 12px solid #282828; border-radius: 48px; box-shadow: 0 25px 60px rgba(0,0,0,0.85); overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; position: relative;">
-            
-            <!-- 2019款 iPhone 顶部刘海 (Notch) & 状态栏 -->
-            <div style="padding: 10px 22px 6px; display: flex; justify-content: space-between; align-items: center; color: #fff; font-size: 12px; font-weight: 600; position: relative; z-index: 10;">
-                <!-- 左侧：实时系统时间 -->
-                <span>${currentTimeStr}</span>
-
-                <!-- 标志性黑色刘海槽 -->
-                <div style="width: 120px; height: 18px; background: #000; border-bottom-left-radius: 14px; border-bottom-right-radius: 14px; position: absolute; left: 50%; transform: translateX(-50%); top: 0;"></div>
-
-                <!-- 右侧：信号与电池图标 -->
-                <div style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
-                    <span>4G</span>
-                    <span style="font-size: 13px;">🔋</span>
-                </div>
-            </div>
-
-            <!-- iOS 13 屏幕区域 -->
-            <div style="background: linear-gradient(150deg, #1e293b, #0f172a, #020617); padding: 12px 14px 18px; min-height: 510px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="display:flex; justify-content:center; align-items:center; width:100%; min-height:80vh; background:#000;">
+            <div style="width: 375px; height: 812px; background: url('image_ef735b.png') no-repeat center/cover, #111; border-radius: 40px; border: 8px solid #333; position: relative; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.8);">
                 
-                <!-- 顶部 AT&T 家庭套餐系统卡片 -->
-                <div style="background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 14px; padding: 10px 12px; color: #e5e7eb; border: 1px solid rgba(255, 255, 255, 0.1);">
-                    <div style="color: #9ca3af; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">AT&T FAMILY PLAN</div>
+                <!-- 顶栏状态 -->
+                <div style="position: absolute; top: 0; width: 100%; padding: 12px 20px; display: flex; justify-content: space-between; color: white; font-size: 12px; font-family: Helvetica, sans-serif; z-index: 10;">
+                    <span>AT&T LTE</span>
+                    <span>10:29 AM</span>
+                    <span>100% 🔋</span>
                 </div>
 
-                <!-- App 应用网格 -->
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 8px; margin-top: 15px;">
-                    ${appGridHTML}
+                <!-- 退出/断开按钮 (右上角浮窗) -->
+                <button onclick="logout()" style="position: absolute; top: 45px; right: 15px; background: rgba(255, 51, 102, 0.8); color: #fff; border: none; padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; z-index: 20; backdrop-filter: blur(4px);">断开镜像</button>
+
+                <!-- App 图标网格区域 -->
+                <div style="position: absolute; top: 100px; width: 100%; padding: 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center; color: white; font-family: Helvetica, sans-serif; font-size: 11px;">
+                    
+                    <!-- 挑食者 (Picky Eater) -->
+                    <div style="cursor: pointer;" onclick="document.getElementById('pickyEaterApp').style.display='block'">
+                        <div style="width: 60px; height: 60px; background: #222; border-radius: 14px; margin: 0 auto 5px auto; display:flex; justify-content:center; align-items:center; font-size: 32px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">🤮</div>
+                        <span>Picky Eater</span>
+                    </div>
+
+                    <!-- 其他占位 App -->
+                    <div style="opacity: 0.5;">
+                        <div style="width: 60px; height: 60px; background: #34c759; border-radius: 14px; margin: 0 auto 5px auto; display:flex; justify-content:center; align-items:center; font-size: 24px;">💬</div>
+                        <span>Messages</span>
+                    </div>
+                    <div style="opacity: 0.5;">
+                        <div style="width: 60px; height: 60px; background: #ff9500; border-radius: 14px; margin: 0 auto 5px auto; display:flex; justify-content:center; align-items:center; font-size: 24px;">⚙️</div>
+                        <span>Settings</span>
+                    </div>
+                    <div style="opacity: 0.5;">
+                        <div style="width: 60px; height: 60px; background: #007aff; border-radius: 14px; margin: 0 auto 5px auto; display:flex; justify-content:center; align-items:center; font-size: 24px;">🛡️</div>
+                        <span>Life360</span>
+                    </div>
+
                 </div>
 
-                <!-- iOS 底部 Dock 栏 -->
-                <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 24px; padding: 10px; margin-top: 20px; display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(255,255,255,0.12);">
-                    <span style="font-size: 22px; cursor: pointer;" onclick="alert('电话: 最近通话包含父母及多次未接来电。')">📞</span>
-                    <span style="font-size: 22px; cursor: pointer;" onclick="alert('信息: 包含多条来自母亲的催促短信。')">💬</span>
-                    <span style="font-size: 22px; cursor: pointer;" onclick="alert('Safari 提示: 当前网络流量已接入“挑食者 (Picky Eater)”代理隧道。如需查看日志请启动主屏幕应用。')">🌐</span>
-                    <span style="font-size: 22px; cursor: pointer;" onclick="alert('音乐: 播放历史记录。')">🎵</span>
+                <!-- 挑食者 App 内部视窗 (默认隐藏) -->
+                <div id="pickyEaterApp" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0a0e14; z-index: 30; padding: 40px 20px; color: #00e5ff; font-family: monospace; overflow-y: auto;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 20px;">
+                        <span style="color: #ff3366; cursor: pointer;" onclick="document.getElementById('pickyEaterApp').style.display='none'">◀ 退出程序</span>
+                        <span>[v2.1.0]</span>
+                    </div>
+                    
+                    <h3 style="margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 10px;">⚠️ 发现异常网络缓存 (2018.08)</h3>
+                    
+                    <div style="background: #121820; padding: 12px; border-radius: 6px; margin: 10px 0; font-size: 12px; line-height: 1.5;">
+                        <strong>设备归属：</strong> Bradley McKay<br>
+                        <strong>底层路由机制：</strong> 物理子结构代理
+                    </div>
+                    
+                    <p style="font-size: 12px; margin-top: 20px;"><strong>[捕获记录 / 死链接清单]：</strong></p>
+                    <ul style="color: #ff5577; line-height: 1.8; padding-left: 20px; font-size: 11px;">
+                        <li>192.168.300.999 (ERR: 段值溢出)</li>
+                        <li>10.256.0.1 (ERR: 协议越界)</li>
+                        <li>http://non-existent-2018.internal (DNS FAIL)</li>
+                        <li style="margin-top: 10px;">
+                            <a href="#" style="color: #00e5ff; text-decoration: underline;" onclick="alert('档案已被伊萨卡警方本地锁存，无法访问目标图片集。'); return false;">
+                                img_09_sorority.png [提取失败]
+                            </a>
+                        </li>
+                    </ul>
                 </div>
 
-                <!-- iOS 底部 Home Indicator 悬浮横条 -->
-                <div style="width: 120px; height: 4px; background: rgba(255, 255, 255, 0.5); border-radius: 2px; margin: 10px auto 0;"></div>
             </div>
         </div>
     `;
-}
-
-// 3. 点击“挑食者”输出原汁原味且无剧透的代理日志
-function openPickyEaterDetail() {
-    const rawLogs = 
-        "🤮【挑食者 (Picky Eater) VPN - 访问历史与数据包日志】\n\n" +
-        "• 设备账户：AT&T Mobile Line #408-201-XXXX [家庭共享套餐]\n" +
-        "• 缓存起点：2018年08月14日 03:12:09 UTC (无更早日志记录)\n" +
-        "[代理网络请求与域名解析记录]：\n" +
-        "1. [2018-08-14] GET http://192.168.300.999/gateway/index.php\n" +
-        "2. [2018-09-02] CONNECT https://10.256.0.1:8443/auth/handshake\n" +
-        "3. [2018-11-19] GET http://non-existent-domain-2018.internal/forum/thread-409\n" +
-        "4. [2019-01-05] GET https://avery-bell-slaughter-cache.null/img_09.png\n" +
-        "5. [2019-03-22] POST http://172.16.0.404/substructure/tunnel_node";
-
-    if (typeof triggerNotifyModal === 'function') {
-        triggerNotifyModal(rawLogs, null, "🤮 Picky Eater [访问历史与抓包记录]");
-    } else {
-        alert(rawLogs);
-    }
-}
-
-// 全局挂载导出
-window.mckayApps = mckayApps;
-window.renderMcKayPhoneScreen = renderMcKayPhoneScreen;
-window.openPickyEaterDetail = openPickyEaterDetail;
+};
