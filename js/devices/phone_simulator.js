@@ -1,75 +1,69 @@
-window.renderMcKayPhoneScreen = function() {
+// 2. 渲染 2019 年 iPhone (iOS 13 刘海屏) 拟真 UI
+function renderMcKayPhoneScreen() {
     const container = document.getElementById('resultsContainer');
     if (!container) return;
 
-    // 清空主容器并注入手机UI
+    // 获取当前设备真实时间 (格式 HH:MM，不带秒)
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    
+    // 👇 修复了这里的模板字符串变量拼写，补上了 $ 符号
+    const currentTimeStr = `${hours}:${minutes}`;
+
+    // 动态生成 App 4×3 图标网格
+    const appGridHTML = mckayApps.map((app, index) => `
+        <div class="app-item" onclick="mckayApps[${index}].action()" style="cursor: pointer; text-align: center;">
+            <div style="width: 52px; height: 52px; background: ${app.bg}; border-radius: 13px; margin: 0 auto; display: flex; justify-content: center; align-items: center; font-size: 24px; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.35);">
+                ${app.icon}
+            </div>
+            <span style="display: block; font-size: 10px; color: #f3f4f6; margin-top: 5px; font-weight: 500; letter-spacing: -0.2px;">${app.name}</span>
+        </div>
+    `).join('');
+
     container.innerHTML = `
-        <div style="display:flex; justify-content:center; align-items:center; width:100%; min-height:80vh; background:#000;">
-            <div style="width: 375px; height: 812px; background: url('image_ef735b.png') no-repeat center/cover, #111; border-radius: 40px; border: 8px solid #333; position: relative; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.8);">
+        <!-- iPhone 11 / iOS 13 经典机身外壳 -->
+        <div class="iphone-shell" style="max-width: 360px; margin: 15px auto; background: #000; border: 12px solid #282828; border-radius: 48px; box-shadow: 0 25px 60px rgba(0,0,0,0.85); overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; position: relative;">
+            
+            <!-- 2019款 iPhone 顶部刘海 (Notch) & 状态栏 -->
+            <div style="padding: 10px 22px 6px; display: flex; justify-content: space-between; align-items: center; color: #fff; font-size: 12px; font-weight: 600; position: relative; z-index: 10;">
+                <!-- 左侧：实时系统时间 -->
+                <span>${currentTimeStr}</span>
+
+                <!-- 标志性黑色刘海槽 -->
+                <div style="width: 120px; height: 18px; background: #000; border-bottom-left-radius: 14px; border-bottom-right-radius: 14px; position: absolute; left: 50%; transform: translateX(-50%); top: 0;"></div>
+
+                <!-- 右侧：信号与电池图标 -->
+                <div style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                    <span>4G</span>
+                    <span style="font-size: 13px;">🔋</span>
+                </div>
+            </div>
+
+            <!-- iOS 13 屏幕区域 -->
+            <div style="background: linear-gradient(150deg, #1e293b, #0f172a, #020617); padding: 12px 14px 18px; min-height: 510px; display: flex; flex-direction: column; justify-content: space-between;">
                 
-                <!-- 顶栏状态 -->
-                <div style="position: absolute; top: 0; width: 100%; padding: 12px 20px; display: flex; justify-content: space-between; color: white; font-size: 12px; font-family: Helvetica, sans-serif; z-index: 10;">
-                    <span>AT&T LTE</span>
-                    <span>10:29 AM</span>
-                    <span>100% 🔋</span>
+                <!-- 顶部 AT&T 家庭套餐系统卡片 -->
+                <div style="background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 14px; padding: 10px 12px; color: #e5e7eb; border: 1px solid rgba(255, 255, 255, 0.1);">
+                    <div style="color: #9ca3af; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">AT&T FAMILY PLAN</div>
                 </div>
 
-                <!-- 退出/断开按钮 (右上角浮窗) -->
-                <button onclick="logout()" style="position: absolute; top: 45px; right: 15px; background: rgba(255, 51, 102, 0.8); color: #fff; border: none; padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; z-index: 20; backdrop-filter: blur(4px);">断开镜像</button>
-
-                <!-- App 图标网格区域 -->
-                <div style="position: absolute; top: 100px; width: 100%; padding: 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center; color: white; font-family: Helvetica, sans-serif; font-size: 11px;">
-                    
-                    <!-- 挑食者 (Picky Eater) -->
-                    <div style="cursor: pointer;" onclick="document.getElementById('pickyEaterApp').style.display='block'">
-                        <div style="width: 60px; height: 60px; background: #222; border-radius: 14px; margin: 0 auto 5px auto; display:flex; justify-content:center; align-items:center; font-size: 32px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">🤮</div>
-                        <span>Picky Eater</span>
-                    </div>
-
-                    <!-- 其他占位 App -->
-                    <div style="opacity: 0.5;">
-                        <div style="width: 60px; height: 60px; background: #34c759; border-radius: 14px; margin: 0 auto 5px auto; display:flex; justify-content:center; align-items:center; font-size: 24px;">💬</div>
-                        <span>Messages</span>
-                    </div>
-                    <div style="opacity: 0.5;">
-                        <div style="width: 60px; height: 60px; background: #ff9500; border-radius: 14px; margin: 0 auto 5px auto; display:flex; justify-content:center; align-items:center; font-size: 24px;">⚙️</div>
-                        <span>Settings</span>
-                    </div>
-                    <div style="opacity: 0.5;">
-                        <div style="width: 60px; height: 60px; background: #007aff; border-radius: 14px; margin: 0 auto 5px auto; display:flex; justify-content:center; align-items:center; font-size: 24px;">🛡️</div>
-                        <span>Life360</span>
-                    </div>
-
+                <!-- App 应用网格 -->
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 8px; margin-top: 15px;">
+                    ${appGridHTML}
                 </div>
 
-                <!-- 挑食者 App 内部视窗 (默认隐藏) -->
-                <div id="pickyEaterApp" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0a0e14; z-index: 30; padding: 40px 20px; color: #00e5ff; font-family: monospace; overflow-y: auto;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom: 20px;">
-                        <span style="color: #ff3366; cursor: pointer;" onclick="document.getElementById('pickyEaterApp').style.display='none'">◀ 退出程序</span>
-                        <span>[v2.1.0]</span>
-                    </div>
-                    
-                    <h3 style="margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 10px;">⚠️ 发现异常网络缓存 (2018.08)</h3>
-                    
-                    <div style="background: #121820; padding: 12px; border-radius: 6px; margin: 10px 0; font-size: 12px; line-height: 1.5;">
-                        <strong>设备归属：</strong> Bradley McKay<br>
-                        <strong>底层路由机制：</strong> 物理子结构代理
-                    </div>
-                    
-                    <p style="font-size: 12px; margin-top: 20px;"><strong>[捕获记录 / 死链接清单]：</strong></p>
-                    <ul style="color: #ff5577; line-height: 1.8; padding-left: 20px; font-size: 11px;">
-                        <li>192.168.300.999 (ERR: 段值溢出)</li>
-                        <li>10.256.0.1 (ERR: 协议越界)</li>
-                        <li>http://non-existent-2018.internal (DNS FAIL)</li>
-                        <li style="margin-top: 10px;">
-                            <a href="#" style="color: #00e5ff; text-decoration: underline;" onclick="alert('档案已被伊萨卡警方本地锁存，无法访问目标图片集。'); return false;">
-                                img_09_sorority.png [提取失败]
-                            </a>
-                        </li>
-                    </ul>
+                <!-- iOS 底部 Dock 栏 -->
+                <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 24px; padding: 10px; margin-top: 20px; display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(255,255,255,0.12);">
+                    <span style="font-size: 22px; cursor: pointer;" onclick="alert('电话: 最近通话包含罗伯特·沃尔斯多次未接来电。')">📞</span>
+                    <span style="font-size: 22px; cursor: pointer;" onclick="alert('信息: 包含多条来自母亲的问候短信。')">💬</span>
+                    <span style="font-size: 22px; cursor: pointer;" onclick="alert('Safari 提示: 当前网络流量已接入“挑食者 (Picky Eater)”代理。如需查看日志请启动主屏幕应用。')">🌐</span>
+                    <span style="font-size: 22px; cursor: pointer;" onclick="alert('音乐: 播放历史记录。')">🎵</span>
                 </div>
 
+                <!-- iOS 底部 Home Indicator 悬浮横条 -->
+                <div style="width: 120px; height: 4px; background: rgba(255, 255, 255, 0.5); border-radius: 2px; margin: 10px auto 0;"></div>
             </div>
         </div>
     `;
-};
+}
